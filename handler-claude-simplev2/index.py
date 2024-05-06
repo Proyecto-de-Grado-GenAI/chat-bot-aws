@@ -22,14 +22,17 @@ def retrieve(query, kbId, numberOfResults=1):
 
 def bedrockS(prompt, question, modelId="anthropic.claude-v2"):
 
-    # response_knowledge_base = retrieve(question, "FFUYGR42Y1")["retrievalResults"]
+    response_knowledge_base = retrieve(question, "FFUYGR42Y1")["retrievalResults"]
+
     context = ""
     contador = 0
-    # for i in response_knowledge_base:
-    #     context += "Context " + str(contador) + "\n"
-    #     context += i["content"]["text"] + "\n"
-    #     context += f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
-    #     contador += 1
+    for i in response_knowledge_base:
+        context += "Context " + str(contador) + "\n"
+        context += i["content"]["text"] + "\n"
+        context += f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
+        contador += 1
+
+    question = f"""{question}\n\n{context}"""
 
     system_prompt = "Eres un agente de inteligencia artificial muy especializado en la arquitectura de software, mejor dicho un experto en la materia por lo que solo debes responder preguntas relacionadas a ello."
     prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{ system_prompt }<|eot_id|><|start_header_id|>user<|end_header_id|>\n{ question }<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
@@ -48,8 +51,6 @@ def bedrockS(prompt, question, modelId="anthropic.claude-v2"):
 
     raw_body = response["body"].read().decode("utf-8")
     response_json = json.loads(raw_body)
-
-    print(response_json)
 
     return [*response_json.values()][0]
 
