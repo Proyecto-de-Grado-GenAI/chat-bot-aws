@@ -17,17 +17,17 @@ await build({
 	bundle: true,
 })
 
-// Build car dealer example
-const files_car_dealer = await glob('lib/example-action-apis/functions/**/*.ts')
-console.log(`Building ${files_car_dealer.length} files from car-dealer example`)
+// // Build car dealer example
+// const files_car_dealer = await glob('lib/example-action-apis/functions/**/*.ts')
+// console.log(`Building ${files_car_dealer.length} files from car-dealer example`)
 
-await build({
-	sourcesContent: false,
-	format: 'esm',
-	target: 'esnext',
-	platform: 'node',
-	external: ['@aws-appsync/utils'],
-	outdir: 'lib/example-action-apis/functions-js',
-	entryPoints: files_car_dealer,
-	bundle: true,
-})
+// await build({
+// 	sourcesContent: false,
+// 	format: 'esm',
+// 	target: 'esnext',
+// 	platform: 'node',
+// 	external: ['@aws-appsync/utils'],
+// 	outdir: 'lib/example-action-apis/functions-js',
+// 	entryPoints: files_car_dealer,
+// 	bundle: true,
+// })

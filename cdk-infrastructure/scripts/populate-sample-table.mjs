@@ -30,13 +30,13 @@ async function DumpIntoTable(tableName, fileName, env = {}){
 }
 
 // Write some sample data to the tables we created
-DumpIntoTable(cdkOutputs['dealershiptable'], 'sample-cars');
-DumpIntoTable(cdkOutputs['agentstable'], 'sample-agents', {
-    '$HANDLERSIMPLE' : cdkOutputs['handlerclaudesimple'],
-    '$HANDLERWEBSOCKET' : cdkOutputs['handlerclaudewebsocket'],
-    '$HANDLERAGENT': cdkOutputs['handlerclaudeagent']
-});
-DumpIntoTable(cdkOutputs['conversationstable'], 'sample-conversations'); 
-DumpIntoTable(cdkOutputs['actionstable'], 'sample-actions', {
-    '$SAMPLEAPI': cdkOutputs['cardealerapi']
-})
+// DumpIntoTable(cdkOutputs['dealershiptable'], 'sample-cars');
+// DumpIntoTable(cdkOutputs['agentstable'], 'sample-agents', {
+//     '$HANDLERSIMPLE' : cdkOutputs['handlerclaudesimple'],
+//     '$HANDLERWEBSOCKET' : cdkOutputs['handlerclaudewebsocket'],
+//     '$HANDLERAGENT': cdkOutputs['handlerclaudeagent']
+// });
+// DumpIntoTable(cdkOutputs['conversationstable'], 'sample-conversations'); 
+// DumpIntoTable(cdkOutputs['actionstable'], 'sample-actions', {
+//     '$SAMPLEAPI': cdkOutputs['cardealerapi']
+// })

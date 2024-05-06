@@ -21,33 +21,33 @@ export class AppsyncAgentAPIStack extends cdk.Stack {
         
         
         // We also build some example graphql apis that help facilitate the playground experience
-        const carDealerExample = buildCarDealerApi(this, { cognito })
+        // const carDealerExample = buildCarDealerApi(this, { cognito })
 
         // And we also build out a collection of foundation model handlers for the sample
         // these are where customer business logic could live that determines how each agent acts 
         // you can choose the llm, and whatever else you need to pull in.
         // We hook them directly into the agent api
 
-        const synchronousChat = buildFoundationModelHandler(this, { 
-            agentApi, 
-            lambdaPath: 'handler-claude-simple' 
-        })
+        // const synchronousChat = buildFoundationModelHandler(this, { 
+        //     agentApi, 
+        //     lambdaPath: 'handler-claude-simple' 
+        // })
 
         const synchronousChatV2 = buildFoundationModelHandler(this, { 
             agentApi, 
             lambdaPath: 'handler-claude-simplev2' 
         })
 
-        const websocketChat = buildFoundationModelHandler(this, {
-            agentApi, 
-            lambdaPath: 'handler-claude-websocket' 
-        })
+        // const websocketChat = buildFoundationModelHandler(this, {
+        //     agentApi, 
+        //     lambdaPath: 'handler-claude-websocket' 
+        // })
         
-        const agentChat = buildFoundationModelHandler(this, { 
-            agentApi,
-            toolApi: carDealerExample,
-            lambdaPath: 'handler-claude-agent' 
-        })
+        // const agentChat = buildFoundationModelHandler(this, { 
+        //     agentApi,
+        //     toolApi: carDealerExample,
+        //     lambdaPath: 'handler-claude-agent' 
+        // })
 
         new cdk.CfnOutput(this, 'Region', { value: this.region })
 
