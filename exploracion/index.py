@@ -21,7 +21,6 @@ def retrieve(query, kbId, numberOfResults=1):
 
 
 def bedrockS(prompt, question, modelId="anthropic.claude-v2"):
-
     response_knowledge_base = retrieve(question, "FFUYGR42Y1")["retrievalResults"]
     context = ""
     contador = 0
@@ -33,14 +32,22 @@ def bedrockS(prompt, question, modelId="anthropic.claude-v2"):
 
     question = f"""{question}\n\n{context}"""
 
-    system_prompt = "Eres un agente de inteligencia artificial muy especializado en la arquitectura de software, mejor dicho un experto en la materia por lo que solo debes responder preguntas relacionadas a ello."
-    prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{ system_prompt }<|eot_id|><|start_header_id|>user<|end_header_id|>\n{ question }<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
+    print(prompt)
+
+    system_prompt = """Eres un agente de inteligencia artificial muy especializado en la arquitectura de software,
+    das respuestas en el mismo lenguaje que te preguntan y además tienes acceso a una base de conocimiento 
+    con información relevante para responder preguntas relacionadas al ADD 3.0 y que se manifiesta como Context bajo la pregunta que se te realiza,
+    además siempre proporcionas en la parte final de tus respuestas la fuente de la información exacta que utilizaste para responder la pregunta.
+    En caso de que la información que te proporciono no sea suficiente para responder la pregunta, por favor házmelo saber para poder proporcionarte más información o contexto.
+    Recuerda que siempre debes responder en el mismo lenguaje que te preguntan y que debes explicar de una forma detallada y entendible para un arquitecto de software.
+    """
+    prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{ system_prompt }\n<|eot_id|><|start_header_id|>user<|end_header_id|>\n{ question }\n<|eot_id|><|start_header_id|>assistant<|end_header_id|>"""
 
     response = bedrock.invoke_model(
         body=json.dumps(
             {
                 "prompt": prompt,
-                "temperature": 1,
+                "temperature": 0.5,
                 "top_p": 0.999,
                 "max_gen_len": 2048,
             }
