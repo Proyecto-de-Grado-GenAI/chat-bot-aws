@@ -65,7 +65,7 @@ def define_Llama3_prompt(history,system_prompt, question_with_context):
 
 supported_models = {"meta.llama3-8b-instruct-v1:0":define_Llama3_prompt, "meta.llama3-70b-instruct-v1:0":define_Llama3_prompt}
 
-#TODO ADD knowledge base ID to the call , temperature and top_p and max_gen_len to the call and system prompt and number of results knowledge base y si se usa o no la Knowledge base
+#TODO ADD knowledge base ID to the call , temperature and top_p and max_gen_len to the call and system prompt and number of results knowledge base y botón de si se usa o no la Knowledge base
 
 def bedrockQuestion(history, question, modelId):
     system_prompt = """Eres un agente de inteligencia artificial muy especializado en la arquitectura de software,
