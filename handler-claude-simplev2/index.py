@@ -1,33 +1,14 @@
 import boto3, json
 from botocore.config import Config
-from transformers import AutoTokenizer
 from chatResponder import ChatResponder
-import os
-import logging
 import re
 
 
-
-
-logger = logging.getLogger()
-logger.setLevel("INFO")
-
 bedrock = boto3.client("bedrock-runtime", config=Config(region_name="us-east-1"))
-
 bedrock_agent_runtime = boto3.client(
     service_name="bedrock-agent-runtime",
     region_name="us-east-1",
 )
-
-
-# Count Tokens
-
-
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
-text = "Write your text here"
-tokens = tokenizer.tokenize(text)
-num_tokens = len(tokens)
-print(f"Number of tokens in your text: {num_tokens}")
 
 
 # Query the knowledge base to retrieve the context for the question RAG
@@ -85,17 +66,15 @@ def bedrockQuestion(history, question, modelId):
     system_prompt = """Eres un agente de inteligencia artificial muy especializado en la arquitectura de software,
     das respuestas en el mismo lenguaje que te preguntan y además tienes acceso a una base de conocimiento 
     con información relevante para responder preguntas relacionadas al ADD 3.0 y que se manifiesta como Context bajo la pregunta que se te realiza,
-    además siempre proporcionas en la parte final de tus respuestas la fuente de la información exacta que utilizaste para responder la pregunta.
+    además siempre proporcionas en la parte final de tus respuestas la fuente de la información exacta que utilizaste para responder la pregunta (si es que te hacen una pregunta).
     En caso de que la información que te proporciono no sea suficiente para responder la pregunta, por favor házmelo saber para poder proporcionarte más información o contexto.
     Recuerda que siempre debes responder en el mismo lenguaje que te preguntan y que debes explicar de una forma detallada y entendible para un arquitecto de software.
-    No respondes nada que no sea relacionado a la arquitectura de software y al ADD 3.0.
     """
     
     if modelId in supported_models:
         response_knowledge_base_query = retrieveFromKnowledgeBase(question, "FFUYGR42Y1")["retrievalResults"]
         question_with_context = insertContext(question, response_knowledge_base_query)
         historial = extract_messages_from_chat(history)
-        print(historial)
         prompt = supported_models[modelId](historial, system_prompt, question_with_context)
         response = bedrock.invoke_model(
             body=json.dumps(
