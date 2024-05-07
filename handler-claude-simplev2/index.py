@@ -1,9 +1,12 @@
 import boto3, json
 from botocore.config import Config
+from transformers import AutoTokenizer
 from chatResponder import ChatResponder
 import os
 import logging
 import re
+
+
 
 
 logger = logging.getLogger()
@@ -15,6 +18,17 @@ bedrock_agent_runtime = boto3.client(
     service_name="bedrock-agent-runtime",
     region_name="us-east-1",
 )
+
+
+# Count Tokens
+
+
+tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+text = "Write your text here"
+tokens = tokenizer.tokenize(text)
+num_tokens = len(tokens)
+print(f"Number of tokens in your text: {num_tokens}")
+
 
 # Query the knowledge base to retrieve the context for the question RAG
 

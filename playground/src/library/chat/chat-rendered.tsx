@@ -46,6 +46,8 @@ export function ChatRendered () {
         return <Loader/>
     }
 
+    
+
     let lastSection = ''
     let renderedChat: ReactNode[] = []
     let lastEffectEndTime = + new Date(events[0]?.timestamp);
