@@ -1,5 +1,5 @@
 body {
-  margin: 0;
+  margin: 20;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -80,19 +80,18 @@ code {
   border-top-right-radius: 3px;
 }
 
-.sidebar {
-  width: 300px;
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  padding: 0 10px;
+
+
+
+
+.sidebar, .sidebarRight {
+  overflow: auto; /* Scroll si el contenido es más largo que el viewport */
 }
 
+
+
 .body {
-  width: calc(100% - 300px);
   position: absolute;
-  left: 300px;
   top: 0;
   height: 100%;
   padding: 0 10px;

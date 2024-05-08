@@ -6,7 +6,7 @@ import {
   useLLmList,
 } from "../apis/agent-api";
 import { Button, Flex, Loader, View } from "@aws-amplify/ui-react";
-import { Container } from "../library/container";
+import { Container } from '../library/container';
 import { Combobox } from "react-widgets/cjs";
 import "react-widgets/scss/styles.scss";
 import { useRecoilState } from "recoil";
@@ -44,39 +44,73 @@ export function AIAgentSidebar() {
       />
     ));
 
-  return (
-    <View>
-      <View className="sidebar">
-        <Container heading="Your LLMS">
-          <Combobox
-            data={LLmsObject.value?.items()}
-            textField="name"
-            onSelect={(value) => {
-              if (typeof value === "object" && value !== null) {
-                setSelectedLlm(value);
-              }
-            }}
-            value={selectedLlm}
-          />
+    const heading = `LLM: ${selectedLlm?.name}`;
+
+    return (
+      <Flex>
+        <Container heading="Conversaciones y LLms" width="20%">
+          <Container heading="Tu LLM">
+            <Combobox
+              data={LLmsObject.value?.items()}
+              textField="name"
+              onSelect={(value) => {
+                if (typeof value === "object" && value !== null) {
+                  setSelectedLlm(value);
+                }
+              }}
+              value={selectedLlm}
+            />
+          </Container>
+          <Container heading="Tus conversaciones">
+            <Flex
+              direction="column"
+              gap={10}
+              maxHeight={"calc(100vh - 150px)"}
+              overflow="auto"
+            >
+              {conversationsRendered}
+            </Flex>
+            <br />
+            <Button isFullWidth onClick={() => nav("/chat/new")}>
+              Nueva conversacion
+            </Button>
+          </Container>
         </Container>
-        <Container heading="Your Conversations">
-          <Flex
-            direction="column"
-            gap={10}
-            maxHeight={"calc(100vh - 150px)"}
-            overflow="auto"
-          >
-            {conversationsRendered}
-          </Flex>
-          <br />
-          <Button isFullWidth onClick={() => nav("/chat/new")}>
-            New Conversation
-          </Button>
+
+        <Container heading= {heading} width="70%">
+          <Outlet />
         </Container>
-      </View>
-      <View className="body">
-        <Outlet />
-      </View>
-    </View>
-  );
+    
+        <Container heading="Etapas y contexto" width="30%">
+          <Container heading="Etapas">
+            <Flex direction="row" gap={10}>
+              <Button onClick={() => nav("/chat/view/1")}>Etapa 1</Button>
+              <Button onClick={() => nav("/chat/view/2")}>Etapa 2</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 3</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 4</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 5</Button>
+            </Flex>
+          </Container>
+          <Container heading="Variables">
+            <Flex direction="row" gap={10}>
+              <Button onClick={() => nav("/chat/view/1")}>Etapa 1</Button>
+              <Button onClick={() => nav("/chat/view/2")}>Etapa 2</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 3</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 4</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 5</Button>
+            </Flex>
+          </Container>
+          <Container heading="Preview">
+            <Flex direction="row" gap={10}>
+              <Button onClick={() => nav("/chat/view/1")}>Etapa 1</Button>
+              <Button onClick={() => nav("/chat/view/2")}>Etapa 2</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 3</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 4</Button>
+              <Button onClick={() => nav("/chat/view/3")}>Etapa 5</Button>
+            </Flex>
+          </Container>
+        </Container>
+      </Flex>
+    );
+    
 }

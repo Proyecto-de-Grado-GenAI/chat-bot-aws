@@ -26,6 +26,7 @@ import {
 } from "../apis/agent-api/hooks/useMetadata";
 import { selectedLlmState } from "../apis/agent-api/state";
 import llama3Tokenizer from "llama3-tokenizer-js";
+import { AIAgentContextPhases } from "./agent-api-context-phases";
 
 export function AIAgentViewChat() {
   const { chatId } = useParams();
@@ -95,10 +96,7 @@ export function AIAgentViewChat() {
 
   return (
     <Flex>
-      <View width={900}>
-        <h3 style={{ textAlign: "center" }}>
-          LLM: {selectedLlm?.name} y Agente Etapa: {agentObject.value.name}
-        </h3>
+      <View >
         <Container
           heading={`Etapa: '${agentObject.value.name}'`}
           minHeight={500}
@@ -113,7 +111,7 @@ export function AIAgentViewChat() {
               <TextAreaField
                 labelHidden
                 label="Message"
-                placeholder="Type your message here"
+                placeholder="Escribe tu mensaje aquí..."
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     handleSendMessage();
@@ -133,9 +131,8 @@ export function AIAgentViewChat() {
           )}
         </Card>
       </View>
-      <View width={300}>
-        <AIAgentChatConnections />
-      </View>
+      
     </Flex>
+    
   );
 }

@@ -19,7 +19,6 @@ export class AppsyncAgentAPIStack extends cdk.Stack {
         const agentApi = buildAgentApi(this, { cognito, tables, enableConstructingAgents: true })
 
         
-        
         // We also build some example graphql apis that help facilitate the playground experience
         // const carDealerExample = buildCarDealerApi(this, { cognito })
 
@@ -33,10 +32,17 @@ export class AppsyncAgentAPIStack extends cdk.Stack {
         //     lambdaPath: 'handler-claude-simple' 
         // })
 
-        const synchronousChatV2 = buildFoundationModelHandler(this, { 
+        const ExplorationLambdaHanndler = buildFoundationModelHandler(this, { 
             agentApi, 
-            lambdaPath: 'handler-claude-simplev2' 
+            lambdaPath: 'ExplorationLambdaHandler' 
         })
+
+        const DiagramLambdaHandler = buildFoundationModelHandler(this, { 
+            agentApi, 
+            lambdaPath: 'DiagramLambdaHandler' 
+        })
+
+       
 
         // const websocketChat = buildFoundationModelHandler(this, {
         //     agentApi, 

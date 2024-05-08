@@ -6,11 +6,12 @@ interface ContainerProps {
     minHeight?: number
     children?: any
     padBody?: number
+    width?: string
 }
 
 export function Container (props: ContainerProps) { 
     return (
-        <Card variation="elevated" padding={'0px'} marginBlock={10} minHeight={props.minHeight}>
+        <Card variation="elevated" padding={'0px'} marginBlock={10} minHeight={props.minHeight} width={props.width}>
             <Flex dir='row' padding={10} >
                 <Heading>
                     {props.heading}

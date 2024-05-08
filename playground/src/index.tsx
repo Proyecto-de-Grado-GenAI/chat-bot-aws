@@ -19,6 +19,7 @@ import '@aws-amplify/ui-react/styles.css';
 import './index.css';
 import { Amplify } from 'aws-amplify';
 import { agentApiEndpoint, cognitoConfig } from './endpoints';
+import { AIAgentContextPhases } from './pages/agent-api-context-phases';
 
 // Load auth config data
 Amplify.configure({ 
@@ -49,11 +50,11 @@ root.render(
           
           <Route path="/chat" element={<AIAgentSidebar />} >
             <Route path="/chat/new" element={<AIAgentNewChat />} />
-            <Route path="/chat/view/:chatId" element={<AIAgentViewChat />} />
+            <Route path="/chat/view/:chatId" element={<AIAgentViewChat /> } />
           </Route>
-
           <Route path="/" element={<Navigate to="/chat" replace/>} />
         </Routes>
+        
       </PageWrapper>
     </BrowserRouter>
   </RecoilRoot>

@@ -9,8 +9,12 @@ export const cognitoConfig = {
 export const fmHandlerArns = [
 
 	{
-		label: 'Exploration Handler',
-		name: process.env.REACT_APP_HANDLERTESTAGENT,
+		label: 'Exploration Lambda Handler',
+		name: process.env.REACT_APP_EXPLORATIONLAMBDAHANDLER,
+	},
+	{
+		label: 'Diagram Lambda Handler',
+		name: process.env.REACT_APP_DIAGRAMLAMBDAHANDLER,
 	},
 ]
 
