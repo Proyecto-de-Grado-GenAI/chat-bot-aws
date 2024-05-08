@@ -1,5 +1,5 @@
-import { useParams } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useParams,useNavigate } from "react-router-dom";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useState, useEffect } from "react";
 import {
   TextAreaField,
@@ -18,18 +18,20 @@ import {
 } from "../apis/agent-api";
 import { Container } from "../library/container";
 import { ChatRendered } from "../library/chat/chat-rendered";
-import { AIAgentChatConnections } from "./agent-api-chat-connections";
 import { useAgentApiConversation } from "../apis/agent-api/hooks/useConversations";
 import {
   useAgentConversationMetadata,
   useResetAgentConversationMetadata,
 } from "../apis/agent-api/hooks/useMetadata";
-import { selectedLlmState } from "../apis/agent-api/state";
+import { activeConversationsState, selectedLlmState } from "../apis/agent-api/state";
 import llama3Tokenizer from "llama3-tokenizer-js";
-import { AIAgentContextPhases } from "./agent-api-context-phases";
+import { selectedAgentState } from "../apis/agent-api/state";
+
+
 
 export function AIAgentViewChat() {
   const { chatId } = useParams();
+
   const selectedLlm = useRecoilValue(selectedLlmState);
 
   const conversationObject = useAgentApiConversation(chatId);
@@ -41,6 +43,9 @@ export function AIAgentViewChat() {
   const conversationMetadata = useAgentConversationMetadata();
   const resetMetadata = useResetAgentConversationMetadata();
   const submitMessage = useAgentApiSendMessage(chatId);
+  const selectedAgent = useRecoilValue(selectedAgentState);
+  
+  
 
   useAgentApiSubscribeConversation(chatId);
 
@@ -52,6 +57,8 @@ export function AIAgentViewChat() {
       resetMetadata();
     }
   }, [chatId, resetMetadata, conversationMetadata]);
+
+
 
   useEffect(() => {
     let totalTokens = 0;
@@ -81,6 +88,8 @@ export function AIAgentViewChat() {
     submitMessage({ message: chatString, model: selectedLlm });
     setChatString("");
   };
+
+  
 
   const maxCharacters = agentObject.value?.inputMaxToken || 1000; // Asegúrate de tener un valor predeterminado
 

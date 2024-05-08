@@ -3,6 +3,8 @@ import { Agent, Conversation } from '../../apis/agent-api/types';
 import { Button, View } from '@aws-amplify/ui-react';
 import { useState } from 'react';
 import { useAgentApiDeleteConversation } from '../../apis/agent-api/hooks/useDeleteConversation';
+import { useRecoilState } from 'recoil';
+import { activeConversationsState } from '../../apis/agent-api/state';
 
 function timeSince(dateString: string) {
 
@@ -37,18 +39,30 @@ export function AgentApiConversationListed (props: {conversation: Conversation, 
     const nav = useNavigate()
     const [hovering, setHovering] = useState(false)
     const deleteConversation = useAgentApiDeleteConversation()
+    
+    const [agentConversations, setAgentConversations] = useRecoilState(activeConversationsState);
 
     const onClick = () => {
-        nav(`/chat/view/${props.conversation.id}`)
-    }
+        setAgentConversations(prevState => ({
+            ...prevState,
+            [props.agent!.id]: props.conversation.id  // Guardar solo un ID de conversación por agente
+        }));
+        nav(`/chat/view/${props.conversation.id}`);
+    };
 
     const onDelete = (e: any) => {
-        e.stopPropagation()
-        deleteConversation(props.conversation.id)
-            .then(() => {
-                nav(`/chat`)
-            })
-    }
+        e.stopPropagation();
+        deleteConversation(props.conversation.id).then(() => {
+            setAgentConversations(prevState => {
+                const newState = { ...prevState };
+                if (newState[props.agent!.id] === props.conversation.id) {
+                    delete newState[props.agent!.id];
+                }
+                return newState;
+            });
+            nav(`/chat`);
+        });
+    };
 
     return (
         <View
