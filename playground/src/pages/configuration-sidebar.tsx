@@ -32,8 +32,8 @@ export function ConfigurationPage () {
 
     // Render the root configuration page
     return (
-        <>
-            <View className="sidebar">
+        <Flex>
+            <Container heading="Creación de agentes" width="20%">  
                 <Container heading="Agents">
                     <Flex direction="column">
                         {agentsRendered}
@@ -63,10 +63,10 @@ export function ConfigurationPage () {
                         Sign Out
                     </Button>
                 </Container>
-            </View>
-            <View className="body">
+            </Container>
+            <Container heading="Opciones de creación"  width="100%">
                 <Outlet/>
-            </View>
-        </>
+            </Container>
+        </Flex>
     )
 }

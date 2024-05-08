@@ -17,6 +17,7 @@ const listAgentsQuery = new GraphqlQuery<GetAgentResponse>(`
             handlerLambda
             systemPrompt
             inputMaxToken
+            precedence
             actions {
                 id
                 type

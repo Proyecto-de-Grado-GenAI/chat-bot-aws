@@ -95,7 +95,7 @@ export function AIAgentViewChat() {
   }
 
   return (
-    <Flex>
+    <>
       <View >
         <Container
           heading={`Etapa: '${agentObject.value.name}'`}
@@ -132,7 +132,7 @@ export function AIAgentViewChat() {
         </Card>
       </View>
       
-    </Flex>
+    </>
     
   );
 }

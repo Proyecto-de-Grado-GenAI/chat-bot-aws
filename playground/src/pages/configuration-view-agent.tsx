@@ -33,6 +33,7 @@ export function ConfigurationViewAgent () {
                 <TextAreaField disabled label="System Prompt" value={agent?.systemPrompt} placeholder="My Prompt"/>
                 <TextField disabled label="Agent actions" value={listedActions} placeholder=""/>
                 <TextField disabled label="Max Tokens Per Question" value={agent?.inputMaxToken} placeholder="1000"/>
+                <TextField disabled label="Precedence" value={agent?.precedence} placeholder="1"/>
             </Container>
             <Flex dir='right' justifyContent='end'>
                 <Button variation="warning" onClick={onDelete} size='small'>

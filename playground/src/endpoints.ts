@@ -18,6 +18,8 @@ export const fmHandlerArns = [
 	},
 ]
 
+export const etapas = process.env.REACT_APP_ETAPAS
+
 
 export const appsyncActionOutputs = [
 	{

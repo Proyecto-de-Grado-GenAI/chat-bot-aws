@@ -19,7 +19,6 @@ import '@aws-amplify/ui-react/styles.css';
 import './index.css';
 import { Amplify } from 'aws-amplify';
 import { agentApiEndpoint, cognitoConfig } from './endpoints';
-import { AIAgentContextPhases } from './pages/agent-api-context-phases';
 
 // Load auth config data
 Amplify.configure({ 

@@ -29,6 +29,7 @@ export interface Agent {
     systemPrompt: string
     actions: Action[]
     inputMaxToken: number
+    precedence: number
 }
 
 export interface LLm {

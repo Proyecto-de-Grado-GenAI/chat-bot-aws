@@ -15,6 +15,7 @@ export function ConfigurationNewAgent () {
     const createAgent = useAgentApiCreateAgent() 
     const actionListObject = useAgentApiActionList()
     const [maxTokensPerQuestion, setMaxTokensPerQuestion] = useState("");
+    const [precedence, setPrecedence] = useState("1");
 
     const enabled = !! agentName
 
@@ -29,7 +30,8 @@ export function ConfigurationNewAgent () {
             systemPrompt,
             handlerLambda: endpoint!,
             actions: chosenAction ? [chosenAction] : [],
-            inputMaxToken: parseInt(maxTokensPerQuestion, 10)
+            inputMaxToken: parseInt(maxTokensPerQuestion, 10),
+            precedence: parseInt(precedence, 10)
         });
     }
 
@@ -55,9 +57,10 @@ export function ConfigurationNewAgent () {
                 }
                 <TextAreaField label="System Prompt" value={systemPrompt} onChange={(e) => setSystemPrompt(e.target.value)} placeholder="You are an ai agent that ...."/>
                 <TextField label="Max Tokens Per Question" value={maxTokensPerQuestion} onChange={(e) => setMaxTokensPerQuestion(e.target.value)} placeholder="1000"/>
+                <TextField label="Precedence" value={precedence} onChange={(e) => setPrecedence(e.target.value)} placeholder="1"/>
                 
             </Container>
-            <Container heading="Action">
+            <Container heading="Action"  >
                 <SelectField
                     label="Action"
                     placeholder="No Actions"

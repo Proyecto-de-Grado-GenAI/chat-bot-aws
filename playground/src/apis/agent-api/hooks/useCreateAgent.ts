@@ -13,16 +13,18 @@ export interface CreateAgentArgs {
     handlerLambda: string
     actions: string[]
     inputMaxToken: number
+    precedence: number
 }
 
 const createAgentQuery = new GraphqlQuery<CreateAgentResponse>(`
-    mutation CreateAgent($handlerLambda: String!, $systemPrompt: String!, $name: String!, $actions: [String!]!, $inputMaxToken: Int!) {
-        createAgent(config: {name: $name, handlerLambda: $handlerLambda, systemPrompt: $systemPrompt, actions: $actions , inputMaxToken: $inputMaxToken}){
+    mutation CreateAgent($handlerLambda: String!, $systemPrompt: String!, $name: String!, $actions: [String!]!, $inputMaxToken: Int!, $precedence: Int!){
+        createAgent(config: {name: $name, handlerLambda: $handlerLambda, systemPrompt: $systemPrompt, actions: $actions , inputMaxToken: $inputMaxToken, precedence: $precedence}) {
             id
             name
             handlerLambda
             systemPrompt
             inputMaxToken
+            precedence
         }
     }
 `)

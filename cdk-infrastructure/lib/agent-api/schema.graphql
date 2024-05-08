@@ -73,6 +73,7 @@ input LLmInput {
 type Agent @aws_cognito_user_pools {
     id: ID!
     timestamp: String!
+    precedence: Int!
     name: String!
     handlerLambda: String!
     systemPrompt: String!
@@ -94,6 +95,7 @@ input NewAgent {
     systemPrompt: String!
     actions: [String!]!
     inputMaxToken: Int!
+    precedence: Int!
 }
 
 input NewLLm {
