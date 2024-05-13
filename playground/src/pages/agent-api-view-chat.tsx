@@ -1,5 +1,5 @@
-import { useParams,useNavigate } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useParams } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import { useState, useEffect } from "react";
 import {
   TextAreaField,
@@ -9,7 +9,6 @@ import {
   Loader,
   Text,
 } from "@aws-amplify/ui-react";
-
 import {
   useAgentApiAgent,
   useAgentApiConversationWithMessages,
@@ -23,17 +22,12 @@ import {
   useAgentConversationMetadata,
   useResetAgentConversationMetadata,
 } from "../apis/agent-api/hooks/useMetadata";
-import { activeConversationsState, selectedLlmState } from "../apis/agent-api/state";
+import { selectedLlmState, selectedAgentState } from "../apis/agent-api/state";
 import llama3Tokenizer from "llama3-tokenizer-js";
-import { selectedAgentState } from "../apis/agent-api/state";
-
-
 
 export function AIAgentViewChat() {
   const { chatId } = useParams();
-
   const selectedLlm = useRecoilValue(selectedLlmState);
-
   const conversationObject = useAgentApiConversation(chatId);
   const agentObject = useAgentApiAgent(conversationObject.value?.agent);
   const { loadingConversation, events, conversation } =
@@ -44,8 +38,6 @@ export function AIAgentViewChat() {
   const resetMetadata = useResetAgentConversationMetadata();
   const submitMessage = useAgentApiSendMessage(chatId);
   const selectedAgent = useRecoilValue(selectedAgentState);
-  
-  
 
   useAgentApiSubscribeConversation(chatId);
 
@@ -57,8 +49,6 @@ export function AIAgentViewChat() {
       resetMetadata();
     }
   }, [chatId, resetMetadata, conversationMetadata]);
-
-
 
   useEffect(() => {
     let totalTokens = 0;
@@ -85,11 +75,26 @@ export function AIAgentViewChat() {
       alert("Por favor, seleccione un LLM para enviar mensajes.");
       return;
     }
-    submitMessage({ message: chatString, model: selectedLlm });
+
+    const payload = {
+      message: chatString,
+      model: selectedLlm,
+      modelParams: {
+        temperature: 0.7, // Parámetros personalizados, "quemados" por ahora
+        top_p: 0.9,
+        max_gen_len: 1500,
+      },
+      systemPrompt: "Eres un asistente útil y amigable.", // System prompt personalizado
+      knowledgeBaseParams: {
+        knowledgeBaseId: "FFUYGR42Y1",
+        useKnowledgeBase: true,
+        numberOfResults: 3
+      }
+    };
+
+    submitMessage(payload);
     setChatString("");
   };
-
-  
 
   const maxCharacters = agentObject.value?.inputMaxToken || 1000; // Asegúrate de tener un valor predeterminado
 
@@ -105,7 +110,7 @@ export function AIAgentViewChat() {
 
   return (
     <>
-      <View >
+      <View>
         <Container
           heading={`Etapa: '${agentObject.value.name}'`}
           minHeight={500}
@@ -140,8 +145,6 @@ export function AIAgentViewChat() {
           )}
         </Card>
       </View>
-      
     </>
-    
   );
 }

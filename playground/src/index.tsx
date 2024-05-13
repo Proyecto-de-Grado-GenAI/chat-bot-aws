@@ -51,6 +51,7 @@ root.render(
             <Route path="/chat/new" element={<AIAgentNewChat />} />
             <Route path="/chat/view/:chatId" element={<AIAgentViewChat /> } />
           </Route>
+          
           <Route path="/" element={<Navigate to="/chat" replace/>} />
         </Routes>
         
