@@ -37,16 +37,16 @@ def insertContext(question, response_knowledge_base):
     question_with_context = f"""{question}\n\n{context}"""
     return question_with_context
 
-def define_Llama3_prompt(history, system_prompt, question_with_context):
-    SystemPrompt = f"""system\n{system_prompt}"""
-    waitForAssistantPrompt = f"""assistant"""
+def define_Llama3_prompt(history,system_prompt, question_with_context):
+    SystemPrompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{system_prompt}<|eot_id|>"""
+    waitForAssistantPrompt = f"""<|start_header_id|>assistant<|end_header_id|>"""
     init = SystemPrompt
     for i in range(len(history)):
         if i % 2 == 0:
-            init += f"""user\n{history[i]}"""
+            init += f"""<|start_header_id|>user<|end_header_id|>\n{history[i]}<|eot_id|>"""
         else:
-            init += f"""assistant\n{history[i]}"""
-    init += f"""user\n{question_with_context}"""
+            init += f"""<|start_header_id|>assistant<|end_header_id|>\n{history[i]}<|eot_id|>"""
+    init += f"""<|start_header_id|>user<|end_header_id|>\n{question_with_context}<|eot_id|>"""
     init += waitForAssistantPrompt
     return init
 

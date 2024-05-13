@@ -3,9 +3,9 @@ import { agentApiEndpoint } from "../endpoints";
 
 export async function Invoke<T> (query: string, variables: any, endpoint: string, authHeaders: any) {
     console.log(JSON.stringify({
-        query,
-        variables: variables || {}
-    }));
+                query,
+                variables: variables || {}
+            }))
 
     const response = await fetch(endpoint, {
         method: 'POST',
@@ -44,7 +44,6 @@ export class GraphqlQuery<T> {
     ) { }
 
     invoke(variables : any = {}){
-
         return InvokeAgentAPI<T>(this.query, variables);
     }   
 }

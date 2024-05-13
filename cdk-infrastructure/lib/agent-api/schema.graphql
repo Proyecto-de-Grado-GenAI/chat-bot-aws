@@ -59,9 +59,24 @@ type AgentMetadata @aws_iam @aws_cognito_user_pools {
 
 input UserAction {
     message: String
-    model: LLmInput! 
+    model: LLmInput!
     actionRequested: String
     actionResult: String
+    modelParams: ModelParamsInput
+    systemPrompt: String
+    knowledgeBaseParams: KnowledgeBaseParamsInput
+}
+
+input ModelParamsInput {
+  temperature: Float
+  top_p: Float
+  max_gen_len: Int
+}
+
+input KnowledgeBaseParamsInput {
+  knowledgeBaseId: String
+  useKnowledgeBase: Boolean
+  numberOfResults: Int
 }
 
 input LLmInput {
@@ -121,7 +136,7 @@ type Query @aws_cognito_user_pools {
 }
 
 type Mutation {
-	createAgent(config: NewAgent!): Agent! @aws_cognito_user_pools
+    createAgent(config: NewAgent!): Agent! @aws_cognito_user_pools
     deleteAgent(id: ID): Agent! @aws_cognito_user_pools
     createAction(config: NewAction): Action!  @aws_cognito_user_pools
     deleteAction(id: ID): Action! @aws_cognito_user_pools
@@ -133,17 +148,17 @@ type Mutation {
     # User side operations
     userPublishMessage(conversationId: ID, event: UserAction!): ConversationEvent! @aws_cognito_user_pools
 
-    #Agent side operations
-    agentPublishEvent (config: NewAgentAction!): ConversationEvent @aws_iam
-    agentPublishMetadata (config: NewAgentMetadata!): AgentMetadata @aws_iam
+    # Agent side operations
+    agentPublishEvent(config: NewAgentAction!): ConversationEvent @aws_iam
+    agentPublishMetadata(config: NewAgentMetadata!): AgentMetadata @aws_iam
 }
 
-type Subscription @aws_api_key{
-	onConversationEvents(conversationId: ID!): ConversationEvent
-		@aws_subscribe(mutations: ["agentPublishEvent"])
+type Subscription @aws_api_key {
+    onConversationEvents(conversationId: ID!): ConversationEvent
+        @aws_subscribe(mutations: ["agentPublishEvent"])
         @aws_cognito_user_pools
-	onConversationMetadata(conversationId: ID!): AgentMetadata
-		@aws_subscribe(mutations: ["agentPublishMetadata"])
+    onConversationMetadata(conversationId: ID!): AgentMetadata
+        @aws_subscribe(mutations: ["agentPublishMetadata"])
         @aws_cognito_user_pools
 }
 
