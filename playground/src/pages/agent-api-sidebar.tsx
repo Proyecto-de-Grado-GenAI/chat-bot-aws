@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
+  
   const conversationsObject = useAgentApiConversationList();
   const agentObjectList = useAgentApiAgentList();
   const LLmsObject = useLLmList();
@@ -24,15 +25,43 @@ export function AIAgentSidebar() {
   const [lastSelectedAgentId, setLastSelectedAgentId] = useState<string | null>(null);
   const [agentConversations, setAgentConversations] = useRecoilState(activeConversationsState);
 
-  const [temperature, setTemperature] = useState(0.7);
-  const [topP, setTopP] = useState(0.9);
+  const [temperature, setTemperature] = useState<number | null>(null);
+  const [topP, setTopP] = useState<number | null>(null);
   const [maxGenLen, setMaxGenLen] = useState(1500);
   const [systemPrompt, setSystemPrompt] = useState("Eres un asistente útil y amigable.");
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
   const [useKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState(3);
+  const [agentName, setAgentName] = useState("");
+  const [handlerLambda, setHandlerLambda] = useState("");
+  const [inputMaxToken, setInputMaxToken] = useState(1000);
+  const [precedence, setPrecedence] = useState(1);
+  const [forceRender, setForceRender] = useState(false);
+
+  
 
   const nav = useNavigate();
+
+
+  useEffect(() => {
+    if (selectedAgent!==null) {
+      const agent = selectedAgent;
+      console.log('Agent Object:', agent); // Print the agent object
+      console.log(agent.modelParams?.temperature); // Print the agent temperature
+      setAgentName(agent.name || "");
+      setHandlerLambda(agent.handlerLambda || "");
+      setSystemPrompt(agent.systemPrompt || "Eres un asistente útil y amigable.");
+      setInputMaxToken(agent.inputMaxToken || 1000);
+      setPrecedence(agent.precedence || 1);
+      setTemperature(agent.modelParams?.temperature ?? 0.7);
+      setTopP(agent.modelParams?.top_p ?? 0.9);
+      setMaxGenLen(agent.modelParams?.max_gen_len || 1500);
+      setKnowledgeBaseId(agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1");
+      setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
+      setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
+      setForceRender(prev => !prev); // Toggle force render
+    }
+  }, [selectedAgent]);
 
   // Set initial agent on load
   useEffect(() => {
@@ -153,22 +182,28 @@ export function AIAgentSidebar() {
 
         <Container heading="Parámetros del Modelo">
           <Flex direction="column" gap={10}>
-            <SliderField
-              label="Temperature"
-              min={0}
-              max={1}
-              step={0.01}
-              value={temperature}
-              onChange={(value) => setTemperature(value)}
-            />
-            <SliderField
-              label="Top P"
-              min={0}
-              max={1}
-              step={0.01}
-              value={topP}
-              onChange={(value) => setTopP(value)}
-            />
+          {temperature !== null && (
+              <SliderField
+                key={`temperature-${forceRender}`} // Force render by changing key
+                label="Temperature"
+                min={0}
+                max={1}
+                step={0.01}
+                value={temperature}
+                onChange={(value) => setTemperature(value)}
+              />
+            )}
+            {topP !== null && (
+              <SliderField
+                key={`topP-${forceRender}`} // Force render by changing key
+                label="Top P"
+                min={0}
+                max={1}
+                step={0.01}
+                value={topP}
+                onChange={(value) => setTopP(value)}
+              />
+            )}
             <TextField
               label="Max Gen Len"
               placeholder="1500"
@@ -190,7 +225,7 @@ export function AIAgentSidebar() {
               value={knowledgeBaseId}
               onChange={(e) => setKnowledgeBaseId(e.target.value)}
             >
-              <option value="FFUYGR42Y1">Base de Conocimiento 1</option>
+              <option value="FFUYGR42Y1">FFUYGR42Y1</option>
               <option value="OtroId">Base de Conocimiento 2</option>
             </SelectField>
             <SwitchField

@@ -18,6 +18,16 @@ const listAgentsQuery = new GraphqlQuery<GetAgentResponse>(`
             systemPrompt
             inputMaxToken
             precedence
+            modelParams {
+                temperature
+                top_p
+                max_gen_len
+            }
+            knowledgeBaseParams {
+                knowledgeBaseId
+                useKnowledgeBase
+                numberOfResults
+            }
         }
     }
 `)

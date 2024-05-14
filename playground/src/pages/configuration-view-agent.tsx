@@ -12,8 +12,8 @@ export function ConfigurationViewAgent() {
   const agentObject = useAgentApiAgent(agentId);
   const deleteAgent = useAgentApiDeleteAgent();
   const updateAgent = useAgentApiUpdateAgent();
-  const [temperature, setTemperature] = useState(0.7);
-  const [topP, setTopP] = useState(0.9);
+  const [temperature, setTemperature] = useState<number | null>(null);
+  const [topP, setTopP] = useState<number | null>(null);
   const [maxGenLen, setMaxGenLen] = useState(1500);
   const [systemPrompt, setSystemPrompt] = useState("Eres un asistente útil y amigable.");
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
@@ -23,25 +23,29 @@ export function ConfigurationViewAgent() {
   const [handlerLambda, setHandlerLambda] = useState("");
   const [inputMaxToken, setInputMaxToken] = useState(1000);
   const [precedence, setPrecedence] = useState(1);
+  const [forceRender, setForceRender] = useState(false);
 
   useEffect(() => {
     if (agentObject.value) {
       const agent = agentObject.value;
+      console.log('Agent Object:', agent); // Print the agent object
+      console.log(agent.modelParams?.temperature); // Print the agent temperature
       setAgentName(agent.name || "");
       setHandlerLambda(agent.handlerLambda || "");
-      setSystemPrompt(agent.systemPrompt || "");
+      setSystemPrompt(agent.systemPrompt || "Eres un asistente útil y amigable.");
       setInputMaxToken(agent.inputMaxToken || 1000);
       setPrecedence(agent.precedence || 1);
-      setTemperature(agent.modelParams?.temperature || 0.7);
-      setTopP(agent.modelParams?.top_p || 0.9);
+      setTemperature(agent.modelParams?.temperature ?? 0.7);
+      setTopP(agent.modelParams?.top_p ?? 0.9);
       setMaxGenLen(agent.modelParams?.max_gen_len || 1500);
       setKnowledgeBaseId(agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1");
-      setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase || true);
+      setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
+      setForceRender(prev => !prev); // Toggle force render
     }
   }, [agentObject.value]);
 
-  if (agentObject.isUnloaded() || !agentObject.value ) {
+  if (agentObject.isUnloaded() || !agentObject.value) {
     return <Loader />;
   }
 
@@ -51,29 +55,27 @@ export function ConfigurationViewAgent() {
 
   const onUpdate = () => {
     const updatedAgent = {
-      name: agentName || "",
-      handlerLambda: handlerLambda || "",
-      systemPrompt: systemPrompt || "",
-      inputMaxToken: inputMaxToken || 1000,
-      precedence: precedence || 1,
+      name: agentName,
+      handlerLambda: handlerLambda,
+      systemPrompt: systemPrompt,
+      inputMaxToken: inputMaxToken,
+      precedence: precedence,
       modelParams: {
-        temperature: temperature || 0.7,
-        top_p: topP || 0.9,
-        max_gen_len: maxGenLen || 1500,
+        temperature: temperature!,
+        top_p: topP!,
+        max_gen_len: maxGenLen,
       },
       knowledgeBaseParams: {
-        knowledgeBaseId: knowledgeBaseId || "FFUYGR42Y1",
-        useKnowledgeBase: useKnowledgeBase || true,
-        numberOfResults: numberOfResults || 3,
+        knowledgeBaseId: knowledgeBaseId,
+        useKnowledgeBase: useKnowledgeBase,
+        numberOfResults: numberOfResults,
       },
     };
     updateAgent(agentId!, updatedAgent)
       .then(() => {
-        // Handle successful update, e.g., navigate to another page or show a success message
         alert("Agent updated successfully!");
       })
       .catch((error) => {
-        // Handle error in update
         alert(`Failed to update agent: ${error.message}`);
       });
   };
@@ -102,39 +104,45 @@ export function ConfigurationViewAgent() {
         />
         <TextField
           label="Max Tokens Per Question"
-          value={inputMaxToken}
+          value={inputMaxToken.toString()}
           placeholder="1000"
           onChange={(e) => setInputMaxToken(parseInt(e.target.value, 10))}
         />
         <TextField
           label="Precedence"
-          value={precedence}
+          value={precedence.toString()}
           placeholder="1"
           onChange={(e) => setPrecedence(parseInt(e.target.value, 10))}
         />
         <Container heading="Parámetros del Modelo">
           <Flex direction="column" gap={10}>
-            <SliderField
-              label="Temperature"
-              min={0}
-              max={1}
-              step={0.01}
-              value={temperature}
-              onChange={(value) => setTemperature(value)}
-            />
-            <SliderField
-              label="Top P"
-              min={0}
-              max={1}
-              step={0.01}
-              value={topP}
-              onChange={(value) => setTopP(value)}
-            />
+            {temperature !== null && (
+              <SliderField
+                key={`temperature-${forceRender}`} // Force render by changing key
+                label="Temperature"
+                min={0}
+                max={1}
+                step={0.01}
+                value={temperature}
+                onChange={(value) => setTemperature(value)}
+              />
+            )}
+            {topP !== null && (
+              <SliderField
+                key={`topP-${forceRender}`} // Force render by changing key
+                label="Top P"
+                min={0}
+                max={1}
+                step={0.01}
+                value={topP}
+                onChange={(value) => setTopP(value)}
+              />
+            )}
             <TextField
               label="Max Gen Len"
               placeholder="1500"
               size="small"
-              value={maxGenLen}
+              value={maxGenLen.toString()}
               onChange={(e) => setMaxGenLen(parseInt(e.target.value, 10))}
             />
             <SelectField
@@ -143,8 +151,7 @@ export function ConfigurationViewAgent() {
               value={knowledgeBaseId}
               onChange={(e) => setKnowledgeBaseId(e.target.value)}
             >
-              <option value="FFUYGR42Y1">Base de Conocimiento 1</option>
-              <option value="OtroId">Base de Conocimiento 2</option>
+              <option value="FFUYGR42Y1">FFUYGR42Y1</option>
             </SelectField>
             <SwitchField
               label="Use Knowledge Base"
@@ -155,7 +162,7 @@ export function ConfigurationViewAgent() {
               label="Number of Results"
               placeholder="3"
               size="small"
-              value={numberOfResults}
+              value={numberOfResults.toString()}
               onChange={(e) => setNumberOfResults(parseInt(e.target.value, 10))}
             />
           </Flex>
