@@ -13,8 +13,6 @@ import Prism from "prismjs";
 import 'prismjs/components/prism-graphql';
 import 'prismjs/components/prism-json';
 import './prism.css'
-import { ConfigurationNewAction } from './pages/configuration-new-action';
-import { ConfigurationViewAction } from './pages/configuration-view-action';
 import '@aws-amplify/ui-react/styles.css';
 import './index.css';
 import { Amplify } from 'aws-amplify';
@@ -41,9 +39,7 @@ root.render(
         <Routes>
           <Route path="/configuration" element={<ConfigurationPage />} >
             <Route path="/configuration/agent-new" element={<ConfigurationNewAgent />} />
-            <Route path="/configuration/action-new" element={<ConfigurationNewAction />} />
             <Route path="/configuration/agent/:agentId" element={<ConfigurationViewAgent />} />
-            <Route path="/configuration/action/:actionId" element={<ConfigurationViewAction />} />
           </Route>
           
           

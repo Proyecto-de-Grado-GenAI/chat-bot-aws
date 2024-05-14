@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { buildFoundationModelHandler, buildCognitoAuth, buildAgentApi, buildCarDealerApi, buildTables } from '.';
+import { buildFoundationModelHandler, buildCognitoAuth, buildAgentApi,  buildTables } from '.';
 
 export class AppsyncAgentAPIStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {

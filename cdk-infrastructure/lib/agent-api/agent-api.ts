@@ -13,7 +13,6 @@ interface AgentApiProps {
     cognito: cognito.UserPool
     tables: {
         agentTable: dynamodb.ITable;
-        actionTable: dynamodb.ITable;
         conversationTable: dynamodb.ITable;
         eventTable: dynamodb.ITable;
         LLmTable: dynamodb.ITable;
@@ -47,7 +46,6 @@ export function buildAgentApi (scope: Construct, props: AgentApiProps) {
     // We add the data sources for tables to this api
     const agentTableDS = appsyncApi.addDynamoDbDataSource('AgentTable', props.tables.agentTable)
     const LLMTableDS = appsyncApi.addDynamoDbDataSource('LLMTable', props.tables.LLmTable)
-    const actionTableDS = appsyncApi.addDynamoDbDataSource('ActionTable', props.tables.actionTable)
     const conversationTableDS = appsyncApi.addDynamoDbDataSource('ConversationTable', props.tables.conversationTable)
     const eventsTableDS = appsyncApi.addDynamoDbDataSource('EventsTable', props.tables.eventTable)
     const noneDS = appsyncApi.addNoneDataSource('NoneDataSource')
@@ -78,9 +76,6 @@ export function buildAgentApi (scope: Construct, props: AgentApiProps) {
     addJsResolver(scope, appsyncApi, 'Mutation.createLLm', { code: 'create', dataSource: LLMTableDS })
     addJsResolver(scope, appsyncApi, 'Mutation.deleteLLm', { code: 'delete', dataSource: LLMTableDS })
     
-    // READ on actions
-    addJsResolver(scope, appsyncApi, 'Query.getAction', { code: 'get',  dataSource: actionTableDS})
-    addJsResolver(scope, appsyncApi, 'Query.listActions', { code: 'scan', dataSource: actionTableDS })
 
     // CRUD on conversations
     addJsResolver(scope, appsyncApi, 'Query.getConversation', { code: 'get',  dataSource: conversationTableDS})
@@ -114,13 +109,6 @@ export function buildAgentApi (scope: Construct, props: AgentApiProps) {
             dataSource: agentTableDS,
         },
         {
-            code: 'Query.userPublishMessage.getActions',
-            dataSource: actionTableDS,
-            replacements: {
-                table: props.tables.actionTable.tableName
-            }
-        },
-        {
             code: 'Query.userPublishMessage.recordMessage',
             dataSource: eventsTableDS,
         },
@@ -138,18 +126,9 @@ export function buildAgentApi (scope: Construct, props: AgentApiProps) {
     if (props.enableConstructingAgents){
         addJsResolver(scope, appsyncApi, 'Mutation.createAgent', { code: 'create', dataSource: agentTableDS })
         addJsResolver(scope, appsyncApi, 'Mutation.deleteAgent', { code: 'delete', dataSource: agentTableDS })
-        addJsResolver(scope, appsyncApi, 'Mutation.createAction', { code: 'create', dataSource: actionTableDS })
-        addJsResolver(scope, appsyncApi, 'Mutation.deleteAction', { code: 'delete', dataSource: actionTableDS })
     }
 
     // Finally some more general metadata linkage
-    addJsResolver(scope, appsyncApi, 'Agent.actions', {
-        code: 'Agent.actions',
-        dataSource: actionTableDS,
-        replacements: {
-            table: props.tables.actionTable.tableName
-        }
-    })
 
     addJsResolver(scope, appsyncApi, 'Conversation.events', {
         code: 'Conversation.events',

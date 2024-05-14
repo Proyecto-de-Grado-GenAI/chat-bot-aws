@@ -11,20 +11,47 @@ export interface CreateAgentArgs {
     name: string
     systemPrompt: string
     handlerLambda: string
-    actions: string[]
     inputMaxToken: number
     precedence: number
+    modelParams: {
+        temperature: number
+        top_p: number
+        max_gen_len: number
+    }
+    knowledgeBaseParams: {
+        knowledgeBaseId: string
+        useKnowledgeBase: boolean
+        numberOfResults: number
+    }
 }
 
 const createAgentQuery = new GraphqlQuery<CreateAgentResponse>(`
-    mutation CreateAgent($handlerLambda: String!, $systemPrompt: String!, $name: String!, $actions: [String!]!, $inputMaxToken: Int!, $precedence: Int!){
-        createAgent(config: {name: $name, handlerLambda: $handlerLambda, systemPrompt: $systemPrompt, actions: $actions , inputMaxToken: $inputMaxToken, precedence: $precedence}) {
+    mutation CreateAgent($handlerLambda: String!, $systemPrompt: String!, $name: String!, $inputMaxToken: Int!, $precedence: Int!, $modelParams: ModelParamsInput!, $knowledgeBaseParams: KnowledgeBaseParamsInput!) {
+        createAgent(config: {
+            name: $name, 
+            handlerLambda: $handlerLambda, 
+            systemPrompt: $systemPrompt, 
+            inputMaxToken: $inputMaxToken, 
+            precedence: $precedence,
+            modelParams: $modelParams,
+            knowledgeBaseParams: $knowledgeBaseParams
+        }) {
             id
             name
             handlerLambda
             systemPrompt
             inputMaxToken
             precedence
+            modelParams {
+                temperature
+                top_p
+                max_gen_len
+            }
+            knowledgeBaseParams {
+                knowledgeBaseId
+                useKnowledgeBase
+                numberOfResults
+            }
         }
     }
 `)

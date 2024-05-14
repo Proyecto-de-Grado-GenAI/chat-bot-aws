@@ -22,15 +22,25 @@ export interface Conversation {
 }
 
 export interface Agent {
-    id: string
-    name: string
-    timestamp: string
-    handlerLambda: string
-    systemPrompt: string
-    actions: Action[]
-    inputMaxToken: number
-    precedence: number
+    id: string;
+    name: string;
+    timestamp: string;
+    handlerLambda: string;
+    systemPrompt: string;
+    inputMaxToken: number;
+    precedence: number;
+    modelParams: {
+        temperature: number;
+        top_p: number;
+        max_gen_len: number;
+    };
+    knowledgeBaseParams: {
+        knowledgeBaseId: string;
+        useKnowledgeBase: boolean;
+        numberOfResults: number;
+    };
 }
+
 
 export interface LLm {
     id: string
@@ -38,12 +48,6 @@ export interface LLm {
     model: string
 }
 
-export interface Action {
-    id: string
-    type: string,
-    name: string,
-    resource: string
-}
 
 export interface ConversationMetadata {
     conversationId: string
@@ -55,4 +59,26 @@ export interface ConversationMetadata {
 export interface ConversationMetadataState {
     partialMessage: string
     responding: boolean
+}
+
+export interface ModelParamsInput {
+    temperature: number;
+    top_p: number;
+    max_gen_len: number;
+}
+
+export interface KnowledgeBaseParamsInput {
+    knowledgeBaseId: string;
+    useKnowledgeBase: boolean;
+    numberOfResults: number;
+}
+
+export interface NewAgent {
+    name: string;
+    handlerLambda: string;
+    systemPrompt: string;
+    inputMaxToken: number;
+    precedence: number;
+    modelParams: ModelParamsInput;
+    knowledgeBaseParams: KnowledgeBaseParamsInput;
 }

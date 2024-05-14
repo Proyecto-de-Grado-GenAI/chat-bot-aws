@@ -92,25 +92,41 @@ type Agent @aws_cognito_user_pools {
     name: String!
     handlerLambda: String!
     systemPrompt: String!
-    actions: [Action!]!
     inputMaxToken: Int!
+    modelParams: ModelParams
+    knowledgeBaseParams: KnowledgeBaseParams
 }
 
-type Action @aws_cognito_user_pools {
-    id: String!
-    timestamp: String!
-    name: String!
-    type: String!
-    resource: String!
+type ModelParams {
+    temperature: Float
+    top_p: Float
+    max_gen_len: Int
+}
+
+type KnowledgeBaseParams {
+    knowledgeBaseId: String
+    useKnowledgeBase: Boolean
+    numberOfResults: Int
 }
 
 input NewAgent {
     name: String!
     handlerLambda: String!
     systemPrompt: String!
-    actions: [String!]!
     inputMaxToken: Int!
     precedence: Int!
+    modelParams: ModelParamsInput
+    knowledgeBaseParams: KnowledgeBaseParamsInput
+}
+
+input UpdateAgentInput {
+    name: String
+    handlerLambda: String
+    systemPrompt: String
+    inputMaxToken: Int
+    precedence: Int
+    modelParams: ModelParamsInput
+    knowledgeBaseParams: KnowledgeBaseParamsInput
 }
 
 input NewLLm {
@@ -118,35 +134,26 @@ input NewLLm {
     model: String!
 }
 
-input NewAction {
-    type: String!,
-    name: String!,
-    resource: String!
-}
-
 type Query @aws_cognito_user_pools {
-    getAgent(id: ID): Agent!
+    getAgent(id: ID!): Agent!
     listAgents: [Agent]!
-    getLLm(id: ID): LLm!
+    getLLm(id: ID!): LLm!
     listLLms: [LLm]!
-    getAction(id: ID): Action!
-    listActions: [Action]!
-    getConversation(id: ID): Conversation!
+    getConversation(id: ID!): Conversation!
     listConversations: [Conversation]!
 }
 
 type Mutation {
     createAgent(config: NewAgent!): Agent! @aws_cognito_user_pools
-    deleteAgent(id: ID): Agent! @aws_cognito_user_pools
-    createAction(config: NewAction): Action!  @aws_cognito_user_pools
-    deleteAction(id: ID): Action! @aws_cognito_user_pools
-    createConversation(config: NewConversation): Conversation! @aws_cognito_user_pools
-    deleteConversation(id: ID): Conversation! @aws_cognito_user_pools
+    updateAgent(id: ID!, config: UpdateAgentInput!): Agent! @aws_cognito_user_pools
+    deleteAgent(id: ID!): Agent! @aws_cognito_user_pools
+    createConversation(config: NewConversation!): Conversation! @aws_cognito_user_pools
+    deleteConversation(id: ID!): Conversation! @aws_cognito_user_pools
     createLLm(config: NewLLm!): LLm! @aws_cognito_user_pools
-    deleteLLm(id: ID): LLm! @aws_cognito_user_pools
+    deleteLLm(id: ID!): LLm! @aws_cognito_user_pools
 
     # User side operations
-    userPublishMessage(conversationId: ID, event: UserAction!): ConversationEvent! @aws_cognito_user_pools
+    userPublishMessage(conversationId: ID!, event: UserAction!): ConversationEvent! @aws_cognito_user_pools
 
     # Agent side operations
     agentPublishEvent(config: NewAgentAction!): ConversationEvent @aws_iam

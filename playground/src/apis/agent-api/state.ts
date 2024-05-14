@@ -113,12 +113,6 @@ export const Agents = atom<AgentStore>({
   default: Loadable.unloaded(),
 });
 
-type ActionStore = Loadable<ObjRecord<TAgentApi.Action>>;
-
-export const Actions = atom<ActionStore>({
-  key: "AgentApiActions",
-  default: Loadable.unloaded(),
-});
 
 type LLmStore = Loadable<ObjRecord<TAgentApi.LLm>>;
 

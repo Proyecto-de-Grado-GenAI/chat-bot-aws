@@ -5,7 +5,7 @@ import {
   useAgentApiConversationList,
   useLLmList,
 } from "../apis/agent-api";
-import { Button, Flex, Loader } from "@aws-amplify/ui-react";
+import { Button, Flex, Loader, SliderField, SelectField, SwitchField, TextField, TextAreaField } from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
 import { Combobox } from "react-widgets/cjs";
 import "react-widgets/scss/styles.scss";
@@ -23,6 +23,14 @@ export function AIAgentSidebar() {
   const [selectedAgent, setSelectedAgent] = useRecoilState(selectedAgentState);
   const [lastSelectedAgentId, setLastSelectedAgentId] = useState<string | null>(null);
   const [agentConversations, setAgentConversations] = useRecoilState(activeConversationsState);
+
+  const [temperature, setTemperature] = useState(0.7);
+  const [topP, setTopP] = useState(0.9);
+  const [maxGenLen, setMaxGenLen] = useState(1500);
+  const [systemPrompt, setSystemPrompt] = useState("Eres un asistente útil y amigable.");
+  const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
+  const [useKnowledgeBase, setUseKnowledgeBase] = useState(true);
+  const [numberOfResults, setNumberOfResults] = useState(3);
 
   const nav = useNavigate();
 
@@ -143,11 +151,61 @@ export function AIAgentSidebar() {
           </Flex>
         </Container>
 
-        <Container heading="Variables">
-          <Flex direction="row" gap={10}></Flex>
-        </Container>
-        <Container heading="Preview">
-          <Flex direction="row" gap={10}></Flex>
+        <Container heading="Parámetros del Modelo">
+          <Flex direction="column" gap={10}>
+            <SliderField
+              label="Temperature"
+              min={0}
+              max={1}
+              step={0.01}
+              value={temperature}
+              onChange={(value) => setTemperature(value)}
+            />
+            <SliderField
+              label="Top P"
+              min={0}
+              max={1}
+              step={0.01}
+              value={topP}
+              onChange={(value) => setTopP(value)}
+            />
+            <TextField
+              label="Max Gen Len"
+              placeholder="1500"
+              size="small"
+              value={maxGenLen}
+              onChange={(e) => setMaxGenLen(e.target.value ? parseInt(e.target.value, 10) : 0)}
+            />
+            <TextAreaField
+              label="System Prompt"
+              placeholder="Eres un asistente útil y amigable."
+              size="small"
+              rows={5}
+              value={systemPrompt}
+              onChange={(e) => setSystemPrompt(e.target.value)}
+            />
+            <SelectField
+              label="Knowledge Base ID"
+              placeholder="Selecciona una base de conocimiento"
+              value={knowledgeBaseId}
+              onChange={(e) => setKnowledgeBaseId(e.target.value)}
+            >
+              <option value="FFUYGR42Y1">Base de Conocimiento 1</option>
+              <option value="OtroId">Base de Conocimiento 2</option>
+            </SelectField>
+            <SwitchField
+              label="Use Knowledge Base"
+              isChecked={useKnowledgeBase}
+              onChange={(e) => setUseKnowledgeBase(e.target.checked)}
+            />
+            <TextField
+              label="Number of Results"
+              placeholder="3"
+              size="small"
+              value={numberOfResults}
+              onChange={(e) => setNumberOfResults(e.target.value ? parseInt(e.target.value, 10) : 0)}
+            />
+          </Flex>
         </Container>
       </Container>
     </Flex>

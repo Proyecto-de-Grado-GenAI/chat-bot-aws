@@ -18,12 +18,6 @@ const listAgentsQuery = new GraphqlQuery<GetAgentResponse>(`
             systemPrompt
             inputMaxToken
             precedence
-            actions {
-                id
-                type
-                name
-                resource
-            }
         }
     }
 `)

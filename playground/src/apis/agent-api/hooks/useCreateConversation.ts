@@ -9,7 +9,7 @@ interface CreateConversationResponse {
 }
 
 const createConversationQuery = new GraphqlQuery<CreateConversationResponse>(`
-    mutation CreateConversation($config: NewConversation) {
+    mutation CreateConversation($config: NewConversation!) {
         createConversation(config: $config) {
             id
         }
@@ -21,6 +21,8 @@ export function useAgentApiCreateConversation () {
     const setConversationsValue = useSetRecoilState(Conversations)
 
     return (agent: string) => {
+        console.log('Creating conversation')
+        console.log(agent)
         
         return createConversationQuery.invoke({config: {agent}})
             .then(c => {

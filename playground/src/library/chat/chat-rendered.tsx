@@ -36,7 +36,6 @@ export function ChatRendered () {
     
     const {loadingConversation, events, conversation} = useAgentApiConversationWithMessages(chatId)
     const agentObject = useAgentApiAgent(conversation?.agent)
-    const [apiKey] = reactUseCookie(agentObject.value?.actions[0]?.id||'')
     const chatBottomRef = useRef<HTMLDivElement>(null)
     const chatInvokeQuery = useAgentApiInvokeQuery(chatId)
     setTimeout(() => Prism.highlightAll(), 100);
@@ -128,30 +127,6 @@ export function ChatRendered () {
                     }
                 });
                
-            }
-
-            else if (event.event.actionRequested) {
-                if (event.event.actionResult) {
-                    renderedChat.push(
-                        <GraphQLResultBlock 
-                            text={event.event.actionResult} 
-                            event={event} 
-                            lastEventTime={lastEffectEndTime}
-                            key={event.id}/>
-                    )
-                }
-                else if (event.event.actionRequested) {
-                    renderedChat.push(
-                        <AgentGraphQLBlock 
-                            text={event.event.actionRequested} 
-                            event={event} 
-                            lastEventTime={lastEffectEndTime}
-                            invoke={() => {
-                                chatInvokeQuery(agentObject.value?.actions[0].resource as string, event.event.actionRequested as string, apiKey)
-                            }}
-                            key={event.id}/>
-                    )
-                }
             }
 
             else if (event.event.innerDialog){
