@@ -114,7 +114,6 @@ export function ConfigurationViewAgent() {
           value={precedence.toString()}
           placeholder="1"
           onChange={(e) => setPrecedence(parseInt(e.target.value, 10))}
-          isDisabled
         />
         <Container heading="Parámetros del Modelo">
           <Flex direction="column" gap={10}>
