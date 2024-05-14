@@ -29,6 +29,7 @@ def insertContext(question, response_knowledge_base):
     context = ""
     contador = 0
     for i in response_knowledge_base:
+        print(i["content"]["text"])
         context += "Context " + str(contador) + "\n"
         context += i["content"]["text"] + "\n"
         context += f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
@@ -55,17 +56,12 @@ supported_models = {
     "meta.llama3-70b-instruct-v1:0": define_Llama3_prompt
 }
 
-default_params = {
-    "temperature": 0.5,
-    "top_p": 0.999,
-    "max_gen_len": 2048
-}
 
 model_specific_params = {
     "meta.llama3-8b-instruct-v1:0": {
-        "temperature": 0.6,
-        "top_p": 0.95,
-        "max_gen_len": 1024
+        "temperature": 0,
+        "top_p": 0,
+        "max_gen_len": 2048
     },
     "meta.llama3-70b-instruct-v1:0": {
         "temperature": 0.7,
@@ -82,14 +78,13 @@ def bedrockQuestion(
     if model_params is None:
         model_params = {}
     
-    system_prompt = system_prompt or """Eres un agente de inteligencia artificial muy especializado en la arquitectura de software,
-    das respuestas en el mismo lenguaje que te preguntan y además tienes acceso a una base de conocimiento 
-    con información relevante para responder preguntas relacionadas al ADD 3.0 y que se manifiesta como Context bajo la pregunta que se te realiza,
-    además siempre proporcionas en la parte final de tus respuestas la fuente de la información exacta que utilizaste para responder la pregunta (si es que te hacen una pregunta).
-    En caso de que la información que te proporciono no sea suficiente para responder la pregunta, por favor házmelo saber para poder proporcionarte más información o contexto.
-    Recuerda que siempre debes responder en el mismo lenguaje que te preguntan y que debes explicar de una forma detallada y entendible para un arquitecto de software.
-    """
-    
+    print(f"Model ID: {modelId}")
+    print(f"Model Params: {model_params}")
+    print(f"System Prompt: {system_prompt}")
+    print(f"Knowledge Base ID: {knowledgeBaseId}")
+    print(f"Use Knowledge Base: {use_knowledge_base}")
+    print(f"Number of Results: {number_of_results}")
+
     if modelId in supported_models:
         if use_knowledge_base:
             response_knowledge_base_query = retrieveFromKnowledgeBase(question, knowledgeBaseId, numberOfResults=number_of_results)["retrievalResults"]
@@ -100,15 +95,14 @@ def bedrockQuestion(
         historial = extract_messages_from_chat(history)
         prompt = supported_models[modelId](historial, system_prompt, question_with_context)
         
-        # Combine default params with model-specific params and user-provided params
-        params = {**default_params, **model_specific_params.get(modelId, {}), **model_params}
-        
+        # Use only user-provided params or model-specific params
+        params = {**model_specific_params.get(modelId, {}), **model_params}
+        print(f"Params: {params}")
         model_invoke_params = {
             "prompt": prompt,
-            "temperature": params["temperature"],
-            "top_p": params["top_p"],
-            "max_gen_len": params["max_gen_len"],
+            **params  # Unpack the parameters dictionary directly into model_invoke_params
         }
+        print(f"Model Invoke Params: {model_invoke_params}")
         
         response = bedrock.invoke_model(
             body=json.dumps(model_invoke_params),
@@ -122,12 +116,15 @@ def bedrockQuestion(
     else:
         return "Model not supported"
 
+
 def handler(event, context):
     chatResponder = ChatResponder(event["conversationData"]["id"])
     try:
-        model_params = event.get("modelParams", {})
-        system_prompt = event.get("systemPrompt", None)
-        knowledge_base_params = event.get("knowledgeBaseParams", {})
+        model_params = event["agentData"]["modelParams"]
+        system_prompt = event["agentData"]["systemPrompt"]
+        knowledge_base_params = event["agentData"]["knowledgeBaseParams"]
+
+        print(f"event: {event}")
         
         response = bedrockQuestion(
             event["chatString"],
@@ -135,9 +132,9 @@ def handler(event, context):
             event["userInput"]["model"]["model"],
             model_params=model_params,
             system_prompt=system_prompt,
-            knowledgeBaseId=knowledge_base_params.get("knowledgeBaseId", "FFUYGR42Y1"),
-            use_knowledge_base=knowledge_base_params.get("useKnowledgeBase", True),
-            number_of_results=knowledge_base_params.get("numberOfResults", 1)
+            knowledgeBaseId= knowledge_base_params["knowledgeBaseId"],
+            use_knowledge_base= knowledge_base_params["useKnowledgeBase"],
+            number_of_results= knowledge_base_params["numberOfResults"]
         )
         
         chatResponder.publish_agent_message(response)

@@ -80,18 +80,18 @@ export function AIAgentViewChat() {
       message: chatString,
       model: selectedLlm,
       modelParams: {
-        temperature: 0.7, // Parámetros personalizados, "quemados" por ahora
-        top_p: 0.9,
-        max_gen_len: 1500,
+        temperature: agentObject.value?.modelParams.temperature || 0.7,
+        top_p: agentObject.value?.modelParams.top_p || 0.9,
+        max_gen_len: agentObject.value?.modelParams.max_gen_len || 2500,
       },
-      systemPrompt: "Eres un asistente útil y amigable.", // System prompt personalizado
+      systemPrompt: agentObject.value?.systemPrompt || "",
       knowledgeBaseParams: {
-        knowledgeBaseId: "FFUYGR42Y1",
-        useKnowledgeBase: true,
-        numberOfResults: 3
+        knowledgeBaseId: agentObject.value?.knowledgeBaseParams.knowledgeBaseId || "",
+        useKnowledgeBase: agentObject.value?.knowledgeBaseParams.useKnowledgeBase || false,
+        numberOfResults: agentObject.value?.knowledgeBaseParams.numberOfResults || 3,
       }
     };
-
+    console.log("Sending message:", payload);
     submitMessage(payload);
     setChatString("");
   };

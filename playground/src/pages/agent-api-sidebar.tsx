@@ -5,30 +5,51 @@ import {
   useAgentApiConversationList,
   useLLmList,
 } from "../apis/agent-api";
-import { Button, Flex, Loader, SliderField, SelectField, SwitchField, TextField, TextAreaField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Loader,
+  SliderField,
+  SelectField,
+  SwitchField,
+  TextField,
+  TextAreaField,
+} from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
 import { Combobox } from "react-widgets/cjs";
 import "react-widgets/scss/styles.scss";
 import { useRecoilState } from "recoil";
-import { activeConversationsState, selectedLlmState, selectedAgentState } from "../apis/agent-api/state";
+import {
+  activeConversationsState,
+  selectedLlmState,
+  selectedAgentState,
+} from "../apis/agent-api/state";
 import { useEffect, useState } from "react";
+import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
-  
+
   const conversationsObject = useAgentApiConversationList();
   const agentObjectList = useAgentApiAgentList();
   const LLmsObject = useLLmList();
+  const updateAgent = useAgentApiUpdateAgent();
 
   const [selectedLlm, setSelectedLlm] = useRecoilState(selectedLlmState);
   const [selectedAgent, setSelectedAgent] = useRecoilState(selectedAgentState);
-  const [lastSelectedAgentId, setLastSelectedAgentId] = useState<string | null>(null);
-  const [agentConversations, setAgentConversations] = useRecoilState(activeConversationsState);
+  const [lastSelectedAgentId, setLastSelectedAgentId] = useState<string | null>(
+    null
+  );
+  const [agentConversations, setAgentConversations] = useRecoilState(
+    activeConversationsState
+  );
 
   const [temperature, setTemperature] = useState<number | null>(null);
   const [topP, setTopP] = useState<number | null>(null);
   const [maxGenLen, setMaxGenLen] = useState(1500);
-  const [systemPrompt, setSystemPrompt] = useState("Eres un asistente útil y amigable.");
+  const [systemPrompt, setSystemPrompt] = useState(
+    "Eres un asistente útil y amigable."
+  );
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
   const [useKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState(3);
@@ -38,35 +59,66 @@ export function AIAgentSidebar() {
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
 
-  
-
   const nav = useNavigate();
 
 
+  const onUpdate = () => {
+    const updatedAgent = {
+      name: agentName,
+      handlerLambda: handlerLambda,
+      systemPrompt: systemPrompt,
+      inputMaxToken: inputMaxToken,
+      precedence: precedence,
+      modelParams: {
+        temperature: temperature!,
+        top_p: topP!,
+        max_gen_len: maxGenLen,
+      },
+      knowledgeBaseParams: {
+        knowledgeBaseId: knowledgeBaseId,
+        useKnowledgeBase: useKnowledgeBase,
+        numberOfResults: numberOfResults,
+      },
+    };
+    updateAgent(selectedAgent!.id, updatedAgent)
+      .then(() => {
+        alert("Agent updated successfully!");
+      })
+      .catch((error) => {
+        alert(`Failed to update agent: ${error.message}`);
+      });
+  };
+
   useEffect(() => {
-    if (selectedAgent!==null) {
+    if (selectedAgent !== null) {
       const agent = selectedAgent;
-      console.log('Agent Object:', agent); // Print the agent object
+      console.log("Agent Object:", agent); // Print the agent object
       console.log(agent.modelParams?.temperature); // Print the agent temperature
       setAgentName(agent.name || "");
       setHandlerLambda(agent.handlerLambda || "");
-      setSystemPrompt(agent.systemPrompt || "Eres un asistente útil y amigable.");
+      setSystemPrompt(
+        agent.systemPrompt || "Eres un asistente útil y amigable."
+      );
       setInputMaxToken(agent.inputMaxToken || 1000);
       setPrecedence(agent.precedence || 1);
       setTemperature(agent.modelParams?.temperature ?? 0.7);
       setTopP(agent.modelParams?.top_p ?? 0.9);
       setMaxGenLen(agent.modelParams?.max_gen_len || 1500);
-      setKnowledgeBaseId(agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1");
+      setKnowledgeBaseId(
+        agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1"
+      );
       setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
-      setForceRender(prev => !prev); // Toggle force render
+      setForceRender((prev) => !prev); // Toggle force render
     }
   }, [selectedAgent]);
 
   // Set initial agent on load
   useEffect(() => {
     if (agentObjectList.value) {
-      const initialAgent = agentObjectList.value.items().find(agent => agent.precedence === 1) || null;
+      const initialAgent =
+        agentObjectList.value.items().find((agent) => agent.precedence === 1) ||
+        null;
       setSelectedAgent(initialAgent);
     }
   }, [agentObjectList.value, setSelectedAgent]);
@@ -82,7 +134,7 @@ export function AIAgentSidebar() {
           nav(`/chat/view/${activeChatId}`);
         }
       } else {
-        nav('/chat');
+        nav("/chat");
       }
     }
   }, [selectedAgent, agentConversations, chatId, nav, lastSelectedAgentId]);
@@ -90,13 +142,23 @@ export function AIAgentSidebar() {
   // Update selected agent based on active chatId
   useEffect(() => {
     if (chatId && conversationsObject.value && agentObjectList.value) {
-      const conversation = conversationsObject.value.items().find(conv => conv.id === chatId);
+      const conversation = conversationsObject.value
+        .items()
+        .find((conv) => conv.id === chatId);
       if (conversation) {
-        const agent = agentObjectList.value.items().find(agent => agent.id === conversation.agent) || null;
+        const agent =
+          agentObjectList.value
+            .items()
+            .find((agent) => agent.id === conversation.agent) || null;
         setSelectedAgent(agent);
       }
     }
-  }, [chatId, conversationsObject.value, agentObjectList.value, setSelectedAgent]);
+  }, [
+    chatId,
+    conversationsObject.value,
+    agentObjectList.value,
+    setSelectedAgent,
+  ]);
 
   if (
     conversationsObject.isUnloaded() ||
@@ -160,7 +222,7 @@ export function AIAgentSidebar() {
           </Button>
         </Container>
       </Container>
-      
+
       <Container heading={heading} width="100%">
         <Outlet />
       </Container>
@@ -171,7 +233,7 @@ export function AIAgentSidebar() {
             {agentObjectList.value
               ?.items()
               .slice()
-              .sort((a, b) => a.precedence - b.precedence) 
+              .sort((a, b) => a.precedence - b.precedence)
               .map((agent, index) => (
                 <Button key={agent.id} onClick={() => setSelectedAgent(agent)}>
                   {agent.name}
@@ -182,7 +244,7 @@ export function AIAgentSidebar() {
 
         <Container heading="Parámetros del Modelo">
           <Flex direction="column" gap={10}>
-          {temperature !== null && (
+            {temperature !== null && (
               <SliderField
                 key={`temperature-${forceRender}`} // Force render by changing key
                 label="Temperature"
@@ -209,7 +271,9 @@ export function AIAgentSidebar() {
               placeholder="1500"
               size="small"
               value={maxGenLen}
-              onChange={(e) => setMaxGenLen(e.target.value ? parseInt(e.target.value, 10) : 0)}
+              onChange={(e) =>
+                setMaxGenLen(e.target.value ? parseInt(e.target.value, 10) : 0)
+              }
             />
             <TextAreaField
               label="System Prompt"
@@ -238,8 +302,15 @@ export function AIAgentSidebar() {
               placeholder="3"
               size="small"
               value={numberOfResults}
-              onChange={(e) => setNumberOfResults(e.target.value ? parseInt(e.target.value, 10) : 0)}
+              onChange={(e) =>
+                setNumberOfResults(
+                  e.target.value ? parseInt(e.target.value, 10) : 0
+                )
+              }
             />
+            <Button variation="primary" onClick={onUpdate} size="small">
+              Aplicar cambios
+            </Button>
           </Flex>
         </Container>
       </Container>

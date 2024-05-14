@@ -94,6 +94,7 @@ export function ConfigurationViewAgent() {
           value={handlerLambda}
           placeholder="arn:aws:lambda:us-east-1:0000000:function:MyLambdaFunction"
           onChange={(e) => setHandlerLambda(e.target.value)}
+          isDisabled
         />
         <TextAreaField
           label="System Prompt"
@@ -113,6 +114,7 @@ export function ConfigurationViewAgent() {
           value={precedence.toString()}
           placeholder="1"
           onChange={(e) => setPrecedence(parseInt(e.target.value, 10))}
+          isDisabled
         />
         <Container heading="Parámetros del Modelo">
           <Flex direction="column" gap={10}>
@@ -143,7 +145,7 @@ export function ConfigurationViewAgent() {
               placeholder="1500"
               size="small"
               value={maxGenLen.toString()}
-              onChange={(e) => setMaxGenLen(parseInt(e.target.value, 10))}
+              onChange={(e) => setMaxGenLen(2500)}
             />
             <SelectField
               label="Knowledge Base ID"
@@ -169,10 +171,10 @@ export function ConfigurationViewAgent() {
         </Container>
       </Container>
       <Flex direction="row" justifyContent="end" padding="1rem">
-        <Button variation="primary" onClick={onUpdate} size="small">
+        <Button variation="primary" onClick={onUpdate} size="small" >
           Update Agent
         </Button>
-        <Button variation="warning" onClick={onDelete} size="small">
+        <Button variation="warning" onClick={onDelete} size="small" >
           Delete Agent
         </Button>
       </Flex>

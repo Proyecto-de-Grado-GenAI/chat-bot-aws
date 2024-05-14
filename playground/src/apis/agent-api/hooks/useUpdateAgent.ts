@@ -1,7 +1,7 @@
 import { useSetRecoilState } from "recoil";
 import { GraphqlQuery } from "../../invoker";
 import { Agents, Loadable } from "../state";
-import { NewAgent } from "../types";
+import { NewAgent, UpdateAgentInput } from "../types";
 
 interface UpdateAgentResponse {
     updateAgent: {
@@ -25,7 +25,7 @@ interface UpdateAgentResponse {
 }
 
 const updateAgentQuery = new GraphqlQuery<UpdateAgentResponse>(`
-    mutation UpdateAgent($id: ID!, $config: NewAgent!) {
+    mutation UpdateAgent($id: ID!, $config: UpdateAgentInput!) { 
         updateAgent(id: $id, config: $config) {
             id
             name
@@ -47,10 +47,12 @@ const updateAgentQuery = new GraphqlQuery<UpdateAgentResponse>(`
     }
 `);
 
+
 export function useAgentApiUpdateAgent() {
     const setAgentsValue = useSetRecoilState(Agents);
 
-    return (id: string, config: NewAgent) => {
+    return (id: string, config: UpdateAgentInput) => { // Asegúrate de que aquí uses UpdateAgentInput
+        console.log("Updating agent:", id, config);
         return updateAgentQuery.invoke({ id, config })
             .then(() => setAgentsValue(Loadable.unloaded()))
             .catch((error) => {
