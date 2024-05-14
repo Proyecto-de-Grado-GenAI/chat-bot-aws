@@ -32,7 +32,7 @@ export function AIAgentNewChat () {
     
     return (
         <div>
-            <Container heading="Start New Conversation">
+            <Container heading="¡Comienza una nueva conversación!">
                 <SelectField 
                     label="Agent"
                     placeholder="Choose An Agent"
