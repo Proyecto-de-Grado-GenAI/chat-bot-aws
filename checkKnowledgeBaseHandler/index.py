@@ -29,9 +29,15 @@ def handler(event, context):
 
         # Return the formatted list of knowledge bases in the response
         return {
-            'statusCode': 200,
-            'body': json.dumps(formatted_kbs)
-        }
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Origin': '*',
+                },
+                'body': json.dumps(formatted_kbs)
+            }
+    
+    
 
     except Exception as e:
         # Handle errors and return an error message

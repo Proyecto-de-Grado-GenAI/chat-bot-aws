@@ -26,6 +26,8 @@ import {
 } from "../apis/agent-api/state";
 import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
+import { invokeAgentCloudFunction } from "../apis/invokeCF";
+import { KnowledgeBaseURL } from "../endpoints";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -58,9 +60,9 @@ export function AIAgentSidebar() {
   const [inputMaxToken, setInputMaxToken] = useState(1000);
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
+  const [knowledgeBases, setKnowledgeBases] = useState<string[]>([]);
 
   const nav = useNavigate();
-
 
   const onUpdate = () => {
     const updatedAgent = {
@@ -113,7 +115,22 @@ export function AIAgentSidebar() {
     }
   }, [selectedAgent]);
 
-  // Set initial agent on load
+  useEffect(() => {
+    const fetchKnowledgeBases = async () => {
+      try {
+        // Ensure the identifier matches one of the names in fmHandlerArns
+        const result = await invokeAgentCloudFunction<{
+          knowledgeBaseIds: string[];
+        }>({}, KnowledgeBaseURL);
+        setKnowledgeBases(result.knowledgeBaseIds);
+      } catch (error) {
+        console.error("Failed to fetch knowledge bases:", error);
+      }
+    };
+
+    fetchKnowledgeBases();
+  }, []);
+
   useEffect(() => {
     if (agentObjectList.value) {
       const initialAgent =
@@ -289,14 +306,24 @@ export function AIAgentSidebar() {
               value={knowledgeBaseId}
               onChange={(e) => setKnowledgeBaseId(e.target.value)}
             >
-              <option value="FFUYGR42Y1">FFUYGR42Y1</option>
-              <option value="OtroId">Base de Conocimiento 2</option>
+              {knowledgeBases.map((kb) => (
+                <option key={kb} value={kb}>
+                  {kb}
+                </option>
+              ))}
             </SelectField>
-            <SwitchField
-              label="Use Knowledge Base"
-              isChecked={useKnowledgeBase}
-              onChange={(e) => setUseKnowledgeBase(e.target.checked)}
-            />
+            <SelectField
+              label="Knowledge Base ID"
+              placeholder="Selecciona una base de conocimiento"
+              value={knowledgeBaseId}
+              onChange={(e) => setKnowledgeBaseId(e.target.value)}
+            >
+              {knowledgeBases.map((kb) => (
+                <option key={kb} value={kb}>
+                  {kb}
+                </option>
+              ))}
+            </SelectField>
             <TextField
               label="Number of Results"
               placeholder="3"

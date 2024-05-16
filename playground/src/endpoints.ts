@@ -28,7 +28,4 @@ export const appsyncActionOutputs = [
 
 export const enableConfigureAgents = process.env.REACT_APP_ENABLECONSTRUCTINGAGENTS === 'true';
 
-export function getLambdaEndpoint(label: string): string | undefined {
-    const lambda = fmHandlerArns.find(handler => handler.label === label);
-    return lambda?.name;
-}
+export const KnowledgeBaseURL = process.env.REACT_APP_AGENTAPIURL as string;
