@@ -12,6 +12,10 @@ export const fmHandlerArns = [
         name: process.env.REACT_APP_EXPLORATIONLAMBDAHANDLER,
     },
     {
+        label: 'Comprehension Lambda Handler',
+        name: process.env.REACT_APP_COMPREHENSIONLAMBDAHANDLER,
+    },
+    {
         label: 'Diagram Lambda Handler',
         name: process.env.REACT_APP_DIAGRAMLAMBDAHANDLER,
     },
