@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useParams } from "react-router-dom";
 import {
   useAgentApiAgentList,
   useAgentApiConversationList,
+  useKnowledgeBase,
   useLLmList,
 } from "../apis/agent-api";
 import {
@@ -23,11 +24,10 @@ import {
   activeConversationsState,
   selectedLlmState,
   selectedAgentState,
+  KnowledgeBases,
 } from "../apis/agent-api/state";
 import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
-import { invokeAgentCloudFunction } from "../apis/invokeCF";
-import { KnowledgeBaseURL } from "../endpoints";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -53,16 +53,19 @@ export function AIAgentSidebar() {
     "Eres un asistente útil y amigable."
   );
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
-  const [useKnowledgeBase, setUseKnowledgeBase] = useState(true);
+  const [IfUseKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState(3);
   const [agentName, setAgentName] = useState("");
   const [handlerLambda, setHandlerLambda] = useState("");
   const [inputMaxToken, setInputMaxToken] = useState(1000);
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
-  const [knowledgeBases, setKnowledgeBases] = useState<string[]>([]);
+  
+  const KnowledgeBases = useKnowledgeBase();
 
   const nav = useNavigate();
+
+  
 
   const onUpdate = () => {
     const updatedAgent = {
@@ -78,7 +81,7 @@ export function AIAgentSidebar() {
       },
       knowledgeBaseParams: {
         knowledgeBaseId: knowledgeBaseId,
-        useKnowledgeBase: useKnowledgeBase,
+        useKnowledgeBase: IfUseKnowledgeBase,
         numberOfResults: numberOfResults,
       },
     };
@@ -111,25 +114,9 @@ export function AIAgentSidebar() {
       );
       setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
-      setForceRender((prev) => !prev); // Toggle force render
+      setForceRender((prev) => !prev); 
     }
   }, [selectedAgent]);
-
-  useEffect(() => {
-    const fetchKnowledgeBases = async () => {
-      try {
-        // Ensure the identifier matches one of the names in fmHandlerArns
-        const result = await invokeAgentCloudFunction<{
-          knowledgeBaseIds: string[];
-        }>({}, KnowledgeBaseURL);
-        setKnowledgeBases(result.knowledgeBaseIds);
-      } catch (error) {
-        console.error("Failed to fetch knowledge bases:", error);
-      }
-    };
-
-    fetchKnowledgeBases();
-  }, []);
 
   useEffect(() => {
     if (agentObjectList.value) {
@@ -140,7 +127,6 @@ export function AIAgentSidebar() {
     }
   }, [agentObjectList.value, setSelectedAgent]);
 
-  // Sync the selected agent with active conversations
   useEffect(() => {
     if (selectedAgent && selectedAgent.id !== lastSelectedAgentId) {
       setLastSelectedAgentId(selectedAgent.id);
@@ -156,7 +142,6 @@ export function AIAgentSidebar() {
     }
   }, [selectedAgent, agentConversations, chatId, nav, lastSelectedAgentId]);
 
-  // Update selected agent based on active chatId
   useEffect(() => {
     if (chatId && conversationsObject.value && agentObjectList.value) {
       const conversation = conversationsObject.value
@@ -177,13 +162,14 @@ export function AIAgentSidebar() {
     setSelectedAgent,
   ]);
 
+
   if (
     conversationsObject.isUnloaded() ||
     !conversationsObject.value ||
     agentObjectList.isUnloaded() ||
     !agentObjectList.value ||
     LLmsObject.isUnloaded() ||
-    !LLmsObject.value
+    !LLmsObject.value || KnowledgeBases.isUnloaded() || !KnowledgeBases.value
   ) {
     return <Loader />;
   }
@@ -300,27 +286,10 @@ export function AIAgentSidebar() {
               value={systemPrompt}
               onChange={(e) => setSystemPrompt(e.target.value)}
             />
-            <SelectField
-              label="Knowledge Base ID"
-              placeholder="Selecciona una base de conocimiento"
-              value={knowledgeBaseId}
-              onChange={(e) => setKnowledgeBaseId(e.target.value)}
-            >
-              {knowledgeBases.map((kb) => (
-                <option key={kb} value={kb}>
-                  {kb}
-                </option>
-              ))}
-            </SelectField>
-            <SelectField
-              label="Knowledge Base ID"
-              placeholder="Selecciona una base de conocimiento"
-              value={knowledgeBaseId}
-              onChange={(e) => setKnowledgeBaseId(e.target.value)}
-            >
-              {knowledgeBases.map((kb) => (
-                <option key={kb} value={kb}>
-                  {kb}
+            <SelectField label="Knowledge Base" size="small" value={knowledgeBaseId} onChange={(e) => setKnowledgeBaseId(e.target.value)}>
+              {KnowledgeBases.value?.map((kb) => (
+                <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
+                  {kb.name}
                 </option>
               ))}
             </SelectField>

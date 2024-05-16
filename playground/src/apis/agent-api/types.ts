@@ -96,7 +96,9 @@ export interface UpdateAgentInput {
 }
 
 export interface KnowledgeBase {
-    id: string;
+    status: string;
     name: string;
     description: string;
+    updatedAt : string;
+    knowledgeBaseId: string;
 }

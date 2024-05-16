@@ -13,6 +13,7 @@
     "@aws-sdk/client-cloudformation": "^3.386.0",
     "@aws-sdk/client-dynamodb": "^3.386.0",
     "@aws-sdk/lib-dynamodb": "^3.387.0",
+    "@cloudcomponents/cdk-dynamodb-seeder": "^2.4.0",
     "@types/node": "10.17.27",
     "aws-cdk": "^2.89.0",
     "aws-cdk-lib": "^2.89.0",

@@ -1,21 +1,16 @@
 import { useRecoilState } from "recoil";
 import { useEffect } from "react";
-import { Loadable, ObjRecord, KnowledgeBases } from "../state";
+import { Loadable, KnowledgeBases } from "../state";
 import * as TAgentApi from "../types";
-import { invokeAgentCloudFunction } from "../../invokeCF";
-
-
-
+import { InvokeAgentCloudFunction } from "../../invokeCF";
+import { KnowledgeBaseURL } from "../../../endpoints";
 
 export class CloudFunctionInvocation<T> {
-    constructor(
-        public body: any,
-        public label: string
-    ) { }
+    constructor(public body: any,  public endpoint: string) { }
 
     invoke() {
-        return invokeAgentCloudFunction<T>(this.body, this.label);
-    }   
+        return InvokeAgentCloudFunction<T>(this.body, this.endpoint);
+    }
 }
 
 export function useKnowledgeBase() {
@@ -30,14 +25,12 @@ export function useKnowledgeBase() {
 
         const fetchKnowledgeBases = async () => {
             try {
-                const invocation = new CloudFunctionInvocation<{ listKnowledgeBases: TAgentApi.KnowledgeBase[] }>({}, 'test');
+                const invocation = new CloudFunctionInvocation<TAgentApi.KnowledgeBase[]>({}, KnowledgeBaseURL);
                 const result = await invocation.invoke();
-                setKnowledgeBases(
-                    Loadable.loaded(
-                        ObjRecord.of(result.listKnowledgeBases)
-                    )
-                );
+                setKnowledgeBases(Loadable.loaded(result));
             } catch (error) {
+                console.error("Failed to fetch knowledge bases", error);
+                setKnowledgeBases(Loadable.unloaded());
             }
         };
 

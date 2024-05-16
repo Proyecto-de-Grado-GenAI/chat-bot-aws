@@ -143,7 +143,7 @@ export const activeConversationsState = atom<ActiveConversationsState>({
 });
 
 
-type KnowledgeBaseStore = Loadable<ObjRecord<TAgentApi.KnowledgeBase>>;
+type KnowledgeBaseStore = Loadable<TAgentApi.KnowledgeBase[]>;
 
 export const KnowledgeBases = atom<KnowledgeBaseStore>({
   key: "KnowledgeBases",
