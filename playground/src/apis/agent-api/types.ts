@@ -94,3 +94,9 @@ export interface UpdateAgentInput {
     modelParams?: ModelParamsInput;
     knowledgeBaseParams?: KnowledgeBaseParamsInput;
 }
+
+export interface KnowledgeBase {
+    id: string;
+    name: string;
+    description: string;
+}

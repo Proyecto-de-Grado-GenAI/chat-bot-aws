@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { buildFoundationModelHandler, buildCognitoAuth, buildAgentApi,  buildTables } from '.';
+import { buildCustomLambda } from './handler-lambda-custom';
 
 export class AppsyncAgentAPIStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -41,6 +42,8 @@ export class AppsyncAgentAPIStack extends cdk.Stack {
             agentApi, 
             lambdaPath: 'DiagramLambdaHandler' 
         })
+
+        const checkKnowledgeBaseHandler = buildCustomLambda(this, { lambdaPath: 'checkKnowledgeBaseHandler' })
 
        
 
