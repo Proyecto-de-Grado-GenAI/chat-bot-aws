@@ -2,10 +2,6 @@ import { Auth } from "aws-amplify";
 import { agentApiEndpoint } from "../endpoints";
 
 export async function Invoke<T> (query: string, variables: any, endpoint: string, authHeaders: any) {
-    console.log(JSON.stringify({
-                query,
-                variables: variables || {}
-            , endpoint, authHeaders}))
 
     const response = await fetch(endpoint, {
         method: 'POST',
@@ -30,8 +26,6 @@ export async function Invoke<T> (query: string, variables: any, endpoint: string
 }
 
 export async function InvokeAgentAPI<T> (query: string, variables?: any) { 
-    console.log('Invoking agent', query, variables)
-    console.log('Invoking agent', agentApiEndpoint)
     const user = await Auth.currentAuthenticatedUser()
     return Invoke<T>(query, variables, agentApiEndpoint, {
         Authorization: user.signInUserSession.accessToken.jwtToken

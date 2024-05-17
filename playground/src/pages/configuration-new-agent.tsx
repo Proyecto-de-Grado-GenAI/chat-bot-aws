@@ -1,9 +1,12 @@
 import { useState } from "react";
 import {
   Button,
+  CheckboxField,
   Flex,
   Loader,
   SelectField,
+  SliderField,
+  SwitchField,
   TextAreaField,
   TextField,
   View,
@@ -11,6 +14,7 @@ import {
 import { Container } from "../library/container";
 import { fmHandlerArns } from "../endpoints";
 import { useAgentApiCreateAgent } from "../apis/agent-api/hooks/useCreateAgent";
+import { useKnowledgeBase } from "../apis/agent-api";
 
 export function ConfigurationNewAgent() {
   const [agentName, setAgentName] = useState("");
@@ -23,13 +27,14 @@ export function ConfigurationNewAgent() {
   const [maxTokensPerQuestion, setMaxTokensPerQuestion] = useState("");
   const [precedence, setPrecedence] = useState("1");
 
-  // Campos adicionales
-  const [temperature, setTemperature] = useState("0.7");
-  const [topP, setTopP] = useState("0.9");
-  const [maxGenLen, setMaxGenLen] = useState("1500");
+  const [temperature, setTemperature] = useState(0.7);
+  const [topP, setTopP] = useState(0.9);
+  const [maxGenLen, setMaxGenLen] = useState("2048");
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
-  const [useKnowledgeBase, setUseKnowledgeBase] = useState(true);
+  const [IfuseKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState("3");
+  const KnowledgeBases = useKnowledgeBase();
+  const [forceRender, setForceRender] = useState(false);
 
   const enabled = !!agentName;
 
@@ -45,16 +50,30 @@ export function ConfigurationNewAgent() {
       inputMaxToken: parseInt(maxTokensPerQuestion, 10),
       precedence: parseInt(precedence, 10),
       modelParams: {
-        temperature: parseFloat(temperature),
-        top_p: parseFloat(topP),
+        temperature: temperature,
+        top_p: topP,
         max_gen_len: parseInt(maxGenLen, 10),
       },
       knowledgeBaseParams: {
-        knowledgeBaseId,
-        useKnowledgeBase,
+        knowledgeBaseId: knowledgeBaseId,
+        useKnowledgeBase: IfuseKnowledgeBase,
         numberOfResults: parseInt(numberOfResults, 10),
       },
     });
+  };
+
+  const handleMaxGenLenChange = (e: any) => {
+    const value = e.target.value;
+    if (parseInt(value, 10) <= 2048) {
+      setMaxGenLen(value);
+    }
+  };
+
+  const handleNumberOfResultsChange = (e: any) => {
+    const value = e.target.value;
+    if (parseInt(value, 10) <= 100) {
+      setNumberOfResults(value);
+    }
   };
 
   return (
@@ -106,44 +125,58 @@ export function ConfigurationNewAgent() {
           onChange={(e) => setPrecedence(e.target.value)}
           placeholder="1"
         />
-
-        {/* Campos adicionales */}
-        <TextField
-          label="Temperature"
-          value={temperature}
-          onChange={(e) => setTemperature(e.target.value)}
-          placeholder="0.7"
-        />
-        <TextField
-          label="Top P"
-          value={topP}
-          onChange={(e) => setTopP(e.target.value)}
-          placeholder="0.9"
-        />
+        {temperature !== null && (
+          <SliderField
+            key={`temperature-${forceRender}`} // Force render by changing key
+            label="Temperature"
+            min={0}
+            max={1}
+            step={0.01}
+            value={temperature}
+            onChange={(value) => setTemperature(value)}
+          />
+        )}
+        {topP !== null && (
+          <SliderField
+            key={`topP-${forceRender}`} // Force render by changing key
+            label="Top P"
+            min={0}
+            max={1}
+            step={0.01}
+            value={topP}
+            onChange={(value) => setTopP(value)}
+          />
+        )}
         <TextField
           label="Max Generation Length"
           value={maxGenLen}
-          onChange={(e) => setMaxGenLen(e.target.value)}
-          placeholder="1500"
-        />
-        <TextField
-          label="Knowledge Base ID"
-          value={knowledgeBaseId}
-          onChange={(e) => setKnowledgeBaseId(e.target.value)}
-          placeholder="FFUYGR42Y1"
+          onChange={handleMaxGenLenChange}
+          placeholder="2048"
         />
         <SelectField
-          label="Use Knowledge Base"
-          onChange={(e) => setUseKnowledgeBase(e.target.value === "true")}
-          value={useKnowledgeBase ? "true" : "false"}
+          label="Knowledge Base"
+          size="small"
+          value={knowledgeBaseId}
+          onChange={(e) => setKnowledgeBaseId(e.target.value)}
         >
-          <option value="true">Yes</option>
-          <option value="false">No</option>
+          {KnowledgeBases.value?.map((kb) => (
+            <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
+              {kb.name}
+            </option>
+          ))}
         </SelectField>
+
+        <CheckboxField
+          label="Use Knowledge Base"
+          name="useKnowledgeBase"
+          checked={IfuseKnowledgeBase}
+          onChange={(e) => setUseKnowledgeBase(e.target.checked)}
+        />
+
         <TextField
           label="Number of Results"
           value={numberOfResults}
-          onChange={(e) => setNumberOfResults(e.target.value)}
+          onChange={handleNumberOfResultsChange}
           placeholder="3"
         />
       </Container>

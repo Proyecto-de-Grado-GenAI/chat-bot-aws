@@ -15,6 +15,7 @@ import {
   SwitchField,
   TextField,
   TextAreaField,
+  CheckboxField,
 } from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
 import { Combobox } from "react-widgets/cjs";
@@ -60,12 +61,10 @@ export function AIAgentSidebar() {
   const [inputMaxToken, setInputMaxToken] = useState(1000);
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
-  
+
   const KnowledgeBases = useKnowledgeBase();
 
   const nav = useNavigate();
-
-  
 
   const onUpdate = () => {
     const updatedAgent = {
@@ -114,7 +113,7 @@ export function AIAgentSidebar() {
       );
       setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
-      setForceRender((prev) => !prev); 
+      setForceRender((prev) => !prev);
     }
   }, [selectedAgent]);
 
@@ -162,14 +161,15 @@ export function AIAgentSidebar() {
     setSelectedAgent,
   ]);
 
-
   if (
     conversationsObject.isUnloaded() ||
     !conversationsObject.value ||
     agentObjectList.isUnloaded() ||
     !agentObjectList.value ||
     LLmsObject.isUnloaded() ||
-    !LLmsObject.value || KnowledgeBases.isUnloaded() || !KnowledgeBases.value
+    !LLmsObject.value ||
+    KnowledgeBases.isUnloaded() ||
+    !KnowledgeBases.value
   ) {
     return <Loader />;
   }
@@ -286,13 +286,24 @@ export function AIAgentSidebar() {
               value={systemPrompt}
               onChange={(e) => setSystemPrompt(e.target.value)}
             />
-            <SelectField label="Knowledge Base" size="small" value={knowledgeBaseId} onChange={(e) => setKnowledgeBaseId(e.target.value)}>
+            <SelectField
+              label="Knowledge Base"
+              size="small"
+              value={knowledgeBaseId}
+              onChange={(e) => setKnowledgeBaseId(e.target.value)}
+            >
               {KnowledgeBases.value?.map((kb) => (
                 <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
                   {kb.name}
                 </option>
               ))}
             </SelectField>
+            <CheckboxField
+              label="Use Knowledge Base"
+              name="useKnowledgeBase"
+              checked={IfUseKnowledgeBase}
+              onChange={(e) => setUseKnowledgeBase(e.target.checked)}
+            />
             <TextField
               label="Number of Results"
               placeholder="3"

@@ -3,7 +3,6 @@ import axios from "axios";
 
 // Función para invocar una función en la nube con autenticación
 export async function invokeCloudFunction<T>(body: any, endpoint: string, authHeaders: any): Promise<T> {
-    console.log('Request:', JSON.stringify({ body, endpoint, authHeaders }));
 
     try {
         const response = await axios.post(endpoint, body, {

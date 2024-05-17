@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Flex, Loader, SliderField, SelectField, SwitchField, TextAreaField, TextField, View } from "@aws-amplify/ui-react";
+import { Button, Flex, Loader, SliderField, SelectField, TextAreaField, TextField, View, CheckboxField } from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
-import { useAgentApiAgent } from "../apis/agent-api";
+import { useAgentApiAgent, useKnowledgeBase } from "../apis/agent-api";
 import { useAgentApiDeleteAgent } from "../apis/agent-api/hooks/useDeleteAgent";
 import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
@@ -17,19 +17,19 @@ export function ConfigurationViewAgent() {
   const [maxGenLen, setMaxGenLen] = useState(1500);
   const [systemPrompt, setSystemPrompt] = useState("Eres un asistente útil y amigable.");
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
-  const [useKnowledgeBase, setUseKnowledgeBase] = useState(true);
+  const [ifuseKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState(3);
   const [agentName, setAgentName] = useState("");
   const [handlerLambda, setHandlerLambda] = useState("");
   const [inputMaxToken, setInputMaxToken] = useState(1000);
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
+  const KnowledgeBases = useKnowledgeBase();
 
   useEffect(() => {
     if (agentObject.value) {
       const agent = agentObject.value;
-      console.log('Agent Object:', agent); // Print the agent object
-      console.log(agent.modelParams?.temperature); // Print the agent temperature
+      
       setAgentName(agent.name || "");
       setHandlerLambda(agent.handlerLambda || "");
       setSystemPrompt(agent.systemPrompt || "Eres un asistente útil y amigable.");
@@ -44,6 +44,10 @@ export function ConfigurationViewAgent() {
       setForceRender(prev => !prev); // Toggle force render
     }
   }, [agentObject.value]);
+
+  useEffect(() => {
+    console.log("ifuseKnowledgeBase state updated: ", ifuseKnowledgeBase);
+  }, [ifuseKnowledgeBase]);
 
   if (agentObject.isUnloaded() || !agentObject.value) {
     return <Loader />;
@@ -67,7 +71,7 @@ export function ConfigurationViewAgent() {
       },
       knowledgeBaseParams: {
         knowledgeBaseId: knowledgeBaseId,
-        useKnowledgeBase: useKnowledgeBase,
+        useKnowledgeBase: ifuseKnowledgeBase,
         numberOfResults: numberOfResults,
       },
     };
@@ -144,19 +148,19 @@ export function ConfigurationViewAgent() {
               placeholder="1500"
               size="small"
               value={maxGenLen.toString()}
-              onChange={(e) => setMaxGenLen(2500)}
+              onChange={(e) => setMaxGenLen(parseInt(e.target.value, 10))}
             />
-            <SelectField
-              label="Knowledge Base ID"
-              placeholder="Selecciona una base de conocimiento"
-              value={knowledgeBaseId}
-              onChange={(e) => setKnowledgeBaseId(e.target.value)}
-            >
-              <option value="FFUYGR42Y1">FFUYGR42Y1</option>
+            <SelectField label="Knowledge Base" size="small" value={knowledgeBaseId} onChange={(e) => setKnowledgeBaseId(e.target.value)}>
+              {KnowledgeBases.value?.map((kb) => (
+                <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
+                  {kb.name}
+                </option>
+              ))}
             </SelectField>
-            <SwitchField
+            <CheckboxField
               label="Use Knowledge Base"
-              isChecked={useKnowledgeBase}
+              name="useKnowledgeBase"
+              checked={ifuseKnowledgeBase}
               onChange={(e) => setUseKnowledgeBase(e.target.checked)}
             />
             <TextField
@@ -170,10 +174,10 @@ export function ConfigurationViewAgent() {
         </Container>
       </Container>
       <Flex direction="row" justifyContent="end" padding="1rem">
-        <Button variation="primary" onClick={onUpdate} size="small" >
+        <Button variation="primary" onClick={onUpdate} size="small">
           Update Agent
         </Button>
-        <Button variation="warning" onClick={onDelete} size="small" >
+        <Button variation="warning" onClick={onDelete} size="small">
           Delete Agent
         </Button>
       </Flex>
