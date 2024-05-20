@@ -85,6 +85,16 @@ export interface NewAgent {
     knowledgeBaseParams: KnowledgeBaseParamsInput;
 }
 
+export interface NewAgentInput {
+    name: string;
+    handlerLambda: string;
+    systemPrompt: string;
+    inputMaxToken: number;
+    precedence: number;
+    modelParams: ModelParamsInput;
+    knowledgeBaseParams: KnowledgeBaseParamsInput;
+}
+
 export interface UpdateAgentInput {
     name?: string;
     handlerLambda?: string;
@@ -101,4 +111,9 @@ export interface KnowledgeBase {
     description: string;
     updatedAt : string;
     knowledgeBaseId: string;
+}
+
+export interface Variable { 
+    name: string;
+    value: string;
 }

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { useState, useEffect } from "react";
 import {
   TextAreaField,
@@ -22,7 +22,7 @@ import {
   useAgentConversationMetadata,
   useResetAgentConversationMetadata,
 } from "../apis/agent-api/hooks/useMetadata";
-import { selectedLlmState, selectedAgentState } from "../apis/agent-api/state";
+import { selectedLlmState, selectedAgentState, variablesState } from "../apis/agent-api/state";
 import llama3Tokenizer from "llama3-tokenizer-js";
 
 export function AIAgentViewChat() {
@@ -38,6 +38,7 @@ export function AIAgentViewChat() {
   const resetMetadata = useResetAgentConversationMetadata();
   const submitMessage = useAgentApiSendMessage(chatId);
   const selectedAgent = useRecoilValue(selectedAgentState);
+  const [variablesList] = useRecoilState(variablesState);
 
   useAgentApiSubscribeConversation(chatId);
 
@@ -75,7 +76,7 @@ export function AIAgentViewChat() {
       alert("Por favor, seleccione un LLM para enviar mensajes.");
       return;
     }
-
+    console.log(variablesList);
     const payload = {
       message: chatString,
       model: selectedLlm,
@@ -89,7 +90,8 @@ export function AIAgentViewChat() {
         knowledgeBaseId: agentObject.value?.knowledgeBaseParams.knowledgeBaseId || "",
         useKnowledgeBase: agentObject.value?.knowledgeBaseParams.useKnowledgeBase || false,
         numberOfResults: agentObject.value?.knowledgeBaseParams.numberOfResults || 3,
-      }
+      },
+      variables: variablesList,
     };
     console.log("Sending message:", payload);
     submitMessage(payload);
