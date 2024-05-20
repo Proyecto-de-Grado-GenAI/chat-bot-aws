@@ -45,7 +45,7 @@ export function ConfigurationNewAgent() {
         : agentEndpointDropdown;
     createAgent({
       name: agentName,
-      systemPrompt,
+      systemPrompt: systemPrompt,
       handlerLambda: endpoint!,
       inputMaxToken: parseInt(maxTokensPerQuestion, 10),
       precedence: parseInt(precedence, 10),

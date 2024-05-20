@@ -16,6 +16,8 @@ import {
   TextField,
   TextAreaField,
   CheckboxField,
+  Expander,
+  ExpanderItem,
 } from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
 import { Combobox } from "react-widgets/cjs";
@@ -26,9 +28,12 @@ import {
   selectedLlmState,
   selectedAgentState,
   KnowledgeBases,
+  variablesState,
 } from "../apis/agent-api/state";
 import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
+import remarkGfm from "remark-gfm";
+import ReactMarkdown from "react-markdown";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -61,6 +66,18 @@ export function AIAgentSidebar() {
   const [inputMaxToken, setInputMaxToken] = useState(1000);
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
+  const [selectedVariable, setSelectedVariable] = useState(
+    "Telecommunications Company"
+  );
+  const [variablesList] = useRecoilState(variablesState);
+
+  const selectedContent =
+    variablesList.find((variable) => variable.name === selectedVariable)
+      ?.value || "";
+
+  const handleVariableChange = (event: any) => {
+    setSelectedVariable(event.target.value);
+  };
 
   const KnowledgeBases = useKnowledgeBase();
 
@@ -197,129 +214,167 @@ export function AIAgentSidebar() {
 
   return (
     <Flex>
-      <Container heading="Conversaciones y LLms" width="20%">
-        <Container heading="Tu LLM">
-          <Combobox
-            data={LLmsObject.value?.items()}
-            textField="name"
-            onSelect={(value) => {
-              if (typeof value === "object" && value !== null) {
-                setSelectedLlm(value);
-              }
-            }}
-            value={selectedLlm}
-          />
-        </Container>
-        <Container heading="Tus conversaciones">
-          <Flex
-            direction="column"
-            gap={10}
-            maxHeight={"calc(100vh - 150px)"}
-            overflow="auto"
-          >
-            {conversationsRendered}
-          </Flex>
-          <br />
-          <Button isFullWidth onClick={() => nav("/chat/new")}>
-            Nueva conversacion
-          </Button>
-        </Container>
+      <Container heading="Conversaciones y LLms" width="30%">
+        <Expander type="multiple" height={"1000"}>
+          <ExpanderItem title="Tu LLM" value="llm">
+            <SelectField
+              label="Selecciona un LLM"
+              size="small"
+              value={selectedLlm ? selectedLlm.id : ""}
+              onChange={(e) => {
+                const selected = LLmsObject.value!.items().find(
+                  (llm) => llm.id === e.target.value
+                );
+                setSelectedLlm(selected!);
+              }}
+            >
+              {LLmsObject.value.items().map((llm) => (
+                <option key={llm.id} value={llm.id}>
+                  {llm.name}
+                </option>
+              ))}
+            </SelectField>
+          </ExpanderItem>
+
+          <ExpanderItem title="Tus conversaciones" value="conversaciones">
+            <Flex
+              direction="column"
+              gap={10}
+              maxHeight={"calc(100vh - 150px)"}
+              overflow="auto"
+            >
+              {conversationsRendered}
+            </Flex>
+            <br />
+            <Button isFullWidth onClick={() => nav("/chat/new")}>
+              Nueva conversacion
+            </Button>
+          </ExpanderItem>
+        </Expander>
       </Container>
 
       <Container heading={heading} width="100%">
         <Outlet />
       </Container>
 
-      <Container heading="Etapas y contexto" width="40%">
-        <Container heading="Etapas">
-          <Flex direction="row" gap={5}>
-            {agentObjectList.value
-              ?.items()
-              .slice()
-              .sort((a, b) => a.precedence - b.precedence)
-              .map((agent, index) => (
-                <Button key={agent.id} onClick={() => setSelectedAgent(agent)}>
-                  {agent.name}
-                </Button>
-              ))}
-          </Flex>
-        </Container>
+      <Container heading="Etapas y contexto" width="60%">
+        <Expander type="multiple">
+          <ExpanderItem title="Etapas" value="etapas">
+            <Flex direction="row" gap={5}>
+              {agentObjectList.value
+                ?.items()
+                .slice()
+                .sort((a, b) => a.precedence - b.precedence)
+                .map((agent, index) => (
+                  <Button
+                    key={agent.id}
+                    onClick={() => setSelectedAgent(agent)}
+                  >
+                    {agent.name}
+                  </Button>
+                ))}
+            </Flex>
+          </ExpanderItem>
 
-        <Container heading="Parámetros del Modelo">
-          <Flex direction="column" gap={10}>
-            {temperature !== null && (
-              <SliderField
-                key={`temperature-${forceRender}`} // Force render by changing key
-                label="Temperature"
-                min={0}
-                max={1}
-                step={0.01}
-                value={temperature}
-                onChange={(value) => setTemperature(value)}
+          <ExpanderItem title="Parámetros del Modelo" value="parametros">
+            <Flex direction="column" gap={10}>
+              {temperature !== null && (
+                <SliderField
+                  key={`temperature-${forceRender}`} // Force render by changing key
+                  label="Temperature"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={temperature}
+                  onChange={(value) => setTemperature(value)}
+                />
+              )}
+              {topP !== null && (
+                <SliderField
+                  key={`topP-${forceRender}`} // Force render by changing key
+                  label="Top P"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={topP}
+                  onChange={(value) => setTopP(value)}
+                />
+              )}
+              <TextField
+                label="Max Gen Len"
+                placeholder="1500"
+                size="small"
+                value={maxGenLen}
+                onChange={(e) =>
+                  setMaxGenLen(
+                    e.target.value ? parseInt(e.target.value, 10) : 0
+                  )
+                }
               />
-            )}
-            {topP !== null && (
-              <SliderField
-                key={`topP-${forceRender}`} // Force render by changing key
-                label="Top P"
-                min={0}
-                max={1}
-                step={0.01}
-                value={topP}
-                onChange={(value) => setTopP(value)}
+              <TextAreaField
+                label="System Prompt"
+                placeholder="Eres un asistente útil y amigable."
+                size="small"
+                rows={5}
+                value={systemPrompt}
+                onChange={(e) => setSystemPrompt(e.target.value)}
               />
-            )}
-            <TextField
-              label="Max Gen Len"
-              placeholder="1500"
-              size="small"
-              value={maxGenLen}
-              onChange={(e) =>
-                setMaxGenLen(e.target.value ? parseInt(e.target.value, 10) : 0)
-              }
-            />
-            <TextAreaField
-              label="System Prompt"
-              placeholder="Eres un asistente útil y amigable."
-              size="small"
-              rows={5}
-              value={systemPrompt}
-              onChange={(e) => setSystemPrompt(e.target.value)}
-            />
+              <SelectField
+                label="Knowledge Base"
+                size="small"
+                value={knowledgeBaseId}
+                onChange={(e) => setKnowledgeBaseId(e.target.value)}
+              >
+                {KnowledgeBases.value?.map((kb) => (
+                  <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
+                    {kb.name}
+                  </option>
+                ))}
+              </SelectField>
+              <CheckboxField
+                label="Use Knowledge Base"
+                name="useKnowledgeBase"
+                checked={IfUseKnowledgeBase}
+                onChange={(e) => setUseKnowledgeBase(e.target.checked)}
+              />
+              <TextField
+                label="Number of Results"
+                placeholder="3"
+                size="small"
+                value={numberOfResults}
+                onChange={(e) =>
+                  setNumberOfResults(
+                    e.target.value ? parseInt(e.target.value, 10) : 0
+                  )
+                }
+              />
+              <Button variation="primary" onClick={onUpdate} size="small">
+                Aplicar cambios
+              </Button>
+            </Flex>
+          </ExpanderItem>
+
+          <ExpanderItem
+            title="Seleccionar Variables y Vista Previa"
+            value="variables"
+          >
             <SelectField
-              label="Knowledge Base"
+              label="Selecciona una variable"
               size="small"
-              value={knowledgeBaseId}
-              onChange={(e) => setKnowledgeBaseId(e.target.value)}
+              value={selectedVariable}
+              onChange={handleVariableChange}
             >
-              {KnowledgeBases.value?.map((kb) => (
-                <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
-                  {kb.name}
+              {variablesList.map((variable) => (
+                <option key={variable.name} value={variable.name}>
+                  {variable.name}
                 </option>
               ))}
             </SelectField>
-            <CheckboxField
-              label="Use Knowledge Base"
-              name="useKnowledgeBase"
-              checked={IfUseKnowledgeBase}
-              onChange={(e) => setUseKnowledgeBase(e.target.checked)}
-            />
-            <TextField
-              label="Number of Results"
-              placeholder="3"
-              size="small"
-              value={numberOfResults}
-              onChange={(e) =>
-                setNumberOfResults(
-                  e.target.value ? parseInt(e.target.value, 10) : 0
-                )
-              }
-            />
-            <Button variation="primary" onClick={onUpdate} size="small">
-              Aplicar cambios
-            </Button>
-          </Flex>
-        </Container>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {selectedContent}
+            </ReactMarkdown>
+          </ExpanderItem>
+        </Expander>
       </Container>
     </Flex>
   );

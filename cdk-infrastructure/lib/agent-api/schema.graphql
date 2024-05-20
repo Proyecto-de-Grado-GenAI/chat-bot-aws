@@ -65,6 +65,18 @@ input UserAction {
     modelParams: ModelParamsInput
     systemPrompt: String
     knowledgeBaseParams: KnowledgeBaseParamsInput
+    variables: [VariableInput]
+}
+
+input VariableInput {
+  name: String
+  value: String
+}
+
+input KnowledgeBaseParamsInput {
+  knowledgeBaseId: String
+  useKnowledgeBase: Boolean
+  numberOfResults: Int
 }
 
 input ModelParamsInput {
@@ -73,11 +85,7 @@ input ModelParamsInput {
   max_gen_len: Int
 }
 
-input KnowledgeBaseParamsInput {
-  knowledgeBaseId: String
-  useKnowledgeBase: Boolean
-  numberOfResults: Int
-}
+
 
 input LLmInput {
     id: String!
