@@ -58,7 +58,6 @@ export function useAgentApiConversationWithMessages (id: string = '') {
                     if (!targetConversationEvents || !targetConversationEvents.isLoaded()){
                         targetConversationEvents = AgentApiStore.Loadable.loaded([])
                     }
-
                     let newConversationEvents = { ...data }
                     let newTargetConversationEvents = [
                         ...targetConversationEvents.value!

@@ -29,6 +29,14 @@ export function buildCognitoAuth(scope: Construct, bucketArn: string) {
             userPassword: true,
             userSrp: true,
         },
+        generateSecret: false,
+        oAuth: {
+            flows: {
+                authorizationCodeGrant: true,
+            },
+            scopes: [cognito.OAuthScope.EMAIL, cognito.OAuthScope.OPENID, cognito.OAuthScope.PROFILE],
+            callbackUrls: ["http://localhost:3000"]
+        },
     });
 
     const identityPool = new cognito.CfnIdentityPool(scope, "auth-identity-pool", {
@@ -46,13 +54,13 @@ export function buildCognitoAuth(scope: Construct, bucketArn: string) {
     authenticatedRole.addToPolicy(
         // IAM policy granting users permission to a specific folder in the S3 bucket
         new PolicyStatement({
-          actions: ["s3:*"],
-          effect: Effect.ALLOW,
-          resources: [
-            bucketArn + "/private/${cognito-identity.amazonaws.com:sub}/*",
-          ],
+            actions: ["s3:*"],
+            effect: Effect.ALLOW,
+            resources: [
+                bucketArn + "/private/${cognito-identity.amazonaws.com:sub}/*",
+            ],
         })
-      );
+    );
 
     new cdk.CfnOutput(scope, 'cognito-pool', {
         exportName: 'cognito-pool',

@@ -12,7 +12,6 @@
     "@aws-amplify/ui-react-storage": "^3.1.2",
     "@chatscope/chat-ui-kit-react": "^2.0.3",
     "@types/node": "^16.18.37",
-    "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "aws-amplify": "^6.3.2",
     "aws-appsync": "^4.1.9",
@@ -24,7 +23,7 @@
     "llama3-tokenizer-js": "^1.1.2",
     "Prism": "^2.0.0",
     "prismjs": "^1.29.0",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
@@ -58,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react": "^18.3.2",
     "@types/uuid": "^9.0.2",
     "sass": "^1.76.0"
   }

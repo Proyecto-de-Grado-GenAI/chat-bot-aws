@@ -1,5 +1,10 @@
 export const agentApiEndpoint = process.env.REACT_APP_AGENTAPIENDPOINT as string;
 
+export const s3Config = {
+    bucket: process.env.REACT_APP_ATTACHMENTSBUCKETNAME as string,
+    region: process.env.REACT_APP_REGION as string
+};
+
 export const cognitoConfig = {
     userPoolId: process.env.REACT_APP_COGNITOPOOL as string,
     userPoolClientId: process.env.REACT_APP_COGNITOCLIENT as string,

@@ -16,12 +16,15 @@ import './prism.css'
 import '@aws-amplify/ui-react/styles.css';
 import './index.css';
 import { Amplify } from 'aws-amplify'
-import { agentApiEndpoint, cognitoConfig } from './endpoints';
+import { agentApiEndpoint, cognitoConfig, s3Config } from './endpoints';
 
 // Load auth config data
 Amplify.configure({ 
   Auth: {
     Cognito: cognitoConfig
+  },
+  Storage: {
+    S3: s3Config
   },
   API: {
     GraphQL: {

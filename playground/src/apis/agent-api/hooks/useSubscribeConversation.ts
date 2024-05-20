@@ -25,13 +25,14 @@ export function subscribeConversationMessages(conversationId: string): any {
             }
         }  
     `;
-
-
-    return client.graphql({ 
+    
+    const res = client.graphql({ 
         query: query,
         variables: { cid: conversationId }
-    })      
+    })
+    console.log("XD", res)
 
+    return res
 }
 
 export function subscribeConversationEvents(conversationId: string): any {
@@ -50,10 +51,11 @@ export function subscribeConversationEvents(conversationId: string): any {
     `;
 
 
-    return client.graphql({ 
+    const res =  client.graphql({ 
         query: query,
         variables: { cid: conversationId }
-    })      
+    })     
+    return res 
 
 }
 
@@ -105,14 +107,14 @@ export function useAgentApiSubscribeConversation (id: string = '') {
         }
 
         const subscriptionListener = subscriptionMessages.subscribe((sub:any) => {
-            if (sub.value.data.onConversationEvents){
-                onConversationGetsNewMessage(sub.value.data.onConversationEvents)
+            if (sub.data.onConversationEvents){
+                onConversationGetsNewMessage(sub.data.onConversationEvents)
             }
         })
 
         const subscriptionListenerMetadata = subscriptionEvents.subscribe((sub:any) => {
-            if (sub.value.data.onConversationMetadata){
-                onConversationGetsNewMetadata(sub.value.data.onConversationMetadata)
+            if (sub.data.onConversationMetadata){
+                onConversationGetsNewMetadata(sub.data.onConversationMetadata)
             }
         })
 

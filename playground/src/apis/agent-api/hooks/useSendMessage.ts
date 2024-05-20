@@ -31,12 +31,9 @@ export function useAgentApiSendMessage (cid: string = '') {
     return async (event: any) => {
 
         console.log('Sending message', event)
-        
         sendConversationMessageQuery.invoke({cid, event})
             .then(result => {
-
                 setConversationEvents((data) => {
-                    console.log(data)
                     let targetConversationEvents = data[cid]
                     if (!targetConversationEvents || targetConversationEvents.loading !== 'loaded'){
                         targetConversationEvents = Loadable.loaded([])

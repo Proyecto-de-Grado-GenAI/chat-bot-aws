@@ -1,7 +1,7 @@
 import { Button, Flex, Loader, SelectField } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAgentApiAgentList, useAgentApiCreateConversation } from "../apis/agent-api"
 import { Container } from '../library/container';
 
@@ -29,6 +29,8 @@ export function AIAgentNewChat () {
     let selectionOptions = agentListObject.value.map(a => 
         <option value={a.id} key={a.id}>{a.name}</option>
     )
+
+    console.log("agentes:", agentListObject)
     
     return (
         <div>

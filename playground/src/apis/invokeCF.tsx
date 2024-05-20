@@ -30,7 +30,7 @@ export async function invokeCloudFunction<T>(body: any, endpoint: string, authHe
 
 export async function getIdToken() {
     try {
-      const idToken = (await fetchAuthSession()).tokens?.idToken ?? {};
+      const idToken = (await fetchAuthSession()).tokens?.idToken?.toString() ?? {};
       return idToken
     } catch (err) {
       console.log(err);
@@ -40,7 +40,7 @@ export async function getIdToken() {
 export async function InvokeAgentCloudFunction<T>(body: any, endpoint: string): Promise<T> {
     try {
         const idToken = await getIdToken();
-
+        console.log("xd", idToken)
         const result = await invokeCloudFunction<T>(body, endpoint, {
             Authorization: idToken, // Pasando el token dinámico
         });

@@ -29,6 +29,7 @@ import {
 } from "../apis/agent-api/state";
 import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
+import CustomStorageManager from "../components/CustomStorageManager"
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -244,6 +245,12 @@ export function AIAgentSidebar() {
               ))}
           </Flex>
         </Container>
+
+        {selectedAgent?.name === "Comprensión" && (
+          <Container heading="Sube tus documentos">
+            <CustomStorageManager />
+            </Container>
+        )}
 
         <Container heading="Parámetros del Modelo">
           <Flex direction="column" gap={10}>

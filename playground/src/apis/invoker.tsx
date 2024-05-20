@@ -36,6 +36,7 @@ export async function getAccessToken() {
 
 export async function InvokeAgentAPI<T> (query: string, variables?: any) { 
     const accessToken = await getAccessToken()
+    console.log(accessToken)
     return Invoke<T>(query, variables, agentApiEndpoint, {
         Authorization: accessToken
     });

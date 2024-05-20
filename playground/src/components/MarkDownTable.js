@@ -1,6 +1,6 @@
 
 import React from 'react';
-import markdownToHtml from '../services/markdownToHtml';
+import markdownToHtml from '../../services/markdownToHtml';
 
 const MarkdownTable = ({ markdown }) => {
   const createMarkup = (html) => {
