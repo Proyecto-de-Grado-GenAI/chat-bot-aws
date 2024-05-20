@@ -15,6 +15,7 @@ import {
   TextField,
   TextAreaField,
   CheckboxField,
+  Accordion,
 } from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
 import "react-widgets/scss/styles.scss";
@@ -29,7 +30,7 @@ import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
 import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
-import CustomStorageManager from "../components/CustomStorageManager"
+import CustomStorageManager from "../components/CustomStorageManager";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -188,18 +189,18 @@ export function AIAgentSidebar() {
 
   const conversationsRendered = selectedAgent
     ? conversationsObject.value
-      .items()
-      .filter((conversation) => conversation.agent === selectedAgent.id)
-      .sort((c1, c2) => (c1.timestamp < c2.timestamp ? 1 : -1))
-      .map((conversation) => (
-        <AgentApiConversationListed
-          agent={agentObjectList.value
-            ?.items()
-            .find((agent) => agent.id === conversation.agent)}
-          conversation={conversation}
-          key={conversation.id}
-        />
-      ))
+        .items()
+        .filter((conversation) => conversation.agent === selectedAgent.id)
+        .sort((c1, c2) => (c1.timestamp < c2.timestamp ? 1 : -1))
+        .map((conversation) => (
+          <AgentApiConversationListed
+            agent={agentObjectList.value
+              ?.items()
+              .find((agent) => agent.id === conversation.agent)}
+            conversation={conversation}
+            key={conversation.id}
+          />
+        ))
     : [];
 
   const heading =
@@ -209,166 +210,203 @@ export function AIAgentSidebar() {
 
   return (
     <Flex>
-      <Container heading="Conversaciones y LLms" width="20%">
-        <Container heading="Tu LLM">
-          <SelectField
-            label="Selecciona un LLM"
-            size="small"
-            value={selectedLlm ? selectedLlm.id : ""}
-            onChange={(e) => {
-              const selected = LLmsObject.value!.items().find(
-                (llm) => llm.id === e.target.value
-              );
-              setSelectedLlm(selected!);
-            }}
-          >
-            {LLmsObject.value.items().map((llm) => (
-              <option key={llm.id} value={llm.id}>
-                {llm.name}
-              </option>
-            ))}
-          </SelectField>
-        </Container>
-        <Container heading="Tus conversaciones">
-          <Flex
-            direction="column"
-            gap={10}
-            maxHeight={"calc(100vh - 150px)"}
-            overflow="auto"
-          >
-            {conversationsRendered}
-          </Flex>
-          <br />
-          <Button isFullWidth onClick={() => nav("/chat/new")}>
-            Nueva conversacion
-          </Button>
-        </Container>
-      </Container>
+      <Accordion.Container allowMultiple width="30%">
+        <Accordion.Item value="Tu LLM">
+          <Accordion.Trigger>
+            Select LLM
+            <Accordion.Icon />
+          </Accordion.Trigger>
+
+          <Accordion.Content>
+            <SelectField
+              label="Selecciona un LLM"
+              size="small"
+              value={selectedLlm ? selectedLlm.id : ""}
+              onChange={(e) => {
+                const selected = LLmsObject.value!.items().find(
+                  (llm) => llm.id === e.target.value
+                );
+                setSelectedLlm(selected!);
+              }}
+            >
+              {LLmsObject.value.items().map((llm) => (
+                <option key={llm.id} value={llm.id}>
+                  {llm.name}
+                </option>
+              ))}
+            </SelectField>
+          </Accordion.Content>
+        </Accordion.Item>
+
+        <Accordion.Item value="Tus conversaciones">
+          <Accordion.Trigger>
+            Tus conversaciones
+            <Accordion.Icon />
+          </Accordion.Trigger>
+          <Accordion.Content>
+            <Flex
+              direction="column"
+              gap={10}
+              maxHeight={"calc(100vh - 150px)"}
+              overflow="auto"
+            >
+              {conversationsRendered}
+            </Flex>
+            <br />
+            <Button isFullWidth onClick={() => nav("/chat/new")}>
+              Nueva conversacion
+            </Button>
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Container>
 
       <Container heading={heading} width="100%">
         <Outlet />
       </Container>
 
-      <Container heading="Etapas y contexto" width="60%">
-        <Container heading="Etapas">
-          <Flex direction="row" gap={5}>
-            {agentObjectList.value
-              ?.items()
-              .slice()
-              .sort((a, b) => a.precedence - b.precedence)
-              .map((agent, index) => (
-                <Button
-                  key={agent.id}
-                  onClick={() => setSelectedAgent(agent)}
-                >
-                  {agent.name}
-                </Button>
-              ))}
-          </Flex>
-        </Container>
+      <Accordion.Container allowMultiple width="70%">
+        <Accordion.Item value="Etapas">
+          <Accordion.Trigger>
+            Select LLM
+            <Accordion.Icon />
+          </Accordion.Trigger>
+          <Accordion.Content>
+            <Flex direction="row" gap={5}>
+              {agentObjectList.value
+                ?.items()
+                .slice()
+                .sort((a, b) => a.precedence - b.precedence)
+                .map((agent, index) => (
+                  <Button
+                    key={agent.id}
+                    onClick={() => setSelectedAgent(agent)}
+                  >
+                    {agent.name}
+                  </Button>
+                ))}
+            </Flex>
+          </Accordion.Content>
+        </Accordion.Item>
 
         {selectedAgent?.name === "Comprensión" && (
-          <Container heading="Sube tus documentos">
-            <CustomStorageManager />
-          </Container>
+          <Accordion.Item value="Sube tus documentos">
+            <Accordion.Trigger>
+              Sube tus documentos
+              <Accordion.Icon />
+            </Accordion.Trigger>
+            <Accordion.Content>
+              <CustomStorageManager />
+            </Accordion.Content>
+          </Accordion.Item>
         )}
 
-        <Container heading="Parámetros del Modelo">
-          <Flex direction="column" gap={10}>
-            {temperature !== null && (
-              <SliderField
-                key={`temperature-${forceRender}`} // Force render by changing key
-                label="Temperature"
-                min={0}
-                max={1}
-                step={0.01}
-                value={temperature}
-                onChange={(value) => setTemperature(value)}
+        <Accordion.Item value="Parámetros del modelo">
+          <Accordion.Trigger>
+            Ver parámetros del modelo
+            <Accordion.Icon />
+          </Accordion.Trigger>
+          <Accordion.Content>
+            <Flex direction="column" gap={10}>
+              {temperature !== null && (
+                <SliderField
+                  key={`temperature-${forceRender}`} // Force render by changing key
+                  label="Temperature"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={temperature}
+                  onChange={(value) => setTemperature(value)}
+                />
+              )}
+              {topP !== null && (
+                <SliderField
+                  key={`topP-${forceRender}`} // Force render by changing key
+                  label="Top P"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={topP}
+                  onChange={(value) => setTopP(value)}
+                />
+              )}
+              <TextField
+                label="Max Gen Len"
+                placeholder="1500"
+                size="small"
+                value={maxGenLen}
+                onChange={(e) =>
+                  setMaxGenLen(
+                    e.target.value ? parseInt(e.target.value, 10) : 0
+                  )
+                }
               />
-            )}
-            {topP !== null && (
-              <SliderField
-                key={`topP-${forceRender}`} // Force render by changing key
-                label="Top P"
-                min={0}
-                max={1}
-                step={0.01}
-                value={topP}
-                onChange={(value) => setTopP(value)}
+              <TextAreaField
+                label="System Prompt"
+                placeholder="Eres un asistente útil y amigable."
+                size="small"
+                rows={5}
+                value={systemPrompt}
+                onChange={(e) => setSystemPrompt(e.target.value)}
               />
-            )}
-            <TextField
-              label="Max Gen Len"
-              placeholder="1500"
-              size="small"
-              value={maxGenLen}
-              onChange={(e) =>
-                setMaxGenLen(
-                  e.target.value ? parseInt(e.target.value, 10) : 0
-                )
-              }
-            />
-            <TextAreaField
-              label="System Prompt"
-              placeholder="Eres un asistente útil y amigable."
-              size="small"
-              rows={5}
-              value={systemPrompt}
-              onChange={(e) => setSystemPrompt(e.target.value)}
-            />
+              <SelectField
+                label="Knowledge Base"
+                size="small"
+                value={knowledgeBaseId}
+                onChange={(e) => setKnowledgeBaseId(e.target.value)}
+              >
+                {KnowledgeBases.value?.map((kb) => (
+                  <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
+                    {kb.name}
+                  </option>
+                ))}
+              </SelectField>
+              <CheckboxField
+                label="Use Knowledge Base"
+                name="useKnowledgeBase"
+                checked={IfUseKnowledgeBase}
+                onChange={(e) => setUseKnowledgeBase(e.target.checked)}
+              />
+              <TextField
+                label="Number of Results"
+                placeholder="3"
+                size="small"
+                value={numberOfResults}
+                onChange={(e) =>
+                  setNumberOfResults(
+                    e.target.value ? parseInt(e.target.value, 10) : 0
+                  )
+                }
+              />
+              <Button variation="primary" onClick={onUpdate} size="small">
+                Aplicar cambios
+              </Button>
+            </Flex>
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="Seleccionar Variables y Vista Previa">
+          <Accordion.Trigger>
+            Seleccionar Variables y Vista Previa
+            <Accordion.Icon />
+          </Accordion.Trigger>
+          <Accordion.Content>
             <SelectField
-              label="Knowledge Base"
+              label="Selecciona una variable"
               size="small"
-              value={knowledgeBaseId}
-              onChange={(e) => setKnowledgeBaseId(e.target.value)}
+              value={selectedVariable}
+              onChange={handleVariableChange}
             >
-              {KnowledgeBases.value?.map((kb) => (
-                <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
-                  {kb.name}
+              {variablesList.map((variable) => (
+                <option key={variable.name} value={variable.name}>
+                  {variable.name}
                 </option>
               ))}
             </SelectField>
-            <CheckboxField
-              label="Use Knowledge Base"
-              name="useKnowledgeBase"
-              checked={IfUseKnowledgeBase}
-              onChange={(e) => setUseKnowledgeBase(e.target.checked)}
-            />
-            <TextField
-              label="Number of Results"
-              placeholder="3"
-              size="small"
-              value={numberOfResults}
-              onChange={(e) =>
-                setNumberOfResults(
-                  e.target.value ? parseInt(e.target.value, 10) : 0
-                )
-              }
-            />
-            <Button variation="primary" onClick={onUpdate} size="small">
-              Aplicar cambios
-            </Button>
-          </Flex>
-        </Container>
-
-        <Container heading="Seleccionar Variables y Vista Previa">
-          <SelectField
-            label="Selecciona una variable"
-            size="small"
-            value={selectedVariable}
-            onChange={handleVariableChange}
-          >
-            {variablesList.map((variable) => (
-              <option key={variable.name} value={variable.name}>
-                {variable.name}
-              </option>
-            ))}
-          </SelectField>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {selectedContent}
-          </ReactMarkdown>
-        </Container>
-      </Container>
-    </Flex >
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {selectedContent}
+            </ReactMarkdown>
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Container>
+    </Flex>
   );
 }
