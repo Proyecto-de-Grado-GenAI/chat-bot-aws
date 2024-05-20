@@ -1,9 +1,9 @@
 export const agentApiEndpoint = process.env.REACT_APP_AGENTAPIENDPOINT as string;
 
 export const cognitoConfig = {
-    region: process.env.REACT_APP_REGION as string,
     userPoolId: process.env.REACT_APP_COGNITOPOOL as string,
-    userPoolWebClientId: process.env.REACT_APP_COGNITOCLIENT as string,
+    userPoolClientId: process.env.REACT_APP_COGNITOCLIENT as string,
+    identityPoolId: process.env.REACT_APP_IDENTITYPOOL as string
 };
 
 export const fmHandlerArns = [

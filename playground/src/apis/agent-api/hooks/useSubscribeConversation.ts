@@ -1,10 +1,11 @@
 import { useRecoilState, useSetRecoilState } from "recoil";
 import * as AgentApiStore from "../state"
 import { useEffect } from "react";
-import { API } from '@aws-amplify/api';
+import { generateClient } from '@aws-amplify/api';
 import { ConversationEvent, ConversationMetadata } from "../types";
 
 export function subscribeConversationMessages(conversationId: string): any {
+    const client = generateClient();
 
     console.log('Subscribed', 'subscribeConversationMessages')
 
@@ -25,7 +26,8 @@ export function subscribeConversationMessages(conversationId: string): any {
         }  
     `;
 
-    return API.graphql({ 
+
+    return client.graphql({ 
         query: query,
         variables: { cid: conversationId }
     })      
@@ -33,7 +35,7 @@ export function subscribeConversationMessages(conversationId: string): any {
 }
 
 export function subscribeConversationEvents(conversationId: string): any {
-
+    const client = generateClient();
     console.log('Subscribed', 'subscribeConversationEvents')
 
     const query = `
@@ -48,7 +50,7 @@ export function subscribeConversationEvents(conversationId: string): any {
     `;
 
 
-    return API.graphql({ 
+    return client.graphql({ 
         query: query,
         variables: { cid: conversationId }
     })      

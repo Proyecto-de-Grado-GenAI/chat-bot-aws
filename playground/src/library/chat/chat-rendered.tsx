@@ -4,15 +4,14 @@ import { useParams } from "react-router-dom"
 import Prism from 'prismjs';
 import { useAgentApiAgent, useAgentApiConversationWithMessages, useAgentApiInvokeQuery } from "../../apis/agent-api";
 import {  Flex, Loader, Text, View, useTheme } from "@aws-amplify/ui-react";
-import { AgentChatMessage, AgentGraphQLBlock, AgentInnerDialogBlock, AgentJSONBlock, AgentPartialChatMessage, GraphQLResultBlock, UserChatMessage } from "./chat-items";
-import reactUseCookie from "react-use-cookie";
+import { AgentChatMessage, AgentInnerDialogBlock, AgentPartialChatMessage, GraphQLResultBlock, UserChatMessage } from "./chat-items";
 import { useAgentConversationMetadata } from "../../apis/agent-api/hooks/useMetadata";
 import ReactMarkdown from 'react-markdown';
 
 function EnterUserSection () {
     const { tokens } = useTheme();
 
-    return <View padding={10} width="100%" backgroundColor={tokens.colors.brand.primary[10]}>
+    return <View padding={10} width="100%" backgroundColor={tokens.colors.brand}>
      <Text textTransform='capitalize' textAlign='center'>        
             You
         </Text>
@@ -22,7 +21,7 @@ function EnterUserSection () {
 function EnterAgentSection (props: {name?: string}) {
     const { tokens } = useTheme();
 
-    return <View padding={10} width="100%" backgroundColor={tokens.colors.brand.primary[10]}>
+    return <View padding={10} width="100%" backgroundColor={tokens.colors.brand}>
         <Text textTransform='capitalize' textAlign='center'>        
             {props.name}
         </Text>

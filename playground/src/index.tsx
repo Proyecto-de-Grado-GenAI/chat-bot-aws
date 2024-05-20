@@ -15,14 +15,20 @@ import 'prismjs/components/prism-json';
 import './prism.css'
 import '@aws-amplify/ui-react/styles.css';
 import './index.css';
-import { Amplify } from 'aws-amplify';
+import { Amplify } from 'aws-amplify'
 import { agentApiEndpoint, cognitoConfig } from './endpoints';
 
 // Load auth config data
 Amplify.configure({ 
-  Auth: cognitoConfig, 
-  API: { aws_appsync_graphqlEndpoint: agentApiEndpoint },
-  aws_appsync_authenticationType: 'AMAZON_COGNITO_USER_POOLS'
+  Auth: {
+    Cognito: cognitoConfig
+  },
+  API: {
+    GraphQL: {
+      endpoint: agentApiEndpoint,
+      defaultAuthMode: "userPool"
+  },
+},
 })
 
 // Force import of prismjs, if the value is not references its not loaded

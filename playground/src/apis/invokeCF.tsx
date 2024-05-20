@@ -1,4 +1,4 @@
-import { Auth } from "aws-amplify";
+import { fetchAuthSession } from 'aws-amplify/auth';
 import axios from "axios";
 
 // Función para invocar una función en la nube con autenticación
@@ -28,10 +28,18 @@ export async function invokeCloudFunction<T>(body: any, endpoint: string, authHe
     }
 }
 
+export async function getIdToken() {
+    try {
+      const idToken = (await fetchAuthSession()).tokens?.idToken ?? {};
+      return idToken
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
 export async function InvokeAgentCloudFunction<T>(body: any, endpoint: string): Promise<T> {
     try {
-        const currentSession = await Auth.currentSession();
-        const idToken = currentSession.getIdToken().getJwtToken();
+        const idToken = await getIdToken();
 
         const result = await invokeCloudFunction<T>(body, endpoint, {
             Authorization: idToken, // Pasando el token dinámico

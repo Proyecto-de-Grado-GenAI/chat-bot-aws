@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import { CognitoAuthRole } from './cognito-auth-role';
+import { PolicyStatement, Effect } from "aws-cdk-lib/aws-iam";
 
 export function buildCognitoAuth(scope: Construct, bucketArn: string) {
 
@@ -41,6 +42,17 @@ export function buildCognitoAuth(scope: Construct, bucketArn: string) {
     });
 
     const authenticatedRole = CognitoAuthRole(scope, identityPool)
+
+    authenticatedRole.addToPolicy(
+        // IAM policy granting users permission to a specific folder in the S3 bucket
+        new PolicyStatement({
+          actions: ["s3:*"],
+          effect: Effect.ALLOW,
+          resources: [
+            bucketArn + "/private/${cognito-identity.amazonaws.com:sub}/*",
+          ],
+        })
+      );
 
     new cdk.CfnOutput(scope, 'cognito-pool', {
         exportName: 'cognito-pool',
