@@ -25,6 +25,85 @@ def retrieveFromKnowledgeBase(query, kbId, numberOfResults=1):
         },
     )
 
+
+def summarize_and_combine_history_with_llama(history, question, modelId):
+
+    model_params = {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "max_gen_len": 1000
+    }
+
+    user_prompt = ""
+
+    
+    history = history[2:] 
+    for i in range(len(history)):
+        if i % 2 == 0:
+            user_prompt += f"Human: {history[i]}\n"
+        else:
+            user_prompt += f"Assistant: {history[i]}\n"
+
+    
+
+    user_prompt += f"Human: {question}\n"
+
+    system_prompt = """### System Prompt **Instrucciones del Sistema:**
+
+Eres un modelo de lenguaje cuya única función es:
+
+1. **Analizar preguntas del usuario:**
+   - Escucha las interacciones entre el asistente y el usuario.
+   - Examina cada pregunta realizada por el usuario.
+   - Formula la mejor pregunta posible para consultar una base de datos vectorial y obtener la información más relevante.
+
+**Restricciones Estrictas:**
+- **No responder mensajes que no contengan preguntas:** Ignora mensajes que no contengan una pregunta específica.
+- **No responder preguntas directamente:** No debes proporcionar respuestas directas al usuario.
+- **Limitación a la función específica:** Tu única salida debe ser la formulación optimizada de la pregunta del usuario.
+- **Formato de salida:** La pregunta reformulada debe estar entre caracteres específicos para asegurar su extracción. Utiliza el formato `@@pregunta@@`.
+- **Prohibición de inventar información:** Solo puedes usar la información proporcionada en la conversación. Está estrictamente prohibido inventar cualquier dato o información.
+
+**Directrices Específicas:**
+- **Análisis de preguntas:** Identifica la intención detrás de la pregunta del usuario y reformúlala para optimizar la búsqueda en la base de datos vectorial.
+- **Objetividad de preguntas:** La pregunta reformulada debe ser clara y directamente relacionada con lo que el usuario pregunta, manteniéndose objetiva y precisa.
+- **Complejidad de preguntas:** La pregunta reformulada debe ser lo suficientemente detallada para generar fragmentos de respuesta relevantes dentro de 1000 caracteres.
+
+**Ejemplo de Salida:**
+- Si el usuario pregunta: "¿Cuál es la capital de Francia?"
+- Tu salida debería ser: `@@¿Cuál es la ciudad que actualmente sirve como la capital de Francia?@@`
+"""
+
+    system_prompt_formatted = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{system_prompt}<|eot_id|>"""
+    user_prompt_formatted = f"""<|start_header_id|>user<|end_header_id|>\n{user_prompt}<|eot_id|>"""
+    waitForAssistantPrompt = f"""<|start_header_id|>assistant<|end_header_id|>"""
+
+    final_prompt = system_prompt_formatted + user_prompt_formatted + waitForAssistantPrompt
+
+    model_invoke_params = {
+        "prompt": final_prompt,
+        **model_params
+    }
+
+    
+
+    response = bedrock.invoke_model(
+        body=json.dumps(model_invoke_params),
+        modelId=modelId,
+    )
+
+    raw_body = response["body"].read().decode("utf-8")
+    response_json = json.loads(raw_body)
+    try :
+        respuesta = [*response_json.values()][0]
+        respuesta = respuesta.split("@@")[1]
+        print(f"Respuesta: {respuesta}")
+    except Exception as e:
+        respuesta = False
+    finally:
+        return respuesta
+
+
 def insertContext(question, response_knowledge_base):
     context = ""
     contador = 0
@@ -37,6 +116,9 @@ def insertContext(question, response_knowledge_base):
 
     question_with_context = f"""{question}\n\n{context}"""
     return question_with_context
+
+
+
 
 def define_Llama3_prompt(history,system_prompt, question_with_context):
     SystemPrompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{system_prompt}<|eot_id|>"""
@@ -86,21 +168,30 @@ def bedrockQuestion(
     print(f"Number of Results: {number_of_results}")
 
     if modelId in supported_models:
-        if use_knowledge_base:
-            response_knowledge_base_query = retrieveFromKnowledgeBase(question, knowledgeBaseId, numberOfResults=number_of_results)["retrievalResults"]
-            question_with_context = insertContext(question, response_knowledge_base_query)
-        else:
-            question_with_context = question
+        
         
         historial = extract_messages_from_chat(history)
+        print(f"Historial: {historial}")
+        if use_knowledge_base:
+            query_knowledge_base = summarize_and_combine_history_with_llama(historial,question,"meta.llama3-70b-instruct-v1:0")
+            print(f"Query Knowledge Base: {query_knowledge_base}")
+            print("test")
+            if query_knowledge_base :
+                response_knowledge_base_query = retrieveFromKnowledgeBase(query_knowledge_base, knowledgeBaseId, number_of_results)["retrievalResults"]
+                question_with_context = insertContext(question, response_knowledge_base_query)
+            else:
+                question_with_context = question
+        else:
+            question_with_context = question
+        print(f"Question with context: {question_with_context}")
+
         prompt = supported_models[modelId](historial, system_prompt, question_with_context)
         
-        # Use only user-provided params or model-specific params
         params = {**model_specific_params.get(modelId, {}), **model_params}
         print(f"Params: {params}")
         model_invoke_params = {
             "prompt": prompt,
-            **params  # Unpack the parameters dictionary directly into model_invoke_params
+            **params  
         }
         print(f"Model Invoke Params: {model_invoke_params}")
         
