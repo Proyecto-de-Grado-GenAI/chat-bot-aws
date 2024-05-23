@@ -57,6 +57,18 @@ export function buildTables(scope: Construct) {
             },
         ]),
     };
+    
+    // Seeder AgentTable
+    // const AgentSeederProps: DynamoDBSeederProps = {
+    //     table: agentTable,
+    //     seeds: Seeds.fromInline([
+    //         {
+    //             id: '1',
+    //             name: 'Exploración',
+    //             handlerLambda: 'arn:aws:lambda:us-west-2:123456789012:function:exploracion',
+            
+    //     ]),
+    // };
 
     // Apply seeder to the LLm table
     new DynamoDBSeeder(scope, 'SeedLLmTable', LLmSeederProps);

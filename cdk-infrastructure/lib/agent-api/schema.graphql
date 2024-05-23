@@ -93,6 +93,11 @@ input LLmInput {
     model: String!
 }
 
+type AgentPhase {
+    name: String
+    description: String
+}
+
 type Agent @aws_cognito_user_pools {
     id: ID!
     timestamp: String!
@@ -103,6 +108,7 @@ type Agent @aws_cognito_user_pools {
     inputMaxToken: Int!
     modelParams: ModelParams
     knowledgeBaseParams: KnowledgeBaseParams
+    phases: [AgentPhase]
 }
 
 type ModelParams {
@@ -125,6 +131,12 @@ input NewAgent {
     precedence: Int!
     modelParams: ModelParamsInput
     knowledgeBaseParams: KnowledgeBaseParamsInput
+    phases: [AgentPhaseInput]
+}
+
+input AgentPhaseInput {
+    name: String
+    description: String
 }
 
 input UpdateAgentInput {
@@ -135,6 +147,7 @@ input UpdateAgentInput {
     precedence: Int
     modelParams: ModelParamsInput
     knowledgeBaseParams: KnowledgeBaseParamsInput
+    phases: [AgentPhaseInput]
 }
 
 input NewLLm {

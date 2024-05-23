@@ -7,7 +7,7 @@ export function request(ctx: Context) {
             id: ctx.arguments.id
         }),
         update: {
-            expression: 'set #name = :name, #handlerLambda = :handlerLambda, #systemPrompt = :systemPrompt, #inputMaxToken = :inputMaxToken, #precedence = :precedence, #modelParams = :modelParams, #knowledgeBaseParams = :knowledgeBaseParams',
+            expression: 'set #name = :name, #handlerLambda = :handlerLambda, #systemPrompt = :systemPrompt, #inputMaxToken = :inputMaxToken, #precedence = :precedence, #modelParams = :modelParams, #knowledgeBaseParams = :knowledgeBaseParams, #phases = :phases',
             expressionNames: {
                 '#name': 'name',
                 '#handlerLambda': 'handlerLambda',
@@ -15,7 +15,8 @@ export function request(ctx: Context) {
                 '#inputMaxToken': 'inputMaxToken',
                 '#precedence': 'precedence',
                 '#modelParams': 'modelParams',
-                '#knowledgeBaseParams': 'knowledgeBaseParams'
+                '#knowledgeBaseParams': 'knowledgeBaseParams',
+                '#phases': 'phases'
             },
             expressionValues: util.dynamodb.toMapValues({
                 ':name': ctx.arguments.config.name,
@@ -24,7 +25,8 @@ export function request(ctx: Context) {
                 ':inputMaxToken': ctx.arguments.config.inputMaxToken,
                 ':precedence': ctx.arguments.config.precedence,
                 ':modelParams': ctx.arguments.config.modelParams,
-                ':knowledgeBaseParams': ctx.arguments.config.knowledgeBaseParams
+                ':knowledgeBaseParams': ctx.arguments.config.knowledgeBaseParams,
+                ':phases': ctx.arguments.config.phases
             })
         }
     }

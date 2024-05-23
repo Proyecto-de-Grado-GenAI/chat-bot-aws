@@ -98,7 +98,7 @@ export function AIAgentViewChat() {
     setChatString("");
   };
 
-  const maxCharacters = agentObject.value?.inputMaxToken || 1000; // Asegúrate de tener un valor predeterminado
+  const maxCharacters = agentObject.value?.inputMaxToken || 1000; 
 
   if (
     conversationObject.isUnloaded() ||

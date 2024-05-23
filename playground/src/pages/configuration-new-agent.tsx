@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
   Button,
+  Card,
   CheckboxField,
   Flex,
-  Loader,
+  Icon,
   SelectField,
   SliderField,
-  SwitchField,
   TextAreaField,
   TextField,
   View,
@@ -15,6 +15,7 @@ import { Container } from "../library/container";
 import { fmHandlerArns } from "../endpoints";
 import { useAgentApiCreateAgent } from "../apis/agent-api/hooks/useCreateAgent";
 import { useKnowledgeBase } from "../apis/agent-api";
+import { AgentPhase } from "../apis/agent-api/types";
 
 export function ConfigurationNewAgent() {
   const [agentName, setAgentName] = useState("");
@@ -34,7 +35,13 @@ export function ConfigurationNewAgent() {
   const [IfuseKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState("3");
   const KnowledgeBases = useKnowledgeBase();
+  const [phases, setPhases] = useState<AgentPhase[]>([]);
+  const [phaseName, setPhaseName] = useState("");
+  const [phaseDescription, setPhaseDescription] = useState("");
   const [forceRender, setForceRender] = useState(false);
+  const [expandedPhaseIndex, setExpandedPhaseIndex] = useState<number | null>(
+    null
+  );
 
   const enabled = !!agentName;
 
@@ -59,6 +66,10 @@ export function ConfigurationNewAgent() {
         useKnowledgeBase: IfuseKnowledgeBase,
         numberOfResults: parseInt(numberOfResults, 10),
       },
+      phases: phases.map((phase) => ({
+        name: phase.name,
+        description: phase.description,
+      })),
     });
   };
 
@@ -67,6 +78,24 @@ export function ConfigurationNewAgent() {
     if (parseInt(value, 10) <= 2048) {
       setMaxGenLen(value);
     }
+  };
+  const handleAddPhase = () => {
+    if (phaseName && phaseDescription) {
+      setPhases([
+        ...phases,
+        { name: phaseName, description: phaseDescription },
+      ]);
+      setPhaseName("");
+      setPhaseDescription("");
+    }
+  };
+  const handleToggleExpand = (index: number) => {
+    setExpandedPhaseIndex(expandedPhaseIndex === index ? null : index);
+  };
+
+  const handleRemovePhase = (index: number) => {
+    const newPhases = phases.filter((_, i) => i !== index);
+    setPhases(newPhases);
   };
 
   const handleNumberOfResultsChange = (e: any) => {
@@ -179,6 +208,86 @@ export function ConfigurationNewAgent() {
           onChange={handleNumberOfResultsChange}
           placeholder="3"
         />
+      </Container>
+      <Container heading="Phases">
+      <View>
+              <TextField
+                label="Phase Name"
+                value={phaseName}
+                onChange={(e) => setPhaseName(e.target.value)}
+                placeholder="Phase Name"
+              />
+              <TextAreaField
+                label="Phase Description"
+                value={phaseDescription}
+                onChange={(e) => setPhaseDescription(e.target.value)}
+                placeholder="Phase Description"
+              />
+              <Button onClick={handleAddPhase}>Add Phase</Button>
+              <View marginTop="20px">
+                <h3>Phases</h3>
+                <Flex direction="row" gap={10}>
+                  {phases.map((phase, index) => (
+                    <Flex
+                      key={index}
+                      padding="10px"
+                      border="1px solid lightgray"
+                      borderRadius="5px"
+                      backgroundColor="white"
+                      direction="column"
+                      position="relative"
+                      width={expandedPhaseIndex === index ? "100%" : "300px"}
+                      maxWidth="500px"
+                      style={{ wordBreak: "break-word" }} // Usamos style para aplicar wordBreak
+                    >
+                      <strong>{phase.name}</strong>
+                      <p
+                        style={{
+                          overflow:
+                            expandedPhaseIndex === index ? "visible" : "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace:
+                            expandedPhaseIndex === index ? "normal" : "nowrap",
+                          display:
+                            expandedPhaseIndex === index
+                              ? "block"
+                              : "-webkit-box",
+                          WebkitLineClamp:
+                            expandedPhaseIndex === index ? "unset" : 3,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {phase.description}
+                      </p>
+                      <Button
+                        size="small"
+                        variation="link"
+                        onClick={() => handleToggleExpand(index)}
+                        padding="0"
+                        margin="0"
+                        alignSelf="flex-start"
+                      >
+                        {expandedPhaseIndex === index
+                          ? "Show less"
+                          : "Show more"}
+                      </Button>
+                      <Button
+                        size="small"
+                        variation="link"
+                        onClick={() => handleRemovePhase(index)}
+                        position="absolute"
+                        top="5px"
+                        right="5px"
+                        padding="0"
+                        margin="0"
+                      >
+                        Remove
+                      </Button>
+                    </Flex>
+                  ))}
+                </Flex>
+              </View>
+            </View>
       </Container>
       <Flex dir="row" justifyContent="flex-end">
         <Button variation="primary" onClick={onCreate} disabled={!enabled}>

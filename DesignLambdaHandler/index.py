@@ -141,7 +141,7 @@ def define_Llama3_prompt(history,system_prompt, question_with_context_variables)
 
 supported_models = {
     "meta.llama3-8b-instruct-v1:0": define_Llama3_prompt,
-    "meta.llama3-70b-instruct-v1:0": define_Llama3_prompt
+    "meta.llama3-70b-instruct-v1:0": define_Llama3_prompt,
 }
 
 

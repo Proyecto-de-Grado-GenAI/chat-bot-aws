@@ -31,6 +31,7 @@ import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
 import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 import CustomStorageManager from "../components/CustomStorageManager";
+import { AgentPhase } from "../apis/agent-api/types";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -67,6 +68,8 @@ export function AIAgentSidebar() {
     "Telecommunications Company"
   );
   const [variablesList] = useRecoilState(variablesState);
+  const [phases, setPhases] = useState<AgentPhase[]>([]);
+  const [selectedPhase, setSelectedPhase] = useState<AgentPhase | null>(null);
 
   const selectedContent =
     variablesList.find((variable) => variable.name === selectedVariable)
@@ -76,12 +79,18 @@ export function AIAgentSidebar() {
     setSelectedVariable(event.target.value);
   };
 
+  const handlePhaseChange = (event: any) => {
+    const phase = phases.find((phase) => phase.name === event.target.value);
+    setSelectedPhase(phase || null);
+  };
+
   const KnowledgeBases = useKnowledgeBase();
 
   const nav = useNavigate();
 
   const onUpdate = () => {
     const updatedAgent = {
+      id: selectedAgent?.id!,
       name: agentName,
       handlerLambda: handlerLambda,
       systemPrompt: systemPrompt,
@@ -97,8 +106,13 @@ export function AIAgentSidebar() {
         useKnowledgeBase: IfUseKnowledgeBase,
         numberOfResults: numberOfResults,
       },
+      phases: phases.map((phase) => ({
+        name: phase.name,
+        description: phase.description,
+      })),
     };
-    updateAgent(selectedAgent!.id, updatedAgent)
+
+    updateAgent(updatedAgent)
       .then(() => {
         alert("Agent updated successfully!");
       })
@@ -127,6 +141,8 @@ export function AIAgentSidebar() {
       );
       setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
+      setPhases(agent.phases || []);
+      setSelectedPhase(agent.phases?.[0] || null);
       setForceRender((prev) => !prev);
     }
   }, [selectedAgent]);
@@ -211,8 +227,8 @@ export function AIAgentSidebar() {
 
   return (
     <Flex>
-      <Accordion.Container allowMultiple width="30%">
-        <Accordion.Item value="Tu LLM">
+      <Accordion.Container allowMultiple width="40%" defaultValue={['Tu LLM', 'Tus conversaciones']}>
+        <Accordion.Item value="Tu LLM" >
           <Accordion.Trigger>
             Select LLM
             <Accordion.Icon />
@@ -259,16 +275,39 @@ export function AIAgentSidebar() {
             </Button>
           </Accordion.Content>
         </Accordion.Item>
+        <Accordion.Item value="Seleccionar Drivers y Vista Previa">
+          <Accordion.Trigger>
+            Seleccionar Drivers y Vista Previa
+            <Accordion.Icon />
+          </Accordion.Trigger>
+          <Accordion.Content>
+            <SelectField
+              label="Selecciona un Driver"
+              size="small"
+              value={selectedVariable}
+              onChange={handleVariableChange}
+            >
+              {variablesList.map((variable) => (
+                <option key={variable.name} value={variable.name}>
+                  {variable.name}
+                </option>
+              ))}
+            </SelectField>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {selectedContent}
+            </ReactMarkdown>
+          </Accordion.Content>
+        </Accordion.Item>
       </Accordion.Container>
 
       <Container heading={heading} width="100%">
         <Outlet />
       </Container>
 
-      <Accordion.Container allowMultiple width="70%">
+      <Accordion.Container allowMultiple width="70%" defaultValue={['Etapas', 'Fases','Parámetros del modelo']}>
         <Accordion.Item value="Etapas">
           <Accordion.Trigger>
-            Select LLM
+            Selecccionar Etapa
             <Accordion.Icon />
           </Accordion.Trigger>
           <Accordion.Content>
@@ -285,6 +324,35 @@ export function AIAgentSidebar() {
                     {agent.name}
                   </Button>
                 ))}
+            </Flex>
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="Fases">
+          <Accordion.Trigger>
+            Selecccionar Fase
+            <Accordion.Icon />
+          </Accordion.Trigger>
+          <Accordion.Content>
+            <Flex direction="column" gap={10}>
+              <SelectField
+                label="Selecciona una fase"
+                size="small"
+                value={selectedPhase ? selectedPhase.name : ""}
+                onChange={handlePhaseChange}
+              >
+                {phases.map((phase) => (
+                  <option key={phase.name} value={phase.name}>
+                    {phase.name}
+                  </option>
+                ))}
+              </SelectField>
+              <TextAreaField
+                label="Descripción de la fase"
+                size="small"
+                rows={5}
+                value={selectedPhase ? selectedPhase.description : ""}
+                readOnly
+              />
             </Flex>
           </Accordion.Content>
         </Accordion.Item>
@@ -384,29 +452,7 @@ export function AIAgentSidebar() {
             </Flex>
           </Accordion.Content>
         </Accordion.Item>
-        <Accordion.Item value="Seleccionar Variables y Vista Previa">
-          <Accordion.Trigger>
-            Seleccionar Variables y Vista Previa
-            <Accordion.Icon />
-          </Accordion.Trigger>
-          <Accordion.Content>
-            <SelectField
-              label="Selecciona una variable"
-              size="small"
-              value={selectedVariable}
-              onChange={handleVariableChange}
-            >
-              {variablesList.map((variable) => (
-                <option key={variable.name} value={variable.name}>
-                  {variable.name}
-                </option>
-              ))}
-            </SelectField>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {selectedContent}
-            </ReactMarkdown>
-          </Accordion.Content>
-        </Accordion.Item>
+
       </Accordion.Container>
     </Flex>
   );

@@ -31,6 +31,12 @@ export interface Agent {
     precedence: number;
     modelParams: ModelParams;
     knowledgeBaseParams: KnowledgeBaseParams;
+    phases : AgentPhase[];
+}
+
+export interface AgentPhase {
+    name: string;
+    description: string;
 }
 
 export interface ModelParams {
@@ -75,6 +81,11 @@ export interface KnowledgeBaseParamsInput {
     numberOfResults: number;
 }
 
+export interface AgentPhaseInput {
+    name: string;
+    description: string;
+}
+
 export interface NewAgent {
     name: string;
     handlerLambda: string;
@@ -83,6 +94,7 @@ export interface NewAgent {
     precedence: number;
     modelParams: ModelParamsInput;
     knowledgeBaseParams: KnowledgeBaseParamsInput;
+    phases: AgentPhaseInput[];
 }
 
 export interface NewAgentInput {
@@ -93,6 +105,7 @@ export interface NewAgentInput {
     precedence: number;
     modelParams: ModelParamsInput;
     knowledgeBaseParams: KnowledgeBaseParamsInput;
+    phases: AgentPhaseInput[];
 }
 
 export interface UpdateAgentInput {
@@ -101,8 +114,17 @@ export interface UpdateAgentInput {
     systemPrompt?: string;
     inputMaxToken?: number;
     precedence?: number;
-    modelParams?: ModelParamsInput;
-    knowledgeBaseParams?: KnowledgeBaseParamsInput;
+    modelParams?: {
+        temperature: number;
+        top_p: number;
+        max_gen_len: number;
+    };
+    knowledgeBaseParams?: {
+        knowledgeBaseId: string;
+        useKnowledgeBase: boolean;
+        numberOfResults: number;
+    };
+    phases?: AgentPhaseInput[];
 }
 
 export interface KnowledgeBase {

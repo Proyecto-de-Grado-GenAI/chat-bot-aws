@@ -29,9 +29,9 @@ export class AppsyncAgentAPIStack extends cdk.Stack {
             lambdaPath: 'ExplorationLambdaHandler' 
         });
 
-        const DiagramLambdaHandler = buildFoundationModelHandler(this, { 
+        const DesignLambdaHandler = buildFoundationModelHandler(this, { 
             agentApi, 
-            lambdaPath: 'DiagramLambdaHandler' 
+            lambdaPath: 'DesignLambdaHandler' 
         });
 
         const ComprehensionLambdaHandler = buildFoundationModelHandler(this, { 
