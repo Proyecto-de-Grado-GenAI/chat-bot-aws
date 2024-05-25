@@ -38,7 +38,11 @@ export interface AgentPhase {
     name: string;
     description: string;
 }
-
+export interface Iteration {
+    id: string;
+    number: string;
+    objetive: string;
+}
 export interface ModelParams {
     temperature: number;
     top_p: number;

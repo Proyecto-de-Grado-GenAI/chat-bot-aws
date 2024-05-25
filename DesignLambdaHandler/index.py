@@ -161,14 +161,13 @@ model_specific_params = {
 def bedrockQuestion(
     history, question, modelId, model_params=None, 
     system_prompt=None, knowledgeBaseId="FFUYGR42Y1", 
-    use_knowledge_base=True, number_of_results=1, variables=None	
+    use_knowledge_base=True, number_of_results=1, variables=None, AgentPhase=None
 ):
     if model_params is None:
         model_params = {}
     
 
     if modelId in supported_models:
-        
         historial = extract_messages_from_chat(history)
         print(f"Historial: {historial}")
         
@@ -219,7 +218,8 @@ def handler(event, context):
         variables = event["userInput"]["variables"]
         variables_list = [{"name": var["name"], "value": var["value"]} for var in variables]
 
-        print(variables_list)
+        phase = event["userInput"]["agentPhase"]
+
     
         response = bedrockQuestion(
             event["chatString"],
@@ -230,7 +230,8 @@ def handler(event, context):
             knowledgeBaseId= knowledge_base_params["knowledgeBaseId"],
             use_knowledge_base= knowledge_base_params["useKnowledgeBase"],
             number_of_results= knowledge_base_params["numberOfResults"],
-            variables=variables_list  # Pasar la lista de variables
+            variables=variables_list,
+            AgentPhase=phase
         )
         
         chatResponder.publish_agent_message(response)

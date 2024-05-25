@@ -22,7 +22,7 @@ import {
   useAgentConversationMetadata,
   useResetAgentConversationMetadata,
 } from "../apis/agent-api/hooks/useMetadata";
-import { selectedLlmState, selectedAgentState, variablesState } from "../apis/agent-api/state";
+import { selectedLlmState, selectedAgentState, variablesState, selectedAgentPhaseState, selectedIterationState } from '../apis/agent-api/state';
 import llama3Tokenizer from "llama3-tokenizer-js";
 
 export function AIAgentViewChat() {
@@ -39,6 +39,8 @@ export function AIAgentViewChat() {
   const submitMessage = useAgentApiSendMessage(chatId);
   const selectedAgent = useRecoilValue(selectedAgentState);
   const [variablesList] = useRecoilState(variablesState);
+  const selectedPhase = useRecoilState(selectedAgentPhaseState);
+  
 
   useAgentApiSubscribeConversation(chatId);
 
@@ -76,7 +78,12 @@ export function AIAgentViewChat() {
       alert("Por favor, seleccione un LLM para enviar mensajes.");
       return;
     }
-    console.log(variablesList);
+    
+    if (!selectedPhase[0]) {
+      alert("No hay una fase seleccionada. Por favor, selecciona una fase.");
+      return;
+    }
+
     const payload = {
       message: chatString,
       model: selectedLlm,
@@ -92,6 +99,7 @@ export function AIAgentViewChat() {
         numberOfResults: agentObject.value?.knowledgeBaseParams.numberOfResults || 3,
       },
       variables: variablesList,
+      agentPhase: selectedPhase[0],
     };
     console.log("Sending message:", payload);
     submitMessage(payload);
@@ -110,9 +118,18 @@ export function AIAgentViewChat() {
     return <Loader />;
   }
 
+  if (!agentObject.value.phases || agentObject.value.phases.length === 0) {
+    return (
+      <View>
+        <Text>Error: No hay una fase seleccionada. Por favor, selecciona una fase para continuar.</Text>
+      </View>
+    );
+  }
+
   return (
     <>
       <View>
+
         <Container
           heading={`Etapa: '${agentObject.value.name}'`}
           minHeight={500}
@@ -120,6 +137,7 @@ export function AIAgentViewChat() {
         >
           <ChatRendered />
         </Container>
+        <br />
         <Card>
           {conversationMetadata.responding && <Loader variation="linear" />}
           {!conversationMetadata.responding && (

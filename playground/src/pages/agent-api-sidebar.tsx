@@ -16,6 +16,7 @@ import {
   TextAreaField,
   CheckboxField,
   Accordion,
+  Text,
 } from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
 import "react-widgets/scss/styles.scss";
@@ -25,13 +26,17 @@ import {
   selectedLlmState,
   selectedAgentState,
   variablesState,
+  selectedAgentPhaseState,
+  selectedIterationState,
+  Iterations,
 } from "../apis/agent-api/state";
 import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
 import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
 import CustomStorageManager from "../components/CustomStorageManager";
-import { AgentPhase } from "../apis/agent-api/types";
+import { AgentPhase, Iteration } from "../apis/agent-api/types";
+import { useIterationApiIterationList } from "../apis/agent-api/hooks/useIterations";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -40,6 +45,7 @@ export function AIAgentSidebar() {
   const agentObjectList = useAgentApiAgentList();
   const LLmsObject = useLLmList();
   const updateAgent = useAgentApiUpdateAgent();
+  const IterationsList = useIterationApiIterationList();
 
   const [selectedLlm, setSelectedLlm] = useRecoilState(selectedLlmState);
   const [selectedAgent, setSelectedAgent] = useRecoilState(selectedAgentState);
@@ -69,7 +75,12 @@ export function AIAgentSidebar() {
   );
   const [variablesList] = useRecoilState(variablesState);
   const [phases, setPhases] = useState<AgentPhase[]>([]);
-  const [selectedPhase, setSelectedPhase] = useState<AgentPhase | null>(null);
+  const [selectedPhase, setSelectedPhase] = useRecoilState(
+    selectedAgentPhaseState
+  );
+  const [selectedIteration, setSelectedIteration] = useRecoilState(
+    selectedIterationState
+  );
 
   const selectedContent =
     variablesList.find((variable) => variable.name === selectedVariable)
@@ -81,6 +92,7 @@ export function AIAgentSidebar() {
 
   const handlePhaseChange = (event: any) => {
     const phase = phases.find((phase) => phase.name === event.target.value);
+    console.log("Selected Phase:", phase);
     setSelectedPhase(phase || null);
   };
 
@@ -142,10 +154,10 @@ export function AIAgentSidebar() {
       setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
       setPhases(agent.phases || []);
-      setSelectedPhase(agent.phases?.[0] || null);
+      setSelectedPhase(null); // No phase selected by default
       setForceRender((prev) => !prev);
     }
-  }, [selectedAgent]);
+  }, [selectedAgent, setSelectedPhase]);
 
   useEffect(() => {
     if (agentObjectList.value) {
@@ -199,7 +211,9 @@ export function AIAgentSidebar() {
     LLmsObject.isUnloaded() ||
     !LLmsObject.value ||
     KnowledgeBases.isUnloaded() ||
-    !KnowledgeBases.value
+    !KnowledgeBases.value ||
+    IterationsList.isUnloaded() ||
+    !IterationsList.value
   ) {
     return <Loader />;
   }
@@ -227,8 +241,12 @@ export function AIAgentSidebar() {
 
   return (
     <Flex>
-      <Accordion.Container allowMultiple width="40%" defaultValue={['Tu LLM', 'Tus conversaciones']}>
-        <Accordion.Item value="Tu LLM" >
+      <Accordion.Container
+        allowMultiple
+        width="60%"
+        defaultValue={["Tu LLM", "Tus conversaciones"]}
+      >
+        <Accordion.Item value="Tu LLM">
           <Accordion.Trigger>
             Select LLM
             <Accordion.Icon />
@@ -243,9 +261,10 @@ export function AIAgentSidebar() {
                 const selected = LLmsObject.value!.items().find(
                   (llm) => llm.id === e.target.value
                 );
-                setSelectedLlm(selected!);
+                setSelectedLlm(selected || null);
               }}
             >
+              <option value="">Selecciona tu LLM</option>
               {LLmsObject.value.items().map((llm) => (
                 <option key={llm.id} value={llm.id}>
                   {llm.name}
@@ -298,13 +317,51 @@ export function AIAgentSidebar() {
             </ReactMarkdown>
           </Accordion.Content>
         </Accordion.Item>
+        <Accordion.Item value="Seleccionar iteración">
+          <Accordion.Trigger>
+            Seleccionar iteración
+            <Accordion.Icon />
+          </Accordion.Trigger>
+          <Accordion.Content>
+            <SelectField
+              label="Selecciona una iteración"
+              size="small"
+              value={selectedIteration ? selectedIteration.id : ""}
+              onChange={(e) => {
+                const selected = IterationsList.value
+                  ?.items()
+                  .find((iteration) => iteration.id === e.target.value);
+                setSelectedIteration(selected || null);
+              }}
+            >
+              <option value="">Selecciona una iteración</option>
+              {IterationsList.value?.items().map((iteration) => (
+                <option key={iteration.id} value={iteration.number}>
+                  {iteration.objetive}
+                </option>
+              ))}
+            </SelectField>
+          </Accordion.Content>
+        </Accordion.Item>
       </Accordion.Container>
 
       <Container heading={heading} width="100%">
+        <Text fontWeight="bold" fontSize="medium" padding="small">
+          {"Objetivo de la iteración: " +
+            (selectedIteration
+              ? `Número de iteración: ${
+                  selectedIteration.number || "N/A"
+                } Objetivo: ${selectedIteration.objetive || "N/A"}`
+              : "No hay iteración seleccionada")}
+        </Text>
         <Outlet />
       </Container>
 
-      <Accordion.Container allowMultiple width="70%" defaultValue={['Etapas', 'Fases','Parámetros del modelo']}>
+      <Accordion.Container
+        allowMultiple
+        width="70%"
+        defaultValue={["Etapas", "Fases", "Parámetros del modelo"]}
+      >
         <Accordion.Item value="Etapas">
           <Accordion.Trigger>
             Selecccionar Etapa
@@ -340,6 +397,7 @@ export function AIAgentSidebar() {
                 value={selectedPhase ? selectedPhase.name : ""}
                 onChange={handlePhaseChange}
               >
+                <option value="">Selecciona una fase</option>
                 {phases.map((phase) => (
                   <option key={phase.name} value={phase.name}>
                     {phase.name}
@@ -452,7 +510,6 @@ export function AIAgentSidebar() {
             </Flex>
           </Accordion.Content>
         </Accordion.Item>
-
       </Accordion.Container>
     </Flex>
   );
