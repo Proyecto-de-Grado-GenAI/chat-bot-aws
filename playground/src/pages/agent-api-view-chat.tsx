@@ -22,7 +22,13 @@ import {
   useAgentConversationMetadata,
   useResetAgentConversationMetadata,
 } from "../apis/agent-api/hooks/useMetadata";
-import { selectedLlmState, selectedAgentState, variablesState, selectedAgentPhaseState, selectedIterationState } from '../apis/agent-api/state';
+import {
+  selectedLlmState,
+  selectedAgentState,
+  variablesState,
+  selectedAgentPhaseState,
+  selectedIterationState,
+} from "../apis/agent-api/state";
 import llama3Tokenizer from "llama3-tokenizer-js";
 
 export function AIAgentViewChat() {
@@ -40,7 +46,6 @@ export function AIAgentViewChat() {
   const selectedAgent = useRecoilValue(selectedAgentState);
   const [variablesList] = useRecoilState(variablesState);
   const selectedPhase = useRecoilState(selectedAgentPhaseState);
-  
 
   useAgentApiSubscribeConversation(chatId);
 
@@ -78,7 +83,7 @@ export function AIAgentViewChat() {
       alert("Por favor, seleccione un LLM para enviar mensajes.");
       return;
     }
-    
+
     if (!selectedPhase[0]) {
       alert("No hay una fase seleccionada. Por favor, selecciona una fase.");
       return;
@@ -94,9 +99,12 @@ export function AIAgentViewChat() {
       },
       systemPrompt: agentObject.value?.systemPrompt || "",
       knowledgeBaseParams: {
-        knowledgeBaseId: agentObject.value?.knowledgeBaseParams.knowledgeBaseId || "",
-        useKnowledgeBase: agentObject.value?.knowledgeBaseParams.useKnowledgeBase || false,
-        numberOfResults: agentObject.value?.knowledgeBaseParams.numberOfResults || 3,
+        knowledgeBaseId:
+          agentObject.value?.knowledgeBaseParams.knowledgeBaseId || "",
+        useKnowledgeBase:
+          agentObject.value?.knowledgeBaseParams.useKnowledgeBase || false,
+        numberOfResults:
+          agentObject.value?.knowledgeBaseParams.numberOfResults || 3,
       },
       variables: variablesList,
       agentPhase: selectedPhase[0],
@@ -106,7 +114,7 @@ export function AIAgentViewChat() {
     setChatString("");
   };
 
-  const maxCharacters = agentObject.value?.inputMaxToken || 1000; 
+  const maxCharacters = agentObject.value?.inputMaxToken || 1000;
 
   if (
     conversationObject.isUnloaded() ||
@@ -121,7 +129,10 @@ export function AIAgentViewChat() {
   if (!agentObject.value.phases || agentObject.value.phases.length === 0) {
     return (
       <View>
-        <Text>Error: No hay una fase seleccionada. Por favor, selecciona una fase para continuar.</Text>
+        <Text>
+          Error: No hay una fase seleccionada. Por favor, selecciona una fase
+          para continuar.
+        </Text>
       </View>
     );
   }
@@ -129,7 +140,6 @@ export function AIAgentViewChat() {
   return (
     <>
       <View>
-
         <Container
           heading={`Etapa: '${agentObject.value.name}'`}
           minHeight={500}

@@ -40,7 +40,7 @@ export interface AgentPhase {
 }
 export interface Iteration {
     id: string;
-    number: string;
+    number: number;
     objetive: string;
 }
 export interface ModelParams {

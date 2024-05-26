@@ -1,8 +1,10 @@
-import { AgentApiConversationListed } from "../library/chat/conversation-listed";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import { useNavigate, useParams, Outlet } from "react-router-dom";
 import {
   useAgentApiAgentList,
   useAgentApiConversationList,
+  useAgentApiSendMessage,
   useKnowledgeBase,
   useLLmList,
 } from "../apis/agent-api";
@@ -19,8 +21,10 @@ import {
   Text,
 } from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
-import "react-widgets/scss/styles.scss";
-import { useRecoilState } from "recoil";
+import remarkGfm from "remark-gfm";
+import ReactMarkdown from "react-markdown";
+import CustomStorageManager from "../components/CustomStorageManager";
+import { AgentApiConversationListed } from "../library/chat/conversation-listed";
 import {
   activeConversationsState,
   selectedLlmState,
@@ -28,40 +32,35 @@ import {
   variablesState,
   selectedAgentPhaseState,
   selectedIterationState,
-  Iterations,
+  phaseExecutedState,
 } from "../apis/agent-api/state";
-import { useEffect, useState } from "react";
+import { AgentPhase } from "../apis/agent-api/types";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
-import remarkGfm from "remark-gfm";
-import ReactMarkdown from "react-markdown";
-import CustomStorageManager from "../components/CustomStorageManager";
-import { AgentPhase, Iteration } from "../apis/agent-api/types";
 import { useIterationApiIterationList } from "../apis/agent-api/hooks/useIterations";
+import { useAgentApiCreateIteration } from "../apis/agent-api/hooks/useCreateIteration";
+import { useAgentApiDeleteIteration } from "../apis/agent-api/hooks/useDeleteIteration";
+import Markdown from "react-markdown";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
 
   const conversationsObject = useAgentApiConversationList();
   const agentObjectList = useAgentApiAgentList();
+  const submitMessage = useAgentApiSendMessage(chatId);
   const LLmsObject = useLLmList();
   const updateAgent = useAgentApiUpdateAgent();
   const IterationsList = useIterationApiIterationList();
 
   const [selectedLlm, setSelectedLlm] = useRecoilState(selectedLlmState);
   const [selectedAgent, setSelectedAgent] = useRecoilState(selectedAgentState);
-  const [lastSelectedAgentId, setLastSelectedAgentId] = useState<string | null>(
-    null
-  );
-  const [agentConversations, setAgentConversations] = useRecoilState(
-    activeConversationsState
-  );
+  const [lastSelectedAgentId, setLastSelectedAgentId] = useState<string | null>(null);
+  const [agentConversations, setAgentConversations] = useRecoilState(activeConversationsState);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [temperature, setTemperature] = useState<number | null>(null);
   const [topP, setTopP] = useState<number | null>(null);
   const [maxGenLen, setMaxGenLen] = useState(1500);
-  const [systemPrompt, setSystemPrompt] = useState(
-    "Eres un asistente útil y amigable."
-  );
+  const [systemPrompt, setSystemPrompt] = useState("Eres un asistente útil y amigable.");
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
   const [IfUseKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState(3);
@@ -70,21 +69,17 @@ export function AIAgentSidebar() {
   const [inputMaxToken, setInputMaxToken] = useState(1000);
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
-  const [selectedVariable, setSelectedVariable] = useState(
-    "Telecommunications Company"
-  );
+  const [selectedVariable, setSelectedVariable] = useState("Telecommunications Company");
   const [variablesList] = useRecoilState(variablesState);
   const [phases, setPhases] = useState<AgentPhase[]>([]);
-  const [selectedPhase, setSelectedPhase] = useRecoilState(
-    selectedAgentPhaseState
-  );
-  const [selectedIteration, setSelectedIteration] = useRecoilState(
-    selectedIterationState
-  );
+  const [selectedPhase, setSelectedPhase] = useRecoilState(selectedAgentPhaseState);
+  const [selectedIteration, setSelectedIteration] = useRecoilState(selectedIterationState);
+  const [phaseExecuted, setPhaseExecuted] = useRecoilState(phaseExecutedState);
 
-  const selectedContent =
-    variablesList.find((variable) => variable.name === selectedVariable)
-      ?.value || "";
+  const addIteration = useAgentApiCreateIteration();
+  const deleteIteration = useAgentApiDeleteIteration();
+
+  const selectedContent = variablesList.find((variable) => variable.name === selectedVariable)?.value || "";
 
   const handleVariableChange = (event: any) => {
     setSelectedVariable(event.target.value);
@@ -92,7 +87,6 @@ export function AIAgentSidebar() {
 
   const handlePhaseChange = (event: any) => {
     const phase = phases.find((phase) => phase.name === event.target.value);
-    console.log("Selected Phase:", phase);
     setSelectedPhase(phase || null);
   };
 
@@ -136,21 +130,15 @@ export function AIAgentSidebar() {
   useEffect(() => {
     if (selectedAgent !== null) {
       const agent = selectedAgent;
-      console.log("Agent Object:", agent); // Print the agent object
-      console.log(agent.modelParams?.temperature); // Print the agent temperature
       setAgentName(agent.name || "");
       setHandlerLambda(agent.handlerLambda || "");
-      setSystemPrompt(
-        agent.systemPrompt || "Eres un asistente útil y amigable."
-      );
+      setSystemPrompt(agent.systemPrompt || "Eres un asistente útil y amigable.");
       setInputMaxToken(agent.inputMaxToken || 1000);
       setPrecedence(agent.precedence || 1);
       setTemperature(agent.modelParams?.temperature ?? 0.7);
       setTopP(agent.modelParams?.top_p ?? 0.9);
       setMaxGenLen(agent.modelParams?.max_gen_len || 1500);
-      setKnowledgeBaseId(
-        agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1"
-      );
+      setKnowledgeBaseId(agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1");
       setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
       setPhases(agent.phases || []);
@@ -161,12 +149,19 @@ export function AIAgentSidebar() {
 
   useEffect(() => {
     if (agentObjectList.value) {
-      const initialAgent =
-        agentObjectList.value.items().find((agent) => agent.precedence === 1) ||
-        null;
+      const initialAgent = agentObjectList.value.items().find((agent) => agent.precedence === 1) || null;
       setSelectedAgent(initialAgent);
     }
   }, [agentObjectList.value, setSelectedAgent]);
+
+  useEffect(() => {
+    if (selectedIteration) {
+      const iteration = IterationsList.value?.items().find((iteration) => iteration.id === selectedIteration.id);
+      if (iteration) {
+        setSelectedIteration(iteration);
+      }
+    }
+  }, [IterationsList.value, phaseExecuted, selectedIteration, setSelectedIteration]);
 
   useEffect(() => {
     if (selectedAgent && selectedAgent.id !== lastSelectedAgentId) {
@@ -185,23 +180,77 @@ export function AIAgentSidebar() {
 
   useEffect(() => {
     if (chatId && conversationsObject.value && agentObjectList.value) {
-      const conversation = conversationsObject.value
-        .items()
-        .find((conv) => conv.id === chatId);
+      const conversation = conversationsObject.value.items().find((conv) => conv.id === chatId);
       if (conversation) {
-        const agent =
-          agentObjectList.value
-            .items()
-            .find((agent) => agent.id === conversation.agent) || null;
+        const agent = agentObjectList.value.items().find((agent) => agent.id === conversation.agent) || null;
         setSelectedAgent(agent);
       }
     }
-  }, [
-    chatId,
-    conversationsObject.value,
-    agentObjectList.value,
-    setSelectedAgent,
-  ]);
+  }, [chatId, conversationsObject.value, agentObjectList.value, setSelectedAgent]);
+
+  const handleExecutePhase = () => {
+    if (!selectedPhase) {
+      alert("No hay una fase seleccionada. Por favor, selecciona una fase.");
+      return;
+    }
+
+    if (!selectedLlm) {
+      alert("No hay un LLM seleccionado. Por favor, selecciona un LLM.");
+      return;
+    }
+    
+
+    const payload = {
+      message: `Vas a ejecutar el segundo paso del la primera iteración del ADD 3.0, dame toda la informacion relevante asociada a ella.`,
+      model: selectedLlm,
+      modelParams: {
+        temperature: temperature,
+        top_p: topP,
+        max_gen_len: maxGenLen,
+      },
+      systemPrompt: systemPrompt,
+      knowledgeBaseParams: {
+        knowledgeBaseId: knowledgeBaseId,
+        useKnowledgeBase: IfUseKnowledgeBase,
+        numberOfResults: numberOfResults,
+      },
+      variables: variablesList,
+      agentPhase: selectedPhase,
+    };
+
+    submitMessage(payload);
+    alert("Fase ejecutada con éxito!");
+    setPhaseExecuted(true);
+  };
+
+  const handleAddIteration = () => {
+    const newIteration = {
+      number: (IterationsList.value?.items().length || 0) + 1,
+      objetive: "Nuevo objetivo",
+    };
+    addIteration(newIteration)
+      .then(() => {
+        alert("Iteración agregada exitosamente!");
+      })
+      .catch((error) => {
+        alert(`Error al agregar la iteración: ${error.message}`);
+      });
+  };
+
+  const handleDeleteIteration = () => {
+    if (selectedIteration) {
+      deleteIteration(selectedIteration.id)
+        .then(() => {
+          alert("Iteración borrada exitosamente!");
+          setSelectedIteration(null);
+        })
+        .catch((error) => {
+          alert(`Error al borrar la iteración: ${error.message}`);
+        });
+    } else {
+      alert("No hay una iteración seleccionada para borrar.");
+    }
+  };
 
   if (
     conversationsObject.isUnloaded() ||
@@ -225,27 +274,18 @@ export function AIAgentSidebar() {
         .sort((c1, c2) => (c1.timestamp < c2.timestamp ? 1 : -1))
         .map((conversation) => (
           <AgentApiConversationListed
-            agent={agentObjectList.value
-              ?.items()
-              .find((agent) => agent.id === conversation.agent)}
+            agent={agentObjectList.value?.items().find((agent) => agent.id === conversation.agent)}
             conversation={conversation}
             key={conversation.id}
           />
         ))
     : [];
 
-  const heading =
-    `LLM: ${selectedLlm?.name || "No LLM selected"}` +
-    `       ` +
-    ` - Agente: ${selectedAgent?.name || "No agent selected"}`;
+  const heading = `LLM: ${selectedLlm?.name || "No LLM selected"} - Agente: ${selectedAgent?.name || "No agent selected"}`;
 
   return (
     <Flex>
-      <Accordion.Container
-        allowMultiple
-        width="60%"
-        defaultValue={["Tu LLM", "Tus conversaciones"]}
-      >
+      <Accordion.Container allowMultiple width="60%" defaultValue={["Tu LLM", "Tus conversaciones"]}>
         <Accordion.Item value="Tu LLM">
           <Accordion.Trigger>
             Select LLM
@@ -258,9 +298,7 @@ export function AIAgentSidebar() {
               size="small"
               value={selectedLlm ? selectedLlm.id : ""}
               onChange={(e) => {
-                const selected = LLmsObject.value!.items().find(
-                  (llm) => llm.id === e.target.value
-                );
+                const selected = LLmsObject.value!.items().find((llm) => llm.id === e.target.value);
                 setSelectedLlm(selected || null);
               }}
             >
@@ -280,12 +318,7 @@ export function AIAgentSidebar() {
             <Accordion.Icon />
           </Accordion.Trigger>
           <Accordion.Content>
-            <Flex
-              direction="column"
-              gap={10}
-              maxHeight={"calc(100vh - 150px)"}
-              overflow="auto"
-            >
+            <Flex direction="column" gap={10} maxHeight={"calc(100vh - 150px)"} overflow="auto">
               {conversationsRendered}
             </Flex>
             <br />
@@ -294,29 +327,24 @@ export function AIAgentSidebar() {
             </Button>
           </Accordion.Content>
         </Accordion.Item>
+
         <Accordion.Item value="Seleccionar Drivers y Vista Previa">
           <Accordion.Trigger>
             Seleccionar Drivers y Vista Previa
             <Accordion.Icon />
           </Accordion.Trigger>
           <Accordion.Content>
-            <SelectField
-              label="Selecciona un Driver"
-              size="small"
-              value={selectedVariable}
-              onChange={handleVariableChange}
-            >
+            <SelectField label="Selecciona un Driver" size="small" value={selectedVariable} onChange={handleVariableChange}>
               {variablesList.map((variable) => (
                 <option key={variable.name} value={variable.name}>
                   {variable.name}
                 </option>
               ))}
             </SelectField>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {selectedContent}
-            </ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{selectedContent}</ReactMarkdown>
           </Accordion.Content>
         </Accordion.Item>
+
         <Accordion.Item value="Seleccionar iteración">
           <Accordion.Trigger>
             Seleccionar iteración
@@ -328,40 +356,33 @@ export function AIAgentSidebar() {
               size="small"
               value={selectedIteration ? selectedIteration.id : ""}
               onChange={(e) => {
-                const selected = IterationsList.value
-                  ?.items()
-                  .find((iteration) => iteration.id === e.target.value);
+                const selected = IterationsList.value?.items().find((iteration) => iteration.id === e.target.value);
                 setSelectedIteration(selected || null);
               }}
             >
               <option value="">Selecciona una iteración</option>
               {IterationsList.value?.items().map((iteration) => (
-                <option key={iteration.id} value={iteration.number}>
+                <option key={iteration.id} value={iteration.id}>
                   {iteration.objetive}
                 </option>
               ))}
             </SelectField>
+            <Button onClick={handleAddIteration}>Agregar Iteración</Button>
+            <Button onClick={handleDeleteIteration} disabled={!selectedIteration}>
+              Borrar Iteración
+            </Button>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion.Container>
 
       <Container heading={heading} width="100%">
         <Text fontWeight="bold" fontSize="medium" padding="small">
-          {"Objetivo de la iteración: " +
-            (selectedIteration
-              ? `Número de iteración: ${
-                  selectedIteration.number || "N/A"
-                } Objetivo: ${selectedIteration.objetive || "N/A"}`
-              : "No hay iteración seleccionada")}
+          {selectedIteration ? `Número de iteración: ${selectedIteration.number || "N/A"} Objetivo: ${selectedIteration.objetive || "N/A"}` : "No hay iteración seleccionada"}
         </Text>
         <Outlet />
       </Container>
 
-      <Accordion.Container
-        allowMultiple
-        width="70%"
-        defaultValue={["Etapas", "Fases", "Parámetros del modelo"]}
-      >
+      <Accordion.Container allowMultiple width="70%" defaultValue={["Etapas", "Fases"]}>
         <Accordion.Item value="Etapas">
           <Accordion.Trigger>
             Selecccionar Etapa
@@ -374,16 +395,14 @@ export function AIAgentSidebar() {
                 .slice()
                 .sort((a, b) => a.precedence - b.precedence)
                 .map((agent, index) => (
-                  <Button
-                    key={agent.id}
-                    onClick={() => setSelectedAgent(agent)}
-                  >
+                  <Button key={agent.id} onClick={() => setSelectedAgent(agent)}>
                     {agent.name}
                   </Button>
                 ))}
             </Flex>
           </Accordion.Content>
         </Accordion.Item>
+
         <Accordion.Item value="Fases">
           <Accordion.Trigger>
             Selecccionar Fase
@@ -404,13 +423,11 @@ export function AIAgentSidebar() {
                   </option>
                 ))}
               </SelectField>
-              <TextAreaField
-                label="Descripción de la fase"
-                size="small"
-                rows={5}
-                value={selectedPhase ? selectedPhase.description : ""}
-                readOnly
-              />
+              <Text fontSize="medium">Descripción de la fase:</Text>
+              <Markdown>{selectedPhase?.description}</Markdown>
+              <Button onClick={handleExecutePhase} variation="primary">
+                Ejecutar Fase
+              </Button>
             </Flex>
           </Accordion.Content>
         </Accordion.Item>
@@ -461,20 +478,25 @@ export function AIAgentSidebar() {
                 placeholder="1500"
                 size="small"
                 value={maxGenLen}
-                onChange={(e) =>
-                  setMaxGenLen(
-                    e.target.value ? parseInt(e.target.value, 10) : 0
-                  )
-                }
+                onChange={(e) => setMaxGenLen(e.target.value ? parseInt(e.target.value, 10) : 0)}
               />
-              <TextAreaField
-                label="System Prompt"
-                placeholder="Eres un asistente útil y amigable."
-                size="small"
-                rows={5}
-                value={systemPrompt}
-                onChange={(e) => setSystemPrompt(e.target.value)}
-              />
+
+              {isEditing ? (
+                <TextAreaField
+                  label="System Prompt"
+                  value={systemPrompt}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
+                />
+              ) : (
+                <>
+                  <Text fontSize="medium">System Prompt:</Text>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{systemPrompt}</ReactMarkdown>
+                </>
+              )}
+
+              <Button onClick={() => setIsEditing(!isEditing)}>
+                {isEditing ? "Guardar" : "Editar"}
+              </Button>
               <SelectField
                 label="Knowledge Base"
                 size="small"
@@ -498,11 +520,7 @@ export function AIAgentSidebar() {
                 placeholder="3"
                 size="small"
                 value={numberOfResults}
-                onChange={(e) =>
-                  setNumberOfResults(
-                    e.target.value ? parseInt(e.target.value, 10) : 0
-                  )
-                }
+                onChange={(e) => setNumberOfResults(e.target.value ? parseInt(e.target.value, 10) : 0)}
               />
               <Button variation="primary" onClick={onUpdate} size="small">
                 Aplicar cambios

@@ -301,3 +301,8 @@ export const Iterations = atom<IterationStore>({
   default: Loadable.unloaded(),
 });
   
+
+export const phaseExecutedState = atom({
+  key: 'phaseExecutedState',
+  default: false,
+});

@@ -58,7 +58,7 @@
     "phases": [
       {
         "name": "Step 2: Establish Iteration Goal by Selecting Drivers",
-        "description": "..."
+        "description": "Revisa los drivers más importantes y generales de entrada, y selecciona el que utilizarás como objetivo de la primera iteración. Sigue los consejos proporcionados a continuación:\n\n- Sea claro y específico: Define claramente el objetivo basado en los drivers.\n- Contextualiza la información: Utiliza la información contextual sobre ADD 3.0 para guiar tu elección.\n- Simplifica la salida: La salida debe ser concisa y en el formato especificado.\n\nUtiliza esta información contextual sobre ADD 3.0:\n{}\n\nUtiliza esta información del primer paso del ADD 3.0 (Review Inputs):\n{}\n\nRecuerda que el objetivo debe estar siempre en términos de los drivers recibidos.\n\nLa salida debe cumplir con las siguientes restricciones:\n\n- Alinearse a las recomendaciones del ADD.\n- Alinear la contextualización del negocio.\n\nLa salida debe estar en el formato:\n\n#Justificación#selected driver#Objective\n\nEjemplo de formato esperado:\n#Se seleccionó el driver porque ... #DriverID123 - descripción DriverID123# El objetivo de ..."
       },
       {
         "name": "Step 3: Choose One or More Elements of the System to Refine",
