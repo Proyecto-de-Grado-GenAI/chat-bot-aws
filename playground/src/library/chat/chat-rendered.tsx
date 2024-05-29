@@ -31,32 +31,32 @@ function EnterAgentSection (props: {name?: string}) {
     </View>
 }
 
-function formatMessage(message) {
-    const parts = message.split('#');
-    const filteredParts = parts.filter(part => part.trim() !== '');
-    const sectionLabels = ["Justificación", "Driver", "Objetivo"];
-    const sections = {};
-    let driverContent = '';
+// function formatMessage(message) {
+//     const parts = message.split('#');
+//     const filteredParts = parts.filter(part => part.trim() !== '');
+//     const sectionLabels = ["Justificación", "Driver", "Objetivo"];
+//     const sections = {};
+//     let driverContent = '';
 
-    filteredParts.forEach((part, index) => {
-        if (sectionLabels[index]) {
-            sections[sectionLabels[index]] = part.trim();
-            if (sectionLabels[index] === "Driver") {
-                driverContent = part.trim();
-            }
-        }
-    });
+//     filteredParts.forEach((part, index) => {
+//         if (sectionLabels[index]) {
+//             sections[sectionLabels[index]] = part.trim();
+//             if (sectionLabels[index] === "Driver") {
+//                 driverContent = part.trim();
+//             }
+//         }
+//     });
 
-    let formattedMessage = '';
-    for (let section in sections) {
-        formattedMessage += `${section}:\n${sections[section]}\n\n`;
-    }
+//     let formattedMessage = '';
+//     for (let section in sections) {
+//         formattedMessage += `${section}:\n${sections[section]}\n\n`;
+//     }
 
-    return {
-        formattedMessage: formattedMessage.trim(),
-        driverContent: driverContent
-    };
-}
+//     return {
+//         formattedMessage: formattedMessage.trim(),
+//         driverContent: driverContent
+//     };
+// }
 
 export function ChatRendered () {
     const { chatId } = useParams();
@@ -140,25 +140,23 @@ export function ChatRendered () {
                     } else {
 
                         if(selectedPhase && selectedIteration && phaseExecuted) {
-                            console.log('selectedPhase', selectedPhase);
-                            console.log(formatMessage(part));
-                            updateIteration({
-                                id: selectedIteration.id,
-                                objetive: formatMessage(part).driverContent,
-                                number: selectedIteration.number
-                            });
-                            setPhaseExecuted(false);
-                            renderedChat.push(
-                                <AgentChatMessage 
-                                    text={formatMessage(part).formattedMessage}
-                                    event={event}
-                                    lastEventTime={localLastEffectTime}
-                                    key={key}
-                                />
-                            );
+                            // console.log('selectedPhase', selectedPhase);
+                            // updateIteration({
+                            //     id: selectedIteration.id,
+                            //     objetive: formatMessage(part).driverContent,
+                            //     number: selectedIteration.number
+                            // });
+                            // setPhaseExecuted(false);
+                            // renderedChat.push(
+                            //     <AgentChatMessage 
+                            //         text={formatMessage(part).formattedMessage}
+                            //         event={event}
+                            //         lastEventTime={localLastEffectTime}
+                            //         key={key}
+                            //     />
+                            // );
                         }
                         else {
-                            part = formatMessage(part).formattedMessage;
                             renderedChat.push(
                                 <AgentChatMessage 
                                     text={part}
@@ -196,7 +194,7 @@ export function ChatRendered () {
     }
 
     return (
-        <View style={{height: 'calc(100vh - 230px)', overflowY: 'scroll'}}>
+        <View style={{height: 'calc(100vh - 450px)', overflowY: 'scroll'}}>
             <View>
                 <Flex
                     minHeight='calc(100vh - 220px)'

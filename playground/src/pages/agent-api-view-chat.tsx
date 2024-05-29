@@ -148,7 +148,7 @@ export function AIAgentViewChat() {
           <ChatRendered />
         </Container>
         <br />
-        <Card>
+        <Card >
           {conversationMetadata.responding && <Loader variation="linear" />}
           {!conversationMetadata.responding && (
             <>
