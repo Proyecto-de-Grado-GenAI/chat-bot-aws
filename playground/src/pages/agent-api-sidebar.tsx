@@ -304,7 +304,7 @@ export function AIAgentSidebar() {
       },
       variables: variablesList,
       agentPhase: selectedPhase,
-      Iteration: iterationInput
+      Iteration: iterationInput,
     };
 
     console.log("Payload: ", payload);
@@ -520,7 +520,9 @@ export function AIAgentSidebar() {
         defaultValue={[
           "Etapas",
           "Fases",
-          "Sube tus documentos y selecciona la iteracíon",
+          "Selecciona la iteración",
+          "Sube tus documentos",
+
         ]}
       >
         <Accordion.Item value="Etapas">
@@ -576,61 +578,67 @@ export function AIAgentSidebar() {
         </Accordion.Item>
 
         {selectedAgent?.name === "Comprensión" && (
-          <Accordion.Item value="Sube tus documentos y selecciona la iteracíon">
-            <Accordion.Trigger>
-              Sube tus documentos
-              <Accordion.Icon />
-            </Accordion.Trigger>
-            <Accordion.Content>
-              <CustomStorageManager />
-            </Accordion.Content>
-            <Accordion.Trigger>
-              Seleccionar iteración
-              <Accordion.Icon />
-            </Accordion.Trigger>
-            <Accordion.Content>
-              <SelectField
-                label="Selecciona una iteración"
-                size="small"
-                value={selectedIteration ? selectedIteration.id : ""}
-                onChange={(e) => {
-                  const selected = IterationsList.value
-                    ?.items()
-                    .find((iteration) => iteration.id === e.target.value);
-                  setSelectedIteration(selected || null);
-                }}
-              >
-                <option value="">Selecciona una iteración</option>
-                {IterationsList.value?.items().map((iteration) => (
-                  <option key={iteration.id} value={iteration.id}>
-                    {iteration.name}
-                  </option>
-                ))}
-              </SelectField>
-              <TextField
-                label="Nuevo objetivo de iteración"
-                placeholder="Describe el objetivo"
-                size="small"
-                value={newIterationObjective}
-                onChange={(e) => setNewIterationObjective(e.target.value)}
-              />
-              <Flex direction="row" gap={10}>
-                <Button onClick={handleAddIteration}>Agregar Iteración</Button>
-                <Button
-                  onClick={handleDeleteIteration}
-                  disabled={!selectedIteration}
+          <>
+            <Accordion.Item value="Sube tus documentos">
+              <Accordion.Trigger>
+                Sube tus documentos
+                <Accordion.Icon />
+              </Accordion.Trigger>
+              <Accordion.Content>
+                <CustomStorageManager />
+              </Accordion.Content>
+            </Accordion.Item>
+            <Accordion.Item value="Selecciona la iteración">
+              <Accordion.Trigger>
+                Seleccionar iteración
+                <Accordion.Icon />
+              </Accordion.Trigger>
+              <Accordion.Content>
+                <SelectField
+                  label="Selecciona una iteración"
+                  size="small"
+                  value={selectedIteration ? selectedIteration.id : ""}
+                  onChange={(e) => {
+                    const selected = IterationsList.value
+                      ?.items()
+                      .find((iteration) => iteration.id === e.target.value);
+                    setSelectedIteration(selected || null);
+                  }}
                 >
-                  Borrar Iteración
-                </Button>
-                <Button
-                  onClick={handleUpdateIteration}
-                  disabled={!selectedIteration}
-                >
-                  Actualizar Iteración
-                </Button>
-              </Flex>
-            </Accordion.Content>
-          </Accordion.Item>
+                  <option value="">Selecciona una iteración</option>
+                  {IterationsList.value?.items().map((iteration) => (
+                    <option key={iteration.id} value={iteration.id}>
+                      {iteration.name}
+                    </option>
+                  ))}
+                </SelectField>
+                <TextField
+                  label="Nuevo objetivo de iteración"
+                  placeholder="Describe el objetivo"
+                  size="small"
+                  value={newIterationObjective}
+                  onChange={(e) => setNewIterationObjective(e.target.value)}
+                />
+                <Flex direction="row" gap={10}>
+                  <Button onClick={handleAddIteration}>
+                    Agregar Iteración
+                  </Button>
+                  <Button
+                    onClick={handleDeleteIteration}
+                    disabled={!selectedIteration}
+                  >
+                    Borrar Iteración
+                  </Button>
+                  <Button
+                    onClick={handleUpdateIteration}
+                    disabled={!selectedIteration}
+                  >
+                    Actualizar Iteración
+                  </Button>
+                </Flex>
+              </Accordion.Content>
+            </Accordion.Item>
+          </>
         )}
 
         <Accordion.Item value="Parámetros del modelo">
