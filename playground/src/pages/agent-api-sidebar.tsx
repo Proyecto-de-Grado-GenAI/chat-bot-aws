@@ -51,8 +51,15 @@ export function AIAgentSidebar() {
   const LLmsObject = useLLmList();
   const updateAgent = useAgentApiUpdateAgent();
   const IterationsList = useIterationApiIterationList();
+  const etapas = [
+    { name: "Comprensión", precedence: 1 },
+    { name: "Diseño", precedence: 2 },
+    { name: "Diseño Detallado", precedence: 3 },
+    // Añade más etapas según sea necesario
+  ];
 
   const [selectedLlm, setSelectedLlm] = useRecoilState(selectedLlmState);
+  const [isDesignSelectable, setIsDesignSelectable] = useState(false);
   const [selectedAgent, setSelectedAgent] = useRecoilState(selectedAgentState);
   const [lastSelectedAgentId, setLastSelectedAgentId] = useState<string | null>(
     null
@@ -246,6 +253,16 @@ export function AIAgentSidebar() {
     }
   }, [LLmsObject.value, setSelectedLlm]);
 
+  useEffect(() => {
+    const hasRequiredVariable = variablesList.some(
+      (variable) =>
+        variable.name === "ADD 3.0 deliverable Step 1: Review inputs"
+    );
+    const hasIteration = selectedIteration !== null;
+
+    setIsDesignSelectable(hasRequiredVariable && hasIteration);
+  }, [variablesList, selectedIteration]);
+
   const handleExecutePhase = () => {
     if (!selectedPhase) {
       alert("No hay una fase seleccionada. Por favor, selecciona una fase.");
@@ -359,6 +376,20 @@ export function AIAgentSidebar() {
           />
         ))
     : [];
+
+  const sortedAgents = agentObjectList.value
+    ?.items()
+    .slice()
+    .sort((a, b) => a.precedence - b.precedence);
+
+  const isHigherPrecedenceDisabled = (precedence) => {
+    return sortedAgents.some(
+      (agent) =>
+        agent.precedence < precedence &&
+        agent.name === "Diseño" &&
+        !isDesignSelectable
+    );
+  };
 
   const heading = `LLM: ${selectedLlm?.name || "No LLM selected"} - Agente: ${
     selectedAgent?.name || "No agent selected"
@@ -482,18 +513,18 @@ export function AIAgentSidebar() {
           </Accordion.Trigger>
           <Accordion.Content>
             <Flex direction="row" gap={5}>
-              {agentObjectList.value
-                ?.items()
-                .slice()
-                .sort((a, b) => a.precedence - b.precedence)
-                .map((agent, index) => (
-                  <Button
-                    key={agent.id}
-                    onClick={() => setSelectedAgent(agent)}
-                  >
-                    {agent.name}
-                  </Button>
-                ))}
+              {sortedAgents.map((agent) => (
+                <Button
+                  key={agent.id}
+                  onClick={() => setSelectedAgent(agent)}
+                  isDisabled={
+                    (agent.name === "Diseño" && !isDesignSelectable) ||
+                    isHigherPrecedenceDisabled(agent.precedence)
+                  }
+                >
+                  {agent.name}
+                </Button>
+              ))}
             </Flex>
           </Accordion.Content>
         </Accordion.Item>

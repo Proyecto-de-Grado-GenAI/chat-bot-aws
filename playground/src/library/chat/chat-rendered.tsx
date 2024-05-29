@@ -139,33 +139,34 @@ export function ChatRendered () {
                         );
                     } else {
 
-                        if(selectedPhase && selectedIteration && phaseExecuted) {
-                            // console.log('selectedPhase', selectedPhase);
-                            // updateIteration({
-                            //     id: selectedIteration.id,
-                            //     objetive: formatMessage(part).driverContent,
-                            //     number: selectedIteration.number
-                            // });
-                            // setPhaseExecuted(false);
-                            // renderedChat.push(
-                            //     <AgentChatMessage 
-                            //         text={formatMessage(part).formattedMessage}
-                            //         event={event}
-                            //         lastEventTime={localLastEffectTime}
-                            //         key={key}
-                            //     />
-                            // );
-                        }
-                        else {
-                            renderedChat.push(
-                                <AgentChatMessage 
-                                    text={part}
-                                    event={event}
-                                    lastEventTime={localLastEffectTime}
-                                    key={key}
-                                />
-                            );
-                        }
+                        renderedChat.push(
+                            <AgentChatMessage 
+                                text={part}
+                                event={event}
+                                lastEventTime={localLastEffectTime}
+                                key={key}
+                            />
+                        );
+                        // if(selectedPhase && selectedIteration && phaseExecuted) {
+                        //     // console.log('selectedPhase', selectedPhase);
+                        //     // updateIteration({
+                        //     //     id: selectedIteration.id,
+                        //     //     objetive: formatMessage(part).driverContent,
+                        //     //     number: selectedIteration.number
+                        //     // });
+                        //     // setPhaseExecuted(false);
+                        //     // renderedChat.push(
+                        //     //     <AgentChatMessage 
+                        //     //         text={formatMessage(part).formattedMessage}
+                        //     //         event={event}
+                        //     //         lastEventTime={localLastEffectTime}
+                        //     //         key={key}
+                        //     //     />
+                        //     // );
+                        // }
+                        // else {
+                            
+                        // }
                         
                     }
                 });
