@@ -11,13 +11,15 @@ interface CreateIterationResponse {
 interface CreateIterationArgs {
     objetive: string
     number: number
+    name: string
 }
 
 const createIterationQuery = new GraphqlQuery<CreateIterationResponse>(`
-    mutation CreateIteration($objetive: String!, $number: Int!) {
+    mutation CreateIteration($objetive: String!, $number: Int!, $name: String!) {
         createIteration(config: {
             objetive: $objetive,
-            number: $number
+            number: $number,
+            name: $name
         }) {
             id
         }

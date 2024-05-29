@@ -11,17 +11,20 @@ export interface UpdateIterationArgs {
   id: string;
   objetive: string;
   number: number;
+  name: string;
 }
 
 const updateIterationQuery = new GraphqlQuery<UpdateIterationResponse>(`
-  mutation UpdateIteration($id: ID!, $objetive: String!, $number: Int!) {
+  mutation UpdateIteration($id: ID!, $objetive: String!, $number: Int!, $name: String!) {
     updateIteration(id: $id, config: {
       objetive: $objetive,
-      number: $number
+      number: $number,
+      name: $name
     }) {
       id
       objetive
       number
+      name
     }
   }
 `);

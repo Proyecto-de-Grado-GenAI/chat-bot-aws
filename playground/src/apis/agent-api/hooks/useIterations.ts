@@ -17,6 +17,7 @@ const listIterationsQuery = new GraphqlQuery<GetIterationResponse>(`
             id
             objetive
             number
+            name
         }
     }
 `)

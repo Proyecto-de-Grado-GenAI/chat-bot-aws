@@ -40,6 +40,7 @@ import { useIterationApiIterationList } from "../apis/agent-api/hooks/useIterati
 import { useAgentApiCreateIteration } from "../apis/agent-api/hooks/useCreateIteration";
 import { useAgentApiDeleteIteration } from "../apis/agent-api/hooks/useDeleteIteration";
 import Markdown from "react-markdown";
+import { useIterationApiUpdateIteration } from "../apis/agent-api/hooks/updateIteration";
 
 export function AIAgentSidebar() {
   const { chatId } = useParams();
@@ -90,6 +91,7 @@ export function AIAgentSidebar() {
 
   const addIteration = useAgentApiCreateIteration();
   const deleteIteration = useAgentApiDeleteIteration();
+  const updateIteration = useIterationApiUpdateIteration();
 
   const [newIterationObjective, setNewIterationObjective] = useState("");
 
@@ -282,6 +284,7 @@ export function AIAgentSidebar() {
     const newIteration = {
       number: (IterationsList.value?.items().length || 0) + 1,
       objetive: newIterationObjective,
+      name: "Iteración " + (IterationsList.value?.items().length || 1),
     };
     addIteration(newIteration)
       .then(() => {
@@ -291,6 +294,24 @@ export function AIAgentSidebar() {
       .catch((error) => {
         alert(`Error al agregar la iteración: ${error.message}`);
       });
+  };
+  const handleUpdateIteration = () => {
+    if (selectedIteration) {
+      const updatedIteration = {
+        ...selectedIteration,
+        objetive: newIterationObjective || selectedIteration.objetive,
+      };
+      updateIteration(updatedIteration)
+        .then(() => {
+          alert("Iteración actualizada exitosamente!");
+          setNewIterationObjective(""); // Limpiar el campo después de actualizar la iteración
+        })
+        .catch((error) => {
+          alert(`Error al actualizar la iteración: ${error.message}`);
+        });
+    } else {
+      alert("No hay una iteración seleccionada para actualizar.");
+    }
   };
 
   const handleDeleteIteration = () => {
@@ -534,7 +555,7 @@ export function AIAgentSidebar() {
                 <option value="">Selecciona una iteración</option>
                 {IterationsList.value?.items().map((iteration) => (
                   <option key={iteration.id} value={iteration.id}>
-                    {iteration.objetive}
+                    {iteration.name}
                   </option>
                 ))}
               </SelectField>
@@ -545,13 +566,21 @@ export function AIAgentSidebar() {
                 value={newIterationObjective}
                 onChange={(e) => setNewIterationObjective(e.target.value)}
               />
-              <Button onClick={handleAddIteration}>Agregar Iteración</Button>
-              <Button
-                onClick={handleDeleteIteration}
-                disabled={!selectedIteration}
-              >
-                Borrar Iteración
-              </Button>
+              <Flex direction="row" gap={10}>
+                <Button onClick={handleAddIteration}>Agregar Iteración</Button>
+                <Button
+                  onClick={handleDeleteIteration}
+                  disabled={!selectedIteration}
+                >
+                  Borrar Iteración
+                </Button>
+                <Button
+                  onClick={handleUpdateIteration}
+                  disabled={!selectedIteration}
+                >
+                  Actualizar Iteración
+                </Button>
+              </Flex>
             </Accordion.Content>
           </Accordion.Item>
         )}
