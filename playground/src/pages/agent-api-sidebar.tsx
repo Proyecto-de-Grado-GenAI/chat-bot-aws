@@ -448,7 +448,11 @@ export function AIAgentSidebar() {
       <Accordion.Container
         allowMultiple
         width="70%"
-        defaultValue={["Etapas", "Fases","Sube tus documentos y selecciona la iteracíon"]}
+        defaultValue={[
+          "Etapas",
+          "Fases",
+          "Sube tus documentos y selecciona la iteracíon",
+        ]}
       >
         <Accordion.Item value="Etapas">
           <Accordion.Trigger>
@@ -503,7 +507,7 @@ export function AIAgentSidebar() {
         </Accordion.Item>
 
         {selectedAgent?.name === "Comprensión" && (
-          <Accordion.Item value="Sube tus documentos y selecciona la iteracíon" >
+          <Accordion.Item value="Sube tus documentos y selecciona la iteracíon">
             <Accordion.Trigger>
               Sube tus documentos
               <Accordion.Icon />
