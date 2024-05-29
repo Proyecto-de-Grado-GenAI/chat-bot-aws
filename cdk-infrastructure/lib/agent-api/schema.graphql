@@ -67,6 +67,7 @@ input UserAction {
     knowledgeBaseParams: KnowledgeBaseParamsInput
     variables: [VariableInput]
     agentPhase: AgentPhaseInput
+    Iteration: IterationInput
 }
 
 input VariableInput {

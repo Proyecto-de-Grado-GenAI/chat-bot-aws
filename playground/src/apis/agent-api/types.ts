@@ -44,6 +44,11 @@ export interface Iteration {
     name: string;
     objetive: string;
 }
+export interface IterationInput {
+    number: number;
+    name: string;
+    objetive: string;
+}
 export interface ModelParams {
     temperature: number;
     top_p: number;

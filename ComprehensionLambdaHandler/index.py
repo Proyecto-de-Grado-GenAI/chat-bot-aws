@@ -93,7 +93,6 @@ Eres un modelo de lenguaje cuya única función es:
     try:
         respuesta = [*response_json.values()][0]
         respuesta = respuesta.split("@@")[1]
-        print(f"Respuesta: {respuesta}")
     except Exception as e:
         respuesta = False
     finally:
@@ -104,11 +103,9 @@ def insertContextPhase(
     phase,
     response_knowledge_base,
     variables=None,
-    iteration={
-        "Number": "1",
-        "Objetive": "CRN-3 - Allocate work to members of the development team.",
-    },
+    iteration=None
 ):
+    print(iteration)
     ADD1 = get_info_by_name(variables, "ADD 3.0 deliverable Step 1: Review inputs")
     context = ""
     contador = 0
@@ -124,8 +121,8 @@ def insertContextPhase(
         final = phase["description"].format(
             add_context=context,
             add_1=ADD1,
-            objetivo_propuesto=iteration["Objetive"],
-            número_de_iteración=iteration["Number"],
+            objetivo_propuesto=iteration["objetive"],
+            número_de_iteración=iteration["number"],
         )
     else:
         final = None
@@ -135,7 +132,6 @@ def insertContext(question, response_knowledge_base):
     context = ""
     contador = 0
     for i in response_knowledge_base:
-        print(i["content"]["text"])
         context += "Context " + str(contador) + "\n"
         context += i["content"]["text"] + "\n"
         context += f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
@@ -197,27 +193,31 @@ def bedrockQuestion(
     number_of_results=1,
     variables=None,
     AgentPhase=None,
+    iteration=None,
 ):
     if model_params is None:
         model_params = {}
 
     if modelId in supported_models:
         historial = extract_messages_from_chat(history)
+        print(historial)
         if use_knowledge_base:
             query_knowledge_base = summarize_and_combine_history_with_llama(
                 historial, question, "meta.llama3-70b-instruct-v1:0"
             )
 
             if query_knowledge_base:
+                
                 response_knowledge_base_query = retrieveFromKnowledgeBase(
                     query_knowledge_base, knowledgeBaseId, number_of_results
                 )["retrievalResults"]
+                print(AgentPhase)
                 if (
-                    AgentPhase["Name"]
+                    AgentPhase.get("name")
                     == "Step 2: Establish Iteration Goal by Selecting Drivers"
                 ):
                     question_with_context = insertContextPhase(
-                        AgentPhase, response_knowledge_base_query, variables
+                        AgentPhase, response_knowledge_base_query, variables,iteration
                     )
                 else:
                     question_with_context = insertContext(question, response_knowledge_base_query)
@@ -225,7 +225,6 @@ def bedrockQuestion(
                 question_with_context = f"Special Question: {question} \n No Knowledge Base used and No variables used"
         else:
             question_with_context = f"Special Question: {question} \n No Knowledge Base used and No variables used"
-        print(f"Question with context: {question_with_context}")
 
         prompt = supported_models[modelId](
             historial, system_prompt, question_with_context
@@ -253,9 +252,12 @@ def handler(event, context):
         model_params = event["agentData"]["modelParams"]
         system_prompt = event["agentData"]["systemPrompt"]
         knowledge_base_params = event["agentData"]["knowledgeBaseParams"]
-
         # Acceder a las variables y convertirlas en una lista
         variables = event["userInput"]["variables"]
+        iteration = event["userInput"].get("Iteration")
+
+        print(event["userInput"])
+        
         variables_list = [
             {"name": var["name"], "value": var["value"]} for var in variables
         ]
@@ -273,11 +275,12 @@ def handler(event, context):
             number_of_results=knowledge_base_params["numberOfResults"],
             variables=variables_list,
             AgentPhase=phase,
+            iteration=iteration,
+
         )
 
         chatResponder.publish_agent_message(response)
     except Exception as e:
-        print(e)
         chatResponder.publish_agent_message(str(e))
 
     chatResponder.publish_agent_stop_responding()

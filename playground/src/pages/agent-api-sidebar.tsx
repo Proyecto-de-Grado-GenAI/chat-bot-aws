@@ -34,7 +34,7 @@ import {
   selectedIterationState,
   phaseExecutedState,
 } from "../apis/agent-api/state";
-import { AgentPhase } from "../apis/agent-api/types";
+import { AgentPhase, IterationInput } from "../apis/agent-api/types";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
 import { useIterationApiIterationList } from "../apis/agent-api/hooks/useIterations";
 import { useAgentApiCreateIteration } from "../apis/agent-api/hooks/useCreateIteration";
@@ -273,6 +273,20 @@ export function AIAgentSidebar() {
       alert("No hay un LLM seleccionado. Por favor, selecciona un LLM.");
       return;
     }
+    if (!selectedIteration) {
+      alert("No hay una iteración seleccionada. Por favor, selecciona una.");
+      return;
+    }
+    if (!selectedAgent) {
+      alert("No hay un agente seleccionado. Por favor, selecciona un agente.");
+      return;
+    }
+
+    const iterationInput: IterationInput = {
+      number: selectedIteration!.number,
+      name: selectedIteration!.name,
+      objetive: selectedIteration!.objetive,
+    };
 
     const payload = {
       message: `Vas a ejecutar el segundo paso del la primera iteración del ADD 3.0, dame toda la informacion relevante asociada a ella.`,
@@ -290,7 +304,10 @@ export function AIAgentSidebar() {
       },
       variables: variablesList,
       agentPhase: selectedPhase,
+      Iteration: iterationInput
     };
+
+    console.log("Payload: ", payload);
 
     submitMessage(payload);
     alert("Fase ejecutada con éxito!");
