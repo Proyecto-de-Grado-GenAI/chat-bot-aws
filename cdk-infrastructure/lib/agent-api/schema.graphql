@@ -158,12 +158,14 @@ input NewLLm {
 
 input IterationInput {
     objetive: String!
+    name: String!
     number: Int!
 }
 
 type Iteration {
     id: ID!
     objetive: String
+    name: String
     number: Int
 }
 
