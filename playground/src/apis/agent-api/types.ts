@@ -44,12 +44,14 @@ export interface Iteration {
     number: number;
     name: string;
     objetive: string;
+    systemElements: systemElement[];
     
 }
 export interface IterationInput {
     number: number;
     name: string;
     objetive: string;
+    systemElements: systemElement[];
 }
 export interface ModelParams {
     temperature: number;
@@ -151,4 +153,9 @@ export interface KnowledgeBase {
 export interface Variable { 
     name: string;
     value: string;
+}
+
+export interface systemElement {
+    name: string;
+    description: string;
 }

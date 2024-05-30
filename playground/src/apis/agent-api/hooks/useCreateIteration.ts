@@ -31,7 +31,6 @@ export function useAgentApiCreateIteration() {
     const setIterationsValue = useSetRecoilState(Iterations);
 
     return (request: CreateIterationArgs) => {
-        console.log(request);
         return createIterationQuery.invoke(request)
             .then((result) => {
                 setIterationsValue(Loadable.unloaded());

@@ -161,9 +161,10 @@ input NewLLm {
 }
 
 input IterationInput {
-    objetive: String!
-    name: String!
-    number: Int!
+    objetive: String
+    name: String
+    number: Int
+    systemElements: [systemElementInput]
 }
 
 type Iteration {
@@ -171,8 +172,18 @@ type Iteration {
     objetive: String
     name: String
     number: Int
+    systemElements: [systemElement]
 }
 
+type systemElement{
+    name: String
+    description: String
+}
+
+input systemElementInput{
+    name: String
+    description: String
+}
 
 
 type Query @aws_cognito_user_pools {
@@ -190,13 +201,14 @@ type Mutation {
     createAgent(config: NewAgent!): Agent! @aws_cognito_user_pools
     createIteration(config: IterationInput!): Iteration! @aws_cognito_user_pools
     deleteIteration(id: ID!): Iteration! @aws_cognito_user_pools
-    updateIteration(id: ID!, config: IterationInput!): Iteration! @aws_cognito_user_pools
+    updateIteration(id: ID!, config: IterationInput): Iteration! @aws_cognito_user_pools
     updateAgent(id: ID!, config: UpdateAgentInput!): Agent! @aws_cognito_user_pools
     deleteAgent(id: ID!): Agent! @aws_cognito_user_pools
     createConversation(config: NewConversation!): Conversation! @aws_cognito_user_pools
     deleteConversation(id: ID!): Conversation! @aws_cognito_user_pools
     createLLm(config: NewLLm!): LLm! @aws_cognito_user_pools
     deleteLLm(id: ID!): LLm! @aws_cognito_user_pools
+    
 
     # User side operations
     userPublishMessage(conversationId: ID!, event: UserAction!): ConversationEvent! @aws_cognito_user_pools

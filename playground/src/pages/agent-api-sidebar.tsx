@@ -34,7 +34,11 @@ import {
   selectedIterationState,
   phaseExecutedState,
 } from "../apis/agent-api/state";
-import { AgentPhase, IterationInput } from "../apis/agent-api/types";
+import {
+  AgentPhase,
+  IterationInput,
+  systemElement,
+} from "../apis/agent-api/types";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
 import { useIterationApiIterationList } from "../apis/agent-api/hooks/useIterations";
 import { useAgentApiCreateIteration } from "../apis/agent-api/hooks/useCreateIteration";
@@ -101,6 +105,14 @@ export function AIAgentSidebar() {
   const updateIteration = useIterationApiUpdateIteration();
 
   const [newIterationObjective, setNewIterationObjective] = useState("");
+
+  const [newSystemElementName, setNewSystemElementName] = useState("");
+  const [newSystemElementDescription, setNewSystemElementDescription] =
+    useState("");
+
+  const [newSystemElements, setNewSystemElements] = useState<systemElement[]>(
+    []
+  );
 
   const selectedContent =
     variablesList.find((variable) => variable.name === selectedVariable)
@@ -287,6 +299,7 @@ export function AIAgentSidebar() {
       number: selectedIteration!.number,
       name: selectedIteration!.name,
       objetive: selectedIteration!.objetive,
+      systemElements: selectedIteration.systemElements || [],
     };
 
     const payload = {
@@ -325,22 +338,25 @@ export function AIAgentSidebar() {
     addIteration(newIteration)
       .then(() => {
         alert("Iteración agregada exitosamente!");
-        setNewIterationObjective(""); // Clear the input field after adding the iteration
+        setNewIterationObjective("");
       })
       .catch((error) => {
         alert(`Error al agregar la iteración: ${error.message}`);
       });
   };
+
   const handleUpdateIteration = () => {
     if (selectedIteration) {
       const updatedIteration = {
         ...selectedIteration,
         objetive: newIterationObjective || selectedIteration.objetive,
+        systemElements: newSystemElements.length > 0 ? newSystemElements : selectedIteration.systemElements,
       };
       updateIteration(updatedIteration)
         .then(() => {
           alert("Iteración actualizada exitosamente!");
-          setNewIterationObjective(""); // Limpiar el campo después de actualizar la iteración
+          setNewIterationObjective("");
+          setNewSystemElements([]);
         })
         .catch((error) => {
           alert(`Error al actualizar la iteración: ${error.message}`);
@@ -362,6 +378,19 @@ export function AIAgentSidebar() {
         });
     } else {
       alert("No hay una iteración seleccionada para borrar.");
+    }
+  };
+
+  const handleAddSystemElement = () => {
+    if (selectedIteration) {
+      const newElement: systemElement = {
+        name: newSystemElementName,
+        description: newSystemElementDescription,
+      };
+      setNewSystemElements([...newSystemElements, newElement]);
+
+      setNewSystemElementName("");
+      setNewSystemElementDescription("");
     }
   };
 
@@ -524,7 +553,6 @@ export function AIAgentSidebar() {
           "Fases",
           "Selecciona la iteración",
           "Sube tus documentos",
-
         ]}
       >
         <Accordion.Item value="Etapas">
@@ -621,6 +649,26 @@ export function AIAgentSidebar() {
                   value={newIterationObjective}
                   onChange={(e) => setNewIterationObjective(e.target.value)}
                 />
+                <TextField
+                  label="Nuevo nombre del elemento del sistema"
+                  placeholder="Nombre del elemento"
+                  size="small"
+                  value={newSystemElementName}
+                  onChange={(e) => setNewSystemElementName(e.target.value)}
+                />
+                <TextField
+                  label="Nueva descripción del elemento del sistema"
+                  placeholder="Descripción del elemento"
+                  size="small"
+                  value={newSystemElementDescription}
+                  onChange={(e) =>
+                    setNewSystemElementDescription(e.target.value)
+                  }
+                />
+                <Button onClick={handleAddSystemElement}>
+                  Agregar Elemento del Sistema
+                </Button>
+
                 <Flex direction="row" gap={10}>
                   <Button onClick={handleAddIteration}>
                     Agregar Iteración
@@ -638,6 +686,25 @@ export function AIAgentSidebar() {
                     Actualizar Iteración
                   </Button>
                 </Flex>
+                <ul>
+                  <Text fontWeight="bold">Elementos del sistema nuevos:</Text>
+                  {newSystemElements.map((element, index) => (
+                    <li key={index}>
+                      <Text fontWeight="bold">{element.name}</Text>
+                      <Text>{element.description}</Text>
+                    </li>
+                  ))}
+                </ul>
+
+                <ul>
+                  <Text fontWeight="bold">Elementos del sistema:</Text>
+                  {selectedIteration?.systemElements?.map((element, index) => (
+                    <li key={index}>
+                      <Text fontWeight="bold">{element.name}</Text>
+                      <Text>{element.description}</Text>
+                    </li>
+                  ))}
+                </ul>
               </Accordion.Content>
             </Accordion.Item>
           </>

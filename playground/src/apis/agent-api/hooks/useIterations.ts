@@ -18,6 +18,10 @@ const listIterationsQuery = new GraphqlQuery<GetIterationResponse>(`
             objetive
             number
             name
+            systemElements {
+                name
+                description
+            }
         }
     }
 `)
