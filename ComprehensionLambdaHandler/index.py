@@ -139,7 +139,7 @@ def insertContext(question, response_knowledge_base, variables):
     for variable in variables:
         ADD_context += f"{variable['name']}: {variable['value']}\n"
 
-    question_with_context = f"""Special Question: {question}\nEnd of question\n ADD 3.0 Context:{ADD_context} \nStart of Context\n{context}\nEnd of context\n"""
+    question_with_context = f"""{question}\nADD 3.0 Context:{ADD_context}\nContexto:\n{context}\nEnd of context"""
     return question_with_context
 
 
@@ -209,31 +209,25 @@ def bedrockQuestion(
                 == "Step 2: Establish Iteration Goal by Selecting Drivers"
                 and executePhase
             ):
-                print("Ejecutando fase")
                 response_knowledge_base_query = retrieveFromKnowledgeBase(
-                    question, knowledgeBaseId, number_of_results
+                    AgentPhase["instruccion"], knowledgeBaseId, number_of_results
                 )["retrievalResults"]
 
                 question_with_context = insertContextPhase(
                     AgentPhase, response_knowledge_base_query, variables, iteration
                 )
             else:
-                query_knowledge_base = summarize_and_combine_history_with_llama(
-                    historial, question, "meta.llama3-70b-instruct-v1:0"
-                )
-                if query_knowledge_base:
-                    response_knowledge_base_query = retrieveFromKnowledgeBase(
-                        query_knowledge_base, knowledgeBaseId, number_of_results
+                response_knowledge_base_query = retrieveFromKnowledgeBase(
+                       AgentPhase["instruccion"], knowledgeBaseId, number_of_results
                     )["retrievalResults"]
-                    question_with_context = insertContext(
-                        question,
-                        response_knowledge_base_query,
-                        variables,
-                    )
-                else:
-                    question_with_context = insertContext(question, [], variables)
+                
+                question_with_context = insertContext(
+                    question,
+                    response_knowledge_base_query,
+                    variables,
+                )
         else:
-            question_with_context = f"Special Question: {question} \n No Knowledge Base used and No variables used"
+            question_with_context = question
 
         prompt = supported_models[modelId](
             historial, system_prompt, question_with_context
