@@ -140,6 +140,7 @@ export function AIAgentSidebar() {
       phases: phases.map((phase) => ({
         name: phase.name,
         description: phase.description,
+        instruccion: phase.instruccion,
       })),
     };
 
@@ -289,7 +290,7 @@ export function AIAgentSidebar() {
     };
 
     const payload = {
-      message: `Vas a ejecutar el segundo paso del la primera iteración del ADD 3.0, dame toda la informacion relevante asociada a ella.`,
+      message: selectedPhase.instruccion,
       model: selectedLlm,
       modelParams: {
         temperature: temperature,
@@ -305,6 +306,7 @@ export function AIAgentSidebar() {
       variables: variablesList,
       agentPhase: selectedPhase,
       Iteration: iterationInput,
+      executePhase: true,
     };
 
     console.log("Payload: ", payload);

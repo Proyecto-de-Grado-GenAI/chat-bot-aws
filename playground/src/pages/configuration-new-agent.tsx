@@ -17,7 +17,7 @@ import { useAgentApiCreateAgent } from "../apis/agent-api/hooks/useCreateAgent";
 import { useKnowledgeBase } from "../apis/agent-api";
 import { AgentPhase } from "../apis/agent-api/types";
 
-import agentsData from './../data/seeds-agent.json';
+import agentsData from "./../data/seeds-agent.json";
 
 export function ConfigurationNewAgent() {
   const [agentName, setAgentName] = useState("");
@@ -44,6 +44,7 @@ export function ConfigurationNewAgent() {
   const [expandedPhaseIndex, setExpandedPhaseIndex] = useState<number | null>(
     null
   );
+  const [phaseInstruction, setPhaseInstruction] = useState("");
 
   const [selectedAgentName, setSelectedAgentName] = useState(""); // Nombre del agente seleccionado
 
@@ -79,6 +80,7 @@ export function ConfigurationNewAgent() {
       phases: phases.map((phase) => ({
         name: phase.name,
         description: phase.description,
+        instruccion: phase.instruccion,
       })),
     });
   };
@@ -91,13 +93,18 @@ export function ConfigurationNewAgent() {
   };
 
   const handleAddPhase = () => {
-    if (phaseName && phaseDescription) {
+    if (phaseName && phaseDescription && phaseInstruction) {
       setPhases([
         ...phases,
-        { name: phaseName, description: phaseDescription },
+        {
+          name: phaseName,
+          description: phaseDescription,
+          instruccion: phaseInstruction,
+        },
       ]);
       setPhaseName("");
       setPhaseDescription("");
+      setPhaseInstruction("");
     }
   };
 
@@ -267,6 +274,12 @@ export function ConfigurationNewAgent() {
             placeholder="Phase Name"
           />
           <TextAreaField
+            label="Instrucción"
+            value={phaseInstruction}
+            onChange={(e) => setPhaseInstruction(e.target.value)}
+            placeholder="Instrucción para la fase"
+          />
+          <TextAreaField
             label="Phase Description"
             value={phaseDescription}
             onChange={(e) => setPhaseDescription(e.target.value)}
@@ -287,7 +300,7 @@ export function ConfigurationNewAgent() {
                   position="relative"
                   width={expandedPhaseIndex === index ? "100%" : "300px"}
                   maxWidth="500px"
-                  style={{ wordBreak: "break-word" }} // Usamos style para aplicar wordBreak
+                  style={{ wordBreak: "break-word" }}
                 >
                   <strong>{phase.name}</strong>
                   <p
@@ -298,15 +311,29 @@ export function ConfigurationNewAgent() {
                       whiteSpace:
                         expandedPhaseIndex === index ? "normal" : "nowrap",
                       display:
-                        expandedPhaseIndex === index
-                          ? "block"
-                          : "-webkit-box",
+                        expandedPhaseIndex === index ? "block" : "-webkit-box",
                       WebkitLineClamp:
                         expandedPhaseIndex === index ? "unset" : 3,
                       WebkitBoxOrient: "vertical",
                     }}
                   >
                     {phase.description}
+                  </p>
+                  <p
+                    style={{
+                      overflow:
+                        expandedPhaseIndex === index ? "visible" : "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace:
+                        expandedPhaseIndex === index ? "normal" : "nowrap",
+                      display:
+                        expandedPhaseIndex === index ? "block" : "-webkit-box",
+                      WebkitLineClamp:
+                        expandedPhaseIndex === index ? "unset" : 3,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    <strong>Instrucción:</strong> {phase.instruccion}
                   </p>
                   <Button
                     size="small"
@@ -316,9 +343,7 @@ export function ConfigurationNewAgent() {
                     margin="0"
                     alignSelf="flex-start"
                   >
-                    {expandedPhaseIndex === index
-                      ? "Show less"
-                      : "Show more"}
+                    {expandedPhaseIndex === index ? "Show less" : "Show more"}
                   </Button>
                   <Button
                     size="small"

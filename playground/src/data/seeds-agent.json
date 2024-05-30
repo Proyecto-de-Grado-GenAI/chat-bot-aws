@@ -16,32 +16,35 @@
     "phases": [
       {
         "name": "Exploración",
-        "description": "Exploración de preguntas y respuestas sobre ADD 3.0."
+        "description": "Exploración de preguntas y respuestas sobre ADD 3.0.",
+        "instruccion": "Instrucciones de inputs"
       }
     ]
   },
   {
     "name": "Comprensión",
-    "systemPrompt": "...",
-    "inputMaxToken": 10000,
+    "systemPrompt": "### Instrucciones para Proporcionar Respuestas sobre ADD 3.0\n\n#### Contexto\n\nEres un agente especializado en el m\u00e9todo ADD (Attribute-Driven Design) 3.0, proporcionando respuestas detalladas y precisas, espec\u00edficamente est\u00e1s programado para responder los pasos 2 y 3 del m\u00e9todo.\nRecuerda responder siempre en el mismo lenguaje en que se formul\u00f3 la pregunta.\n\n#### Directrices para Responder\n\n1. **Alcance Exclusivo**: Responde solo preguntas relacionadas con:\n    - Principios y fundamentos del ADD 3.0.\n    - Proceso y pasos del ADD 3.0.\n    - Casos de uso y ejemplos aplicados.\n    - Comparaci\u00f3n con otras metodolog\u00edas.\n    - Beneficios y desaf\u00edos de implementaci\u00f3n.\n    - Herramientas y recursos.\n\n2. **Precisi\u00f3n y Detalle**: Explica los conceptos claramente y usa terminolog\u00eda t\u00e9cnica adecuada. Proporciona ejemplos pr\u00e1cticos cuando sea necesario.\n\n3. **Combinaci\u00f3n de Conocimiento**: Integra informaci\u00f3n de la base de conocimientos con tu propio conocimiento sin hacer referencias expl\u00edcitas a las fuentes proporcionadas por el usuario.\n\n4. **Citaci\u00f3n de Fuentes**: Incluye al final de cada respuesta las fuentes exactas de la informaci\u00f3n utilizada para reforzar la credibilidad y proporcionar referencias \u00fatiles.\n\n5. **Lenguaje Consistente**: Responde en el mismo idioma en que se formul\u00f3 la pregunta.\n\n6. **Solicitud de Informaci\u00f3n Adicional**: Si la informaci\u00f3n proporcionada no es suficiente, solicita detalles adicionales de manera clara y espec\u00edfica.\n\n#### Ejemplos de Preguntas Detalladas\n\n- \"\u00bfCu\u00e1les son los principios fundamentales del ADD 3.0?\"\n- \"\u00bfPuedes describir cada uno de los pasos del proceso ADD 3.0 en un proyecto de desarrollo de software?\"\n- \"\u00bfPodr\u00edas proporcionar un caso de uso donde el ADD 3.0 se haya aplicado exitosamente?\"\n- \"\u00bfQu\u00e9 ventajas ofrece el ADD 3.0 sobre la metodolog\u00eda SAAM en la gesti\u00f3n de atributos de calidad?\"\n- \"\u00bfCu\u00e1les son los beneficios y desaf\u00edos de implementar el ADD 3.0 en un entorno \u00e1gil?\"\n- \"\u00bfQu\u00e9 herramientas y recursos son recomendados para el ADD 3.0?\"\n\n#### Solicitud de Informaci\u00f3n Adicional\n\nEjemplo: \"Necesito m\u00e1s contexto sobre c\u00f3mo se realiza el paso de selecci\u00f3n de t\u00e1cticas en el ADD 3.0. \u00bfPuedes explicar este proceso con m\u00e1s detalle?\"\n\n#### Referencias\n\nAl final de cada respuesta, incluye una secci\u00f3n de referencias mencionando las fuentes exactas de la informaci\u00f3n utilizada.\n\n\n",
+    "inputMaxToken": 20000,
     "precedence": 2,
     "modelParams": {
-      "temperature": 0.7,
-      "top_p": 0.9,
+      "temperature": 1,
+      "top_p": 1,
       "max_gen_len": 2048
     },
     "knowledgeBaseParams": {
       "useKnowledgeBase": true,
-      "numberOfResults": 10
+      "numberOfResults": 20
     },
     "phases": [
       {
         "name": "Step 1: Review Inputs",
-        "description": "Instrucciones de inputs"
+        "description": "Instrucciones de inputs",
+        "instruccion": "Instrucciones de inputs"
       },
       {
         "name": "Step 2: Establish Iteration Goal by Selecting Drivers",
-        "description": "\n### Instrucciones para Analizar el Objetivo Seleccionado en ADD 3.0\n\nPara analizar y verificar si el objetivo seleccionado basado en los drivers de entrada es adecuado, sigue estos pasos. La salida debe proporcionar un an\u00e1lisis detallado que permita concluir si el objetivo de la iteraci\u00f3n es v\u00e1lido y est\u00e1 Alineado con el ADD 3.0\n\n1. **Revisa los Drivers de Entrada:**\n   - Revisa los drivers m\u00e1s importantes y generales de entrada.\n\n2. **Define el Objetivo de la Iteraci\u00f3n:**\n   - S\u00e9 claro y espec\u00edfico: Define claramente el objetivo basado en los drivers seleccionados.\n   - Contextualiza la informaci\u00f3n: Utiliza la informaci\u00f3n contextual sobre ADD 3.0 para guiar tu elecci\u00f3n.\n   - Simplifica la salida: La salida debe ser concisa y en el formato especificado.\n\n3. **Utiliza Informaci\u00f3n Contextual:**\n\n   - Utiliza esta informaci\u00f3n contextual sobre ADD 3.0: {add_context}\n\n4. **Utiliza Informaci\u00f3n del Primer Paso del ADD 3.0 (Review Inputs):**\n\n   - Informaci\u00f3n contextual del primer paso del ADD 3.0: {add_1}\n\n5. **Utiliza Informaci\u00f3n sobre el Objetivo Seleccionado y la Iteraci\u00f3n Actual:**\n   - Utiliza esta informaci\u00f3n sobre el objetivo seleccionado:\n     \n     Objetivo Seleccionado: {objetivo_propuesto}\n\n     N\u00famero de Iteraci\u00f3n: {n\u00famero_de_iteraci\u00f3n}\n\n6. **An\u00e1lisis del Objetivo seleccionado:**\n   - Cuestiona por qu\u00e9 se seleccion\u00f3 este driver en particular.\n   - Analiza si el objetivo propuesto es adecuado para abordar el driver seleccionado.\n   - Verifica si el objetivo se alinea con las recomendaciones de ADD 3.0.\n   - Revisa si hay una priorizaci\u00f3n adecuada de los drivers y si se est\u00e1n abordando los aspectos m\u00e1s cr\u00edticos primero.\n   - Por \u00faltimo necesito que todas las justificaciones est\u00e9n en terminos del contexto del ADD 3.0 proporcionado.\n\n\n# Resultado\n\nEl resultado del an\u00e1lisis superior debe ser una serie de p\u00e1rrafos cuestionando si el objetivo seleccionado est\u00e1 o no alineado con el ADD 3.0. Se debe proporcionar una justificaci\u00f3n clara y detallada para respaldar la conclusi\u00f3n final.\n"
+        "description": "\n### Instrucciones para Analizar el Objetivo Seleccionado en ADD 3.0\n\nPara analizar y verificar si el objetivo seleccionado basado en los drivers de entrada es adecuado, sigue estos pasos. La salida debe proporcionar un an\u00e1lisis detallado que permita concluir si el objetivo de la iteraci\u00f3n es v\u00e1lido y est\u00e1 Alineado con el ADD 3.0\n\n1. **Revisa los Drivers de Entrada:**\n   - Revisa los drivers m\u00e1s importantes y generales de entrada.\n\n2. **Define el Objetivo de la Iteraci\u00f3n:**\n   - S\u00e9 claro y espec\u00edfico: Define claramente el objetivo basado en los drivers seleccionados.\n   - Contextualiza la informaci\u00f3n: Utiliza la informaci\u00f3n contextual sobre ADD 3.0 para guiar tu elecci\u00f3n.\n   - Simplifica la salida: La salida debe ser concisa y en el formato especificado.\n\n3. **Utiliza Informaci\u00f3n Contextual:**\n\n   - Utiliza esta informaci\u00f3n contextual sobre ADD 3.0: {add_context}\n\n4. **Utiliza Informaci\u00f3n del Primer Paso del ADD 3.0 (Review Inputs):**\n\n   - Informaci\u00f3n contextual del primer paso del ADD 3.0: {add_1}\n\n5. **Utiliza Informaci\u00f3n sobre el Objetivo Seleccionado y la Iteraci\u00f3n Actual:**\n   - Utiliza esta informaci\u00f3n sobre el objetivo seleccionado:\n     \n     Objetivo Seleccionado: {objetivo_propuesto}\n\n     N\u00famero de Iteraci\u00f3n: {n\u00famero_de_iteraci\u00f3n}\n\n6. **An\u00e1lisis del Objetivo seleccionado:**\n   - Cuestiona por qu\u00e9 se seleccion\u00f3 este driver en particular.\n   - Analiza si el objetivo propuesto es adecuado para abordar el driver seleccionado.\n   - Verifica si el objetivo se alinea con las recomendaciones de ADD 3.0.\n   - Revisa si hay una priorizaci\u00f3n adecuada de los drivers y si se est\u00e1n abordando los aspectos m\u00e1s cr\u00edticos primero.\n   - Por \u00faltimo necesito que todas las justificaciones est\u00e9n en terminos del contexto del ADD 3.0 proporcionado.\n\n\n# Resultado\n\nEl resultado del an\u00e1lisis superior debe ser una serie de p\u00e1rrafos cuestionando si el objetivo seleccionado est\u00e1 o no alineado con el ADD 3.0. Se debe proporcionar una justificaci\u00f3n clara y detallada para respaldar la conclusi\u00f3n final.\n",
+        "instruccion": "Vas a ejecutar el paso 2 del ADD 3.0, trae la mayor cantidad de información posible para un sistema Greenfield"
       }
     ]
   },
@@ -62,15 +65,18 @@
     "phases": [
       {
         "name": "Step 3: Choose One or More Elements of the System to Refine",
-        "description": "..."
+        "description": "...",
+        "instruccion": "Instrucciones de inputs"
       },
       {
         "name": "Step 4: Choose One or More Design Concepts That Satisfy the Selected Drivers",
-        "description": "..."
+        "description": "...",
+        "instruccion": "Instrucciones de inputs"
       },
       {
         "name": "Step 5: Instantiate Architectural Elements, Allocate Responsibilities, and Define Interfaces",
-        "description": "..."
+        "description": "...",
+        "instruccion": "Instrucciones de inputs"
       }
     ]
   },
@@ -91,11 +97,13 @@
     "phases": [
       {
         "name": "Step 6: Sketch Views and Record Design Decisions",
-        "description": "..."
+        "description": "...",
+        "instruccion": "Instrucciones de inputs"
       },
       {
         "name": "Step 7: Perform Analysis of Current Design and Review Iteration Goal and Achievement of Design Purpose",
-        "description": "..."
+        "description": "...",
+        "instruccion": "Instrucciones de inputs"
       }
     ]
   }

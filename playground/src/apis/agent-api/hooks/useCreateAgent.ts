@@ -57,6 +57,7 @@ const createAgentQuery = new GraphqlQuery<CreateAgentResponse>(`
             phases {
                 name
                 description
+                instruccion
             }
         }
     }

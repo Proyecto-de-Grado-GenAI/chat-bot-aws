@@ -68,6 +68,7 @@ input UserAction {
     variables: [VariableInput]
     agentPhase: AgentPhaseInput
     Iteration: IterationInput
+    executePhase: Boolean
 }
 
 input VariableInput {
@@ -98,6 +99,7 @@ input LLmInput {
 type AgentPhase {
     name: String
     description: String
+    instruccion: String
 }
 
 type Agent @aws_cognito_user_pools {
@@ -139,6 +141,7 @@ input NewAgent {
 input AgentPhaseInput {
     name: String
     description: String
+    instruccion: String
 }
 
 input UpdateAgentInput {

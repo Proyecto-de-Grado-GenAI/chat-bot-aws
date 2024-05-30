@@ -58,6 +58,7 @@ export interface UpdateAgentResponse {
         phases {
           name
           description
+          instruccion
         }
       }
     }

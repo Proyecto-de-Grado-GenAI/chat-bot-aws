@@ -99,13 +99,7 @@ Eres un modelo de lenguaje cuya única función es:
         return respuesta
 
 
-def insertContextPhase(
-    phase,
-    response_knowledge_base,
-    variables=None,
-    iteration=None
-):
-    print(iteration)
+def insertContextPhase(phase, response_knowledge_base, variables=None, iteration=None):
     ADD1 = get_info_by_name(variables, "ADD 3.0 deliverable Step 1: Review inputs")
     context = ""
     contador = 0
@@ -128,16 +122,24 @@ def insertContextPhase(
         final = None
     return final
 
-def insertContext(question, response_knowledge_base):
+
+def insertContext(question, response_knowledge_base, variables):
     context = ""
     contador = 0
     for i in response_knowledge_base:
         context += "Context " + str(contador) + "\n"
         context += i["content"]["text"] + "\n"
-        context += f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
+        context += (
+            f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
+        )
         contador += 1
 
-    question_with_context = f"""{question}\n\n{context}"""
+    ADD_context = ""
+
+    for variable in variables:
+        ADD_context += f"{variable['name']}: {variable['value']}\n"
+
+    question_with_context = f"""Special Question: {question}\nEnd of question\n ADD 3.0 Context:{ADD_context} \nStart of Context\n{context}\nEnd of context\n"""
     return question_with_context
 
 
@@ -194,35 +196,42 @@ def bedrockQuestion(
     variables=None,
     AgentPhase=None,
     iteration=None,
+    executePhase=None,
 ):
     if model_params is None:
         model_params = {}
 
     if modelId in supported_models:
         historial = extract_messages_from_chat(history)
-        print(historial)
         if use_knowledge_base:
-            query_knowledge_base = summarize_and_combine_history_with_llama(
-                historial, question, "meta.llama3-70b-instruct-v1:0"
-            )
-
-            if query_knowledge_base:
-                
+            if (
+                AgentPhase.get("name")
+                == "Step 2: Establish Iteration Goal by Selecting Drivers"
+                and executePhase
+            ):
+                print("Ejecutando fase")
                 response_knowledge_base_query = retrieveFromKnowledgeBase(
-                    query_knowledge_base, knowledgeBaseId, number_of_results
+                    question, knowledgeBaseId, number_of_results
                 )["retrievalResults"]
-                print(AgentPhase)
-                if (
-                    AgentPhase.get("name")
-                    == "Step 2: Establish Iteration Goal by Selecting Drivers"
-                ):
-                    question_with_context = insertContextPhase(
-                        AgentPhase, response_knowledge_base_query, variables,iteration
+
+                question_with_context = insertContextPhase(
+                    AgentPhase, response_knowledge_base_query, variables, iteration
+                )
+            else:
+                query_knowledge_base = summarize_and_combine_history_with_llama(
+                    historial, question, "meta.llama3-70b-instruct-v1:0"
+                )
+                if query_knowledge_base:
+                    response_knowledge_base_query = retrieveFromKnowledgeBase(
+                        query_knowledge_base, knowledgeBaseId, number_of_results
+                    )["retrievalResults"]
+                    question_with_context = insertContext(
+                        question,
+                        response_knowledge_base_query,
+                        variables,
                     )
                 else:
-                    question_with_context = insertContext(question, response_knowledge_base_query)
-            else:
-                question_with_context = f"Special Question: {question} \n No Knowledge Base used and No variables used"
+                    question_with_context = insertContext(question, [], variables)
         else:
             question_with_context = f"Special Question: {question} \n No Knowledge Base used and No variables used"
 
@@ -252,17 +261,16 @@ def handler(event, context):
         model_params = event["agentData"]["modelParams"]
         system_prompt = event["agentData"]["systemPrompt"]
         knowledge_base_params = event["agentData"]["knowledgeBaseParams"]
-        # Acceder a las variables y convertirlas en una lista
         variables = event["userInput"]["variables"]
         iteration = event["userInput"].get("Iteration")
 
-        print(event["userInput"])
-        
         variables_list = [
             {"name": var["name"], "value": var["value"]} for var in variables
         ]
 
         phase = event["userInput"]["agentPhase"]
+        executePhase = event["userInput"].get("executePhase")
+        print(event["userInput"])
 
         response = bedrockQuestion(
             event["chatString"],
@@ -276,7 +284,7 @@ def handler(event, context):
             variables=variables_list,
             AgentPhase=phase,
             iteration=iteration,
-
+            executePhase=executePhase,
         )
 
         chatResponder.publish_agent_message(response)

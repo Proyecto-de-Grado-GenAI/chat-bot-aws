@@ -41,6 +41,7 @@ export function ConfigurationViewAgent() {
   const KnowledgeBases = useKnowledgeBase();
   const [phases, setPhases] = useState<AgentPhase[]>([]);
   const [phaseName, setPhaseName] = useState("");
+  const [phaseInstruction, setPhaseInstruction] = useState("");
   const [phaseDescription, setPhaseDescription] = useState("");
   const [expandedPhaseIndex, setExpandedPhaseIndex] = useState<number | null>(
     null
@@ -74,13 +75,18 @@ export function ConfigurationViewAgent() {
   }, [agentObject.value]);
 
   const handleAddPhase = () => {
-    if (phaseName && phaseDescription) {
+    if (phaseName && phaseDescription && phaseInstruction) {
       setPhases([
         ...phases,
-        { name: phaseName, description: phaseDescription },
+        {
+          name: phaseName,
+          description: phaseDescription,
+          instruccion: phaseInstruction,
+        },
       ]);
       setPhaseName("");
       setPhaseDescription("");
+      setPhaseInstruction("");
     }
   };
 
@@ -125,6 +131,7 @@ export function ConfigurationViewAgent() {
       phases: phases.map((phase) => ({
         name: phase.name,
         description: phase.description,
+        instruccion: phase.instruccion,
       })),
     };
 
@@ -258,7 +265,7 @@ export function ConfigurationViewAgent() {
                       position="relative"
                       width={expandedPhaseIndex === index ? "100%" : "300px"}
                       maxWidth="500px"
-                      style={{ wordBreak: "break-word" }} // Usamos style para aplicar wordBreak
+                      style={{ wordBreak: "break-word" }}
                     >
                       <strong>{phase.name}</strong>
                       <p
@@ -278,6 +285,24 @@ export function ConfigurationViewAgent() {
                         }}
                       >
                         {phase.description}
+                      </p>
+                      <p
+                        style={{
+                          overflow:
+                            expandedPhaseIndex === index ? "visible" : "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace:
+                            expandedPhaseIndex === index ? "normal" : "nowrap",
+                          display:
+                            expandedPhaseIndex === index
+                              ? "block"
+                              : "-webkit-box",
+                          WebkitLineClamp:
+                            expandedPhaseIndex === index ? "unset" : 3,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        <strong>Instrucción:</strong> {phase.instruccion}
                       </p>
                       <Button
                         size="small"

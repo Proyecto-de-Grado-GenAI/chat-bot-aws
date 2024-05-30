@@ -31,6 +31,7 @@ const listAgentsQuery = new GraphqlQuery<GetAgentResponse>(`
             phases {
                 name
                 description
+                instruccion
             }
         }
     }

@@ -37,12 +37,14 @@ export interface Agent {
 export interface AgentPhase {
     name: string;
     description: string;
+    instruccion: string;
 }
 export interface Iteration {
     id: string;
     number: number;
     name: string;
     objetive: string;
+    
 }
 export interface IterationInput {
     number: number;
@@ -94,6 +96,7 @@ export interface KnowledgeBaseParamsInput {
 export interface AgentPhaseInput {
     name: string;
     description: string;
+    instruccion: string;
 }
 
 export interface NewAgent {
