@@ -113,6 +113,10 @@ export function AIAgentSidebar() {
   const [newSystemElements, setNewSystemElements] = useState<systemElement[]>(
     []
   );
+  const [deletedSystemElements, setDeletedSystemElements] = useState<
+    systemElement[]
+  >([]);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   const selectedContent =
     variablesList.find((variable) => variable.name === selectedVariable)
@@ -350,19 +354,53 @@ export function AIAgentSidebar() {
       const updatedIteration = {
         ...selectedIteration,
         objetive: newIterationObjective || selectedIteration.objetive,
-        systemElements: newSystemElements.length > 0 ? newSystemElements : selectedIteration.systemElements,
+        systemElements: [
+          ...selectedIteration.systemElements,
+          ...newSystemElements,
+        ].filter((element) => !deletedSystemElements.includes(element)),
       };
       updateIteration(updatedIteration)
         .then(() => {
           alert("Iteración actualizada exitosamente!");
           setNewIterationObjective("");
           setNewSystemElements([]);
+          setDeletedSystemElements([]);
         })
         .catch((error) => {
           alert(`Error al actualizar la iteración: ${error.message}`);
         });
     } else {
       alert("No hay una iteración seleccionada para actualizar.");
+    }
+  };
+
+  const handleDeleteSystemElement = (index, isExisting) => {
+    if (isExisting && selectedIteration) {
+      const elementToDelete = selectedIteration.systemElements[index];
+
+      if (!deletedSystemElements.includes(elementToDelete)) {
+        setDeletedSystemElements([...deletedSystemElements, elementToDelete]);
+        const updatedSystemElements = selectedIteration.systemElements.filter(
+          (_, i) => i !== index
+        );
+
+        setSelectedIteration({
+          ...selectedIteration,
+          systemElements: updatedSystemElements,
+        });
+      } else {
+        alert("El elemento ya está en la lista de eliminados.");
+      }
+    } else {
+      const elementToDelete = newSystemElements[index];
+
+      // Verifica si el elemento ya está en la lista de eliminados
+      if (!deletedSystemElements.includes(elementToDelete)) {
+        setDeletedSystemElements([...deletedSystemElements, elementToDelete]);
+        setNewSystemElements(newSystemElements.filter((_, i) => i !== index));
+      } else {
+        alert("El elemento ya está en la lista de eliminados.");
+      }
     }
   };
 
@@ -553,6 +591,7 @@ export function AIAgentSidebar() {
           "Fases",
           "Selecciona la iteración",
           "Sube tus documentos",
+          "Seleccionar elementos del sistema"
         ]}
       >
         <Accordion.Item value="Etapas">
@@ -578,6 +617,178 @@ export function AIAgentSidebar() {
           </Accordion.Content>
         </Accordion.Item>
 
+        {selectedAgent?.name === "Comprensión" && (
+          <>
+            {selectedPhase?.name.includes("Step 1: Review Inputs") && (
+              <Accordion.Item value="Sube tus documentos">
+                <Accordion.Trigger>
+                  Sube tus documentos
+                  <Accordion.Icon />
+                </Accordion.Trigger>
+                <Accordion.Content>
+                  <CustomStorageManager />
+                </Accordion.Content>
+              </Accordion.Item>
+            )}
+            {selectedPhase?.name.includes(
+              "Step 2: Establish Iteration Goal by Selecting Drivers"
+            ) && (
+              <Accordion.Item value="Selecciona la iteración">
+                <Accordion.Trigger>
+                  Seleccionar iteración
+                  <Accordion.Icon />
+                </Accordion.Trigger>
+                <Accordion.Content>
+                  <SelectField
+                    label="Selecciona una iteración"
+                    size="small"
+                    value={selectedIteration ? selectedIteration.id : ""}
+                    onChange={(e) => {
+                      const selected = IterationsList.value
+                        ?.items()
+                        .find((iteration) => iteration.id === e.target.value);
+                      setSelectedIteration(selected || null);
+                    }}
+                  >
+                    <option value="">Selecciona una iteración</option>
+                    {IterationsList.value?.items().map((iteration) => (
+                      <option key={iteration.id} value={iteration.id}>
+                        {iteration.name}
+                      </option>
+                    ))}
+                  </SelectField>
+                  <TextField
+                    label="Nuevo objetivo de iteración"
+                    placeholder="Describe el objetivo"
+                    size="small"
+                    value={newIterationObjective}
+                    onChange={(e) => setNewIterationObjective(e.target.value)}
+                  />
+
+                  <Flex direction="row" gap={10}>
+                    <Button onClick={handleAddIteration}>
+                      Agregar Iteración
+                    </Button>
+                    <Button
+                      onClick={handleDeleteIteration}
+                      disabled={!selectedIteration}
+                    >
+                      Borrar Iteración
+                    </Button>
+                    <Button
+                      onClick={handleUpdateIteration}
+                      disabled={!selectedIteration}
+                    >
+                      Actualizar Iteración
+                    </Button>
+                  </Flex>
+                </Accordion.Content>
+              </Accordion.Item>
+            )}
+          </>
+        )}
+        {selectedAgent?.name === "Diseño" && (
+          <>
+            {selectedPhase?.name.includes("Step 3: Choose One or More Elements of the System to Refine") && (
+               <Accordion.Item value="Seleccionar elementos del sistema">
+               <Accordion.Trigger>
+                 Seleccionar elementos del sistema
+                 <Accordion.Icon />
+               </Accordion.Trigger>
+               <Accordion.Content>
+                 <TextField
+                   label="Nuevo nombre del elemento del sistema"
+                   placeholder="Nombre del elemento"
+                   size="small"
+                   value={newSystemElementName}
+                   onChange={(e) => setNewSystemElementName(e.target.value)}
+                 />
+                 <TextField
+                   label="Nueva descripción del elemento del sistema"
+                   placeholder="Descripción del elemento"
+                   size="small"
+                   value={newSystemElementDescription}
+                   onChange={(e) =>
+                     setNewSystemElementDescription(e.target.value)
+                   }
+                 />
+                 <Flex direction="row" gap={10}>
+                   <Button onClick={handleAddSystemElement}>
+                     Agregar Elemento del Sistema
+                   </Button>
+                   <Button
+                     onClick={handleUpdateIteration}
+                     disabled={!selectedIteration}
+                   >
+                     Actualizar Iteración
+                   </Button>
+                 </Flex>
+ 
+                 <Flex direction="column" gap={10}>
+                   {newSystemElements.length > 0 && (
+                     <ul>
+                       <Text fontWeight="bold">
+                         Elementos del sistema nuevos:
+                       </Text>
+                       {newSystemElements.map((element, index) => (
+                         <li key={index}>
+                           <Text fontWeight="bold">{element.name}</Text>
+                           <Text>{element.description}</Text>
+                           <Button
+                             onClick={() =>
+                               handleDeleteSystemElement(index, false)
+                             }
+                           >
+                             Eliminar
+                           </Button>
+                         </li>
+                       ))}
+                     </ul>
+                   )}
+ 
+                   {(selectedIteration?.systemElements?.length ?? 0) > 0 && (
+                     <ul>
+                       <Text fontWeight="bold">Elementos del sistema:</Text>
+                       {selectedIteration?.systemElements?.map(
+                         (element, index) => (
+                           <li key={index}>
+                             <Text fontWeight="bold">{element.name}</Text>
+                             <Text>{element.description}</Text>
+                             <Button
+                               onClick={() =>
+                                 handleDeleteSystemElement(index, true)
+                               }
+                             >
+                               Eliminar
+                             </Button>
+                           </li>
+                         )
+                       )}
+                     </ul>
+                   )}
+ 
+                   {deletedSystemElements.length > 0 && (
+                     <ul>
+                       <Text fontWeight="bold">
+                         Elementos del sistema borrados:
+                       </Text>
+                       {deletedSystemElements.map((element, index) => (
+                         <li key={index}>
+                           <Text fontWeight="bold">{element.name}</Text>
+                           <Text>{element.description}</Text>
+                         </li>
+                       ))}
+                     </ul>
+                   )}
+                 </Flex>
+               </Accordion.Content>
+             </Accordion.Item>
+            )}
+
+           
+          </>
+        )}
+
         <Accordion.Item value="Fases">
           <Accordion.Trigger>
             Selecccionar Fase
@@ -599,116 +810,22 @@ export function AIAgentSidebar() {
                 ))}
               </SelectField>
               <Text fontSize="medium">Descripción de la fase:</Text>
-              <Markdown>{selectedPhase?.description}</Markdown>
+              <Markdown>
+                {showFullDescription
+                  ? selectedPhase?.description
+                  : `${selectedPhase?.description?.slice(0, 100)}...`}
+              </Markdown>
+              <Button
+                onClick={() => setShowFullDescription(!showFullDescription)}
+              >
+                {showFullDescription ? "Ver Menos" : "Ver Más"}
+              </Button>
               <Button onClick={handleExecutePhase} variation="primary">
                 Ejecutar Fase
               </Button>
             </Flex>
           </Accordion.Content>
         </Accordion.Item>
-
-        {selectedAgent?.name === "Comprensión" && (
-          <>
-            <Accordion.Item value="Sube tus documentos">
-              <Accordion.Trigger>
-                Sube tus documentos
-                <Accordion.Icon />
-              </Accordion.Trigger>
-              <Accordion.Content>
-                <CustomStorageManager />
-              </Accordion.Content>
-            </Accordion.Item>
-            <Accordion.Item value="Selecciona la iteración">
-              <Accordion.Trigger>
-                Seleccionar iteración
-                <Accordion.Icon />
-              </Accordion.Trigger>
-              <Accordion.Content>
-                <SelectField
-                  label="Selecciona una iteración"
-                  size="small"
-                  value={selectedIteration ? selectedIteration.id : ""}
-                  onChange={(e) => {
-                    const selected = IterationsList.value
-                      ?.items()
-                      .find((iteration) => iteration.id === e.target.value);
-                    setSelectedIteration(selected || null);
-                  }}
-                >
-                  <option value="">Selecciona una iteración</option>
-                  {IterationsList.value?.items().map((iteration) => (
-                    <option key={iteration.id} value={iteration.id}>
-                      {iteration.name}
-                    </option>
-                  ))}
-                </SelectField>
-                <TextField
-                  label="Nuevo objetivo de iteración"
-                  placeholder="Describe el objetivo"
-                  size="small"
-                  value={newIterationObjective}
-                  onChange={(e) => setNewIterationObjective(e.target.value)}
-                />
-                <TextField
-                  label="Nuevo nombre del elemento del sistema"
-                  placeholder="Nombre del elemento"
-                  size="small"
-                  value={newSystemElementName}
-                  onChange={(e) => setNewSystemElementName(e.target.value)}
-                />
-                <TextField
-                  label="Nueva descripción del elemento del sistema"
-                  placeholder="Descripción del elemento"
-                  size="small"
-                  value={newSystemElementDescription}
-                  onChange={(e) =>
-                    setNewSystemElementDescription(e.target.value)
-                  }
-                />
-                <Button onClick={handleAddSystemElement}>
-                  Agregar Elemento del Sistema
-                </Button>
-
-                <Flex direction="row" gap={10}>
-                  <Button onClick={handleAddIteration}>
-                    Agregar Iteración
-                  </Button>
-                  <Button
-                    onClick={handleDeleteIteration}
-                    disabled={!selectedIteration}
-                  >
-                    Borrar Iteración
-                  </Button>
-                  <Button
-                    onClick={handleUpdateIteration}
-                    disabled={!selectedIteration}
-                  >
-                    Actualizar Iteración
-                  </Button>
-                </Flex>
-                <ul>
-                  <Text fontWeight="bold">Elementos del sistema nuevos:</Text>
-                  {newSystemElements.map((element, index) => (
-                    <li key={index}>
-                      <Text fontWeight="bold">{element.name}</Text>
-                      <Text>{element.description}</Text>
-                    </li>
-                  ))}
-                </ul>
-
-                <ul>
-                  <Text fontWeight="bold">Elementos del sistema:</Text>
-                  {selectedIteration?.systemElements?.map((element, index) => (
-                    <li key={index}>
-                      <Text fontWeight="bold">{element.name}</Text>
-                      <Text>{element.description}</Text>
-                    </li>
-                  ))}
-                </ul>
-              </Accordion.Content>
-            </Accordion.Item>
-          </>
-        )}
 
         <Accordion.Item value="Parámetros del modelo">
           <Accordion.Trigger>

@@ -44,14 +44,14 @@ export interface Iteration {
     number: number;
     name: string;
     objetive: string;
-    systemElements: systemElement[];
+    systemElements: systemElement[] | [];
     
 }
 export interface IterationInput {
     number: number;
     name: string;
     objetive: string;
-    systemElements: systemElement[];
+    systemElements: systemElement[] | [];
 }
 export interface ModelParams {
     temperature: number;
