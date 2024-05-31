@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
+  Card,
   CheckboxField,
   Flex,
-  Loader,
+  Icon,
   SelectField,
   SliderField,
-  SwitchField,
   TextAreaField,
   TextField,
   View,
@@ -15,6 +15,9 @@ import { Container } from "../library/container";
 import { fmHandlerArns } from "../endpoints";
 import { useAgentApiCreateAgent } from "../apis/agent-api/hooks/useCreateAgent";
 import { useKnowledgeBase } from "../apis/agent-api";
+import { AgentPhase } from "../apis/agent-api/types";
+
+import agentsData from "./../data/seeds-agent.json";
 
 export function ConfigurationNewAgent() {
   const [agentName, setAgentName] = useState("");
@@ -30,13 +33,28 @@ export function ConfigurationNewAgent() {
   const [temperature, setTemperature] = useState(0.7);
   const [topP, setTopP] = useState(0.9);
   const [maxGenLen, setMaxGenLen] = useState("2048");
-  const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
+  const [knowledgeBaseId, setKnowledgeBaseId] = useState("");
   const [IfuseKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState("3");
   const KnowledgeBases = useKnowledgeBase();
+  const [phases, setPhases] = useState<AgentPhase[]>([]);
+  const [phaseName, setPhaseName] = useState("");
+  const [phaseDescription, setPhaseDescription] = useState("");
   const [forceRender, setForceRender] = useState(false);
+  const [expandedPhaseIndex, setExpandedPhaseIndex] = useState<number | null>(
+    null
+  );
+  const [phaseInstruction, setPhaseInstruction] = useState("");
+
+  const [selectedAgentName, setSelectedAgentName] = useState(""); // Nombre del agente seleccionado
 
   const enabled = !!agentName;
+
+  useEffect(() => {
+    if (KnowledgeBases.value && KnowledgeBases.value.length > 0) {
+      setKnowledgeBaseId(KnowledgeBases.value[0].knowledgeBaseId);
+    }
+  }, [KnowledgeBases.value]);
 
   const onCreate = () => {
     let endpoint =
@@ -59,6 +77,11 @@ export function ConfigurationNewAgent() {
         useKnowledgeBase: IfuseKnowledgeBase,
         numberOfResults: parseInt(numberOfResults, 10),
       },
+      phases: phases.map((phase) => ({
+        name: phase.name,
+        description: phase.description,
+        instruccion: phase.instruccion,
+      })),
     });
   };
 
@@ -69,6 +92,31 @@ export function ConfigurationNewAgent() {
     }
   };
 
+  const handleAddPhase = () => {
+    if (phaseName && phaseDescription && phaseInstruction) {
+      setPhases([
+        ...phases,
+        {
+          name: phaseName,
+          description: phaseDescription,
+          instruccion: phaseInstruction,
+        },
+      ]);
+      setPhaseName("");
+      setPhaseDescription("");
+      setPhaseInstruction("");
+    }
+  };
+
+  const handleToggleExpand = (index: number) => {
+    setExpandedPhaseIndex(expandedPhaseIndex === index ? null : index);
+  };
+
+  const handleRemovePhase = (index: number) => {
+    const newPhases = phases.filter((_, i) => i !== index);
+    setPhases(newPhases);
+  };
+
   const handleNumberOfResultsChange = (e: any) => {
     const value = e.target.value;
     if (parseInt(value, 10) <= 100) {
@@ -76,9 +124,46 @@ export function ConfigurationNewAgent() {
     }
   };
 
+  const handlePopulateAgent = (name: string) => {
+    const agent = agentsData.find((agent) => agent.name === name);
+    if (agent) {
+      setAgentName(agent.name);
+      setSystemPrompt(agent.systemPrompt);
+      setMaxTokensPerQuestion(agent.inputMaxToken.toString());
+      setPrecedence(agent.precedence.toString());
+      setTemperature(agent.modelParams.temperature);
+      setTopP(agent.modelParams.top_p);
+      setMaxGenLen(agent.modelParams.max_gen_len.toString());
+      setUseKnowledgeBase(agent.knowledgeBaseParams.useKnowledgeBase);
+      setNumberOfResults(agent.knowledgeBaseParams.numberOfResults.toString());
+      setPhases(agent.phases);
+      if (KnowledgeBases.value && KnowledgeBases.value.length > 0) {
+        setKnowledgeBaseId(KnowledgeBases.value[0].knowledgeBaseId);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (selectedAgentName) {
+      handlePopulateAgent(selectedAgentName);
+    }
+  }, [selectedAgentName]);
+
   return (
     <View>
       <Container heading="New Agent">
+        <SelectField
+          label="Select Agent to Populate"
+          value={selectedAgentName}
+          onChange={(e) => setSelectedAgentName(e.target.value)}
+        >
+          <option value="">Seleccione su agente base a cargar</option>
+          {agentsData.map((agent) => (
+            <option key={agent.name} value={agent.name}>
+              {agent.name}
+            </option>
+          ))}
+        </SelectField>
         <TextField
           label="Agent Name"
           value={agentName}
@@ -179,6 +264,104 @@ export function ConfigurationNewAgent() {
           onChange={handleNumberOfResultsChange}
           placeholder="3"
         />
+      </Container>
+      <Container heading="Phases">
+        <View>
+          <TextField
+            label="Phase Name"
+            value={phaseName}
+            onChange={(e) => setPhaseName(e.target.value)}
+            placeholder="Phase Name"
+          />
+          <TextAreaField
+            label="Instrucción"
+            value={phaseInstruction}
+            onChange={(e) => setPhaseInstruction(e.target.value)}
+            placeholder="Instrucción para la fase"
+          />
+          <TextAreaField
+            label="Phase Description"
+            value={phaseDescription}
+            onChange={(e) => setPhaseDescription(e.target.value)}
+            placeholder="Phase Description"
+          />
+          <Button onClick={handleAddPhase}>Add Phase</Button>
+          <View marginTop="20px">
+            <h3>Phases</h3>
+            <Flex direction="row" gap={10}>
+              {phases.map((phase, index) => (
+                <Flex
+                  key={index}
+                  padding="10px"
+                  border="1px solid lightgray"
+                  borderRadius="5px"
+                  backgroundColor="white"
+                  direction="column"
+                  position="relative"
+                  width={expandedPhaseIndex === index ? "100%" : "300px"}
+                  maxWidth="500px"
+                  style={{ wordBreak: "break-word" }}
+                >
+                  <strong>{phase.name}</strong>
+                  <p
+                    style={{
+                      overflow:
+                        expandedPhaseIndex === index ? "visible" : "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace:
+                        expandedPhaseIndex === index ? "normal" : "nowrap",
+                      display:
+                        expandedPhaseIndex === index ? "block" : "-webkit-box",
+                      WebkitLineClamp:
+                        expandedPhaseIndex === index ? "unset" : 3,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    {phase.description}
+                  </p>
+                  <p
+                    style={{
+                      overflow:
+                        expandedPhaseIndex === index ? "visible" : "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace:
+                        expandedPhaseIndex === index ? "normal" : "nowrap",
+                      display:
+                        expandedPhaseIndex === index ? "block" : "-webkit-box",
+                      WebkitLineClamp:
+                        expandedPhaseIndex === index ? "unset" : 3,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    <strong>Instrucción:</strong> {phase.instruccion}
+                  </p>
+                  <Button
+                    size="small"
+                    variation="link"
+                    onClick={() => handleToggleExpand(index)}
+                    padding="0"
+                    margin="0"
+                    alignSelf="flex-start"
+                  >
+                    {expandedPhaseIndex === index ? "Show less" : "Show more"}
+                  </Button>
+                  <Button
+                    size="small"
+                    variation="link"
+                    onClick={() => handleRemovePhase(index)}
+                    position="absolute"
+                    top="5px"
+                    right="5px"
+                    padding="0"
+                    margin="0"
+                  >
+                    Remove
+                  </Button>
+                </Flex>
+              ))}
+            </Flex>
+          </View>
+        </View>
       </Container>
       <Flex dir="row" justifyContent="flex-end">
         <Button variation="primary" onClick={onCreate} disabled={!enabled}>

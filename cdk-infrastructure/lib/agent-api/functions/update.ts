@@ -1,35 +1,56 @@
-import { Context, util } from '@aws-appsync/utils'
+import { util } from '@aws-appsync/utils';
+import { Context } from '@aws-appsync/utils';
 
+/**
+ * Update Item Resolver
+ * @param ctx - AppSync Context
+ * @returns UpdateItem request
+ */
 export function request(ctx: Context) {
-    return {
-        operation: 'UpdateItem',
-        key: util.dynamodb.toMapValues({
-            id: ctx.arguments.id
-        }),
-        update: {
-            expression: 'set #name = :name, #handlerLambda = :handlerLambda, #systemPrompt = :systemPrompt, #inputMaxToken = :inputMaxToken, #precedence = :precedence, #modelParams = :modelParams, #knowledgeBaseParams = :knowledgeBaseParams',
-            expressionNames: {
-                '#name': 'name',
-                '#handlerLambda': 'handlerLambda',
-                '#systemPrompt': 'systemPrompt',
-                '#inputMaxToken': 'inputMaxToken',
-                '#precedence': 'precedence',
-                '#modelParams': 'modelParams',
-                '#knowledgeBaseParams': 'knowledgeBaseParams'
-            },
-            expressionValues: util.dynamodb.toMapValues({
-                ':name': ctx.arguments.config.name,
-                ':handlerLambda': ctx.arguments.config.handlerLambda,
-                ':systemPrompt': ctx.arguments.config.systemPrompt,
-                ':inputMaxToken': ctx.arguments.config.inputMaxToken,
-                ':precedence': ctx.arguments.config.precedence,
-                ':modelParams': ctx.arguments.config.modelParams,
-                ':knowledgeBaseParams': ctx.arguments.config.knowledgeBaseParams
-            })
-        }
-    }
+  const { id, config } = ctx.arguments;
+
+  const values = { ...config };
+
+  return dynamodbUpdateRequest({ keys: { id }, values });
 }
 
 export function response(ctx: Context) {
-    return ctx.result
+  return ctx.result;
+}
+
+/**
+ * Helper function to create an UpdateItem request
+ * @param params - Parameters for the UpdateItem request
+ * @returns UpdateItem request
+ */
+function dynamodbUpdateRequest(params: { keys: any, values: any }) {
+  const { keys, values } = params;
+
+  const sets: string[] = [];
+  const removes: string[] = [];
+  const expressionNames: { [key: string]: string } = {};
+  const expValues: { [key: string]: any } = {};
+
+  for (const [key, value] of Object.entries(values)) {
+    expressionNames[`#${key}`] = key;
+    if (value !== undefined && value !== null) {
+      sets.push(`#${key} = :${key}`);
+      expValues[`:${key}`] = value;
+    } else {
+      removes.push(`#${key}`);
+    }
+  }
+
+  let expression = sets.length ? `SET ${sets.join(', ')}` : '';
+  expression += removes.length ? ` REMOVE ${removes.join(', ')}` : '';
+
+  return {
+    operation: 'UpdateItem',
+    key: util.dynamodb.toMapValues(keys),
+    update: {
+      expression,
+      expressionNames,
+      expressionValues: util.dynamodb.toMapValues(expValues),
+    },
+  };
 }

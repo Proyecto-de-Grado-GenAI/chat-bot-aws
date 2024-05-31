@@ -8,6 +8,7 @@ import {
   Card,
   Loader,
   Text,
+  CheckboxField,
 } from "@aws-amplify/ui-react";
 import {
   useAgentApiAgent,
@@ -22,8 +23,20 @@ import {
   useAgentConversationMetadata,
   useResetAgentConversationMetadata,
 } from "../apis/agent-api/hooks/useMetadata";
-import { selectedLlmState, selectedAgentState, variablesState } from "../apis/agent-api/state";
+import {
+  selectedLlmState,
+  selectedAgentState,
+  variablesState,
+  selectedAgentPhaseState,
+  selectedIterationState,
+} from "../apis/agent-api/state";
 import llama3Tokenizer from "llama3-tokenizer-js";
+import {
+  AgentPhase,
+  IterationInput,
+  LLm,
+  Variable,
+} from "../apis/agent-api/types";
 
 export function AIAgentViewChat() {
   const { chatId } = useParams();
@@ -39,6 +52,11 @@ export function AIAgentViewChat() {
   const submitMessage = useAgentApiSendMessage(chatId);
   const selectedAgent = useRecoilValue(selectedAgentState);
   const [variablesList] = useRecoilState(variablesState);
+  const selectedPhase = useRecoilState(selectedAgentPhaseState);
+  const [selectedIteration, setSelectedIteration] = useRecoilState(
+    selectedIterationState
+  );
+  const [includeBusinessContext, setIncludeBusinessContext] = useState(true);
 
   useAgentApiSubscribeConversation(chatId);
 
@@ -71,13 +89,39 @@ export function AIAgentViewChat() {
     setTokens(totalTokens + currentInputTokens);
   }, [events, chatString]);
 
+  interface Payload {
+    message: string;
+    model: LLm;
+    modelParams: {
+      temperature: number;
+      top_p: number;
+      max_gen_len: number;
+    };
+    systemPrompt: string;
+    knowledgeBaseParams: {
+      knowledgeBaseId: string;
+      useKnowledgeBase: boolean;
+      numberOfResults: number;
+    };
+    variables: Variable[];
+    agentPhase: AgentPhase;
+    executePhase: boolean;
+    Iteration?: IterationInput;
+    useBusinessContext: boolean;
+  }
+
   const handleSendMessage = () => {
     if (!selectedLlm) {
       alert("Por favor, seleccione un LLM para enviar mensajes.");
       return;
     }
-    console.log(variablesList);
-    const payload = {
+
+    if (!selectedPhase[0]) {
+      alert("No hay una fase seleccionada. Por favor, selecciona una fase.");
+      return;
+    }
+
+    const payload: Payload = {
       message: chatString,
       model: selectedLlm,
       modelParams: {
@@ -87,18 +131,29 @@ export function AIAgentViewChat() {
       },
       systemPrompt: agentObject.value?.systemPrompt || "",
       knowledgeBaseParams: {
-        knowledgeBaseId: agentObject.value?.knowledgeBaseParams.knowledgeBaseId || "",
-        useKnowledgeBase: agentObject.value?.knowledgeBaseParams.useKnowledgeBase || false,
-        numberOfResults: agentObject.value?.knowledgeBaseParams.numberOfResults || 3,
+        knowledgeBaseId:
+          agentObject.value?.knowledgeBaseParams.knowledgeBaseId || "",
+        useKnowledgeBase:
+          agentObject.value?.knowledgeBaseParams.useKnowledgeBase || false,
+        numberOfResults:
+          agentObject.value?.knowledgeBaseParams.numberOfResults || 3,
       },
       variables: variablesList,
+      agentPhase: selectedPhase[0],
+      executePhase: false,
+      useBusinessContext: includeBusinessContext,
     };
+
+    // if (selectedIteration !== null) {
+    //   payload.Iteration = selectedIteration;
+    // }
+
     console.log("Sending message:", payload);
     submitMessage(payload);
     setChatString("");
   };
 
-  const maxCharacters = agentObject.value?.inputMaxToken || 1000; // Asegúrate de tener un valor predeterminado
+  const maxCharacters = agentObject.value?.inputMaxToken || 1000;
 
   if (
     conversationObject.isUnloaded() ||
@@ -108,6 +163,17 @@ export function AIAgentViewChat() {
     loadingConversation
   ) {
     return <Loader />;
+  }
+
+  if (!agentObject.value.phases || agentObject.value.phases.length === 0) {
+    return (
+      <View>
+        <Text>
+          Error: No hay una fase seleccionada. Por favor, selecciona una fase
+          para continuar.
+        </Text>
+      </View>
+    );
   }
 
   return (
@@ -120,6 +186,7 @@ export function AIAgentViewChat() {
         >
           <ChatRendered />
         </Container>
+        <br />
         <Card>
           {conversationMetadata.responding && <Loader variation="linear" />}
           {!conversationMetadata.responding && (
@@ -139,6 +206,13 @@ export function AIAgentViewChat() {
                 maxLength={maxCharacters}
               />
               <Flex justifyContent="space-between">
+                <CheckboxField
+                  label="Incluir contexto del negocio"
+                  name="includeBusinessContext"
+                  checked={includeBusinessContext}
+                  onChange={(e) => setIncludeBusinessContext(e.target.checked)}
+                />
+
                 <Text>{`Presiona Enter para enviar el mensaje`}</Text>
                 <Text>{`${tokens} tokens`}</Text>
                 <Text>{`${chatString.length} / ${maxCharacters} caracteres`}</Text>

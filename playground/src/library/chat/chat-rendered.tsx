@@ -1,12 +1,15 @@
-import { ReactNode, useEffect, useRef } from "react"
-import { useParams } from "react-router-dom"
-//@ts-ignore
+import React, { ReactNode, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import Prism from 'prismjs';
 import { useAgentApiAgent, useAgentApiConversationWithMessages, useAgentApiInvokeQuery } from "../../apis/agent-api";
-import {  Flex, Loader, Text, View, useTheme } from "@aws-amplify/ui-react";
+import { Flex, Loader, Text, View, useTheme } from "@aws-amplify/ui-react";
 import { AgentChatMessage, AgentInnerDialogBlock, AgentPartialChatMessage, GraphQLResultBlock, UserChatMessage } from "./chat-items";
 import { useAgentConversationMetadata } from "../../apis/agent-api/hooks/useMetadata";
 import ReactMarkdown from 'react-markdown';
+import { selectedAgentPhaseState, selectedIterationState } from "../../apis/agent-api/state";
+import { useRecoilState } from "recoil";
+import { useIterationApiUpdateIteration } from "../../apis/agent-api/hooks/updateIteration";
+import { phaseExecutedState } from "../../apis/agent-api/state";
 
 function EnterUserSection () {
     const { tokens } = useTheme();
@@ -28,46 +31,70 @@ function EnterAgentSection (props: {name?: string}) {
     </View>
 }
 
-export function ChatRendered () {
+// function formatMessage(message) {
+//     const parts = message.split('#');
+//     const filteredParts = parts.filter(part => part.trim() !== '');
+//     const sectionLabels = ["Justificación", "Driver", "Objetivo"];
+//     const sections = {};
+//     let driverContent = '';
 
-    const {chatId} = useParams()
-    const conversationMetadata = useAgentConversationMetadata()
-    
-    const {loadingConversation, events, conversation} = useAgentApiConversationWithMessages(chatId)
-    const agentObject = useAgentApiAgent(conversation?.agent)
-    const chatBottomRef = useRef<HTMLDivElement>(null)
-    const chatInvokeQuery = useAgentApiInvokeQuery(chatId)
+//     filteredParts.forEach((part, index) => {
+//         if (sectionLabels[index]) {
+//             sections[sectionLabels[index]] = part.trim();
+//             if (sectionLabels[index] === "Driver") {
+//                 driverContent = part.trim();
+//             }
+//         }
+//     });
+
+//     let formattedMessage = '';
+//     for (let section in sections) {
+//         formattedMessage += `${section}:\n${sections[section]}\n\n`;
+//     }
+
+//     return {
+//         formattedMessage: formattedMessage.trim(),
+//         driverContent: driverContent
+//     };
+// }
+
+export function ChatRendered () {
+    const { chatId } = useParams();
+    const conversationMetadata = useAgentConversationMetadata();
+    const { loadingConversation, events, conversation } = useAgentApiConversationWithMessages(chatId);
+    const agentObject = useAgentApiAgent(conversation?.agent);
+    const [selectedPhase] = useRecoilState(selectedAgentPhaseState);
+    const [selectedIteration] = useRecoilState(selectedIterationState);
+    const updateIteration = useIterationApiUpdateIteration();
+    const [phaseExecuted, setPhaseExecuted] = useRecoilState(phaseExecutedState);
+
+    const chatBottomRef = useRef<HTMLDivElement>(null);
+    const chatInvokeQuery = useAgentApiInvokeQuery(chatId);
     setTimeout(() => Prism.highlightAll(), 100);
-    useEffect(() => chatBottomRef.current?.scrollIntoView(), [events, conversationMetadata])
+    useEffect(() => chatBottomRef.current?.scrollIntoView(), [events, conversationMetadata]);
 
     if (agentObject.isUnloaded() || !agentObject.value || loadingConversation) {
-        return <Loader/>
+        return <Loader/>;
     }
 
-    
+    let lastSection = '';
+    let renderedChat: ReactNode[] = [];
+    let lastEffectEndTime = +new Date(events[0]?.timestamp);
 
-    let lastSection = ''
-    let renderedChat: ReactNode[] = []
-    let lastEffectEndTime = + new Date(events[0]?.timestamp);
-    
     events.forEach((event, index) => {
-
-
-
         if (new Date(event.timestamp).getTime() > lastEffectEndTime) {
-            lastEffectEndTime = new Date(event.timestamp).getTime()
+            lastEffectEndTime = new Date(event.timestamp).getTime();
         }
 
         let messageSize = 0;
 
         if (event.sender === 'user'){
             if (lastSection !== 'user') {
-                lastSection = 'user'
-                renderedChat.push(<EnterUserSection key={index}/>)
+                lastSection = 'user';
+                renderedChat.push(<EnterUserSection key={index}/>);
             }
 
             if (event.event.message) {
-                
                 renderedChat.push(
                     <UserChatMessage
                         text={event.event.message}
@@ -75,7 +102,7 @@ export function ChatRendered () {
                         lastEventTime={lastEffectEndTime}
                         key={event.id}
                     />
-                )
+                );
             }
 
             if (event.event.actionResult) {
@@ -86,23 +113,19 @@ export function ChatRendered () {
                         lastEventTime={lastEffectEndTime}
                         key={event.id}
                     />
-                )
+                );
             }
         }
-        
+
         if (event.sender === 'agent'){
-
             if (lastSection !== 'agent') {
-                lastSection = 'agent'
-                renderedChat.push(<EnterAgentSection name={agentObject.value?.name} key={index}/>)
+                lastSection = 'agent';
+                renderedChat.push(<EnterAgentSection name={agentObject.value?.name} key={index}/>);
             }
-             
-            if (event.event.message) {
 
-                
+            if (event.event.message) {
                 let parts = event.event.message.split('```');
                 let localLastEffectTime = lastEffectEndTime;
-
 
                 parts.forEach((part, idx) => {
                     const isCodeBlock = idx % 2 !== 0;
@@ -115,6 +138,7 @@ export function ChatRendered () {
                             </div>
                         );
                     } else {
+
                         renderedChat.push(
                             <AgentChatMessage 
                                 text={part}
@@ -123,50 +147,66 @@ export function ChatRendered () {
                                 key={key}
                             />
                         );
+                        // if(selectedPhase && selectedIteration && phaseExecuted) {
+                        //     // console.log('selectedPhase', selectedPhase);
+                        //     // updateIteration({
+                        //     //     id: selectedIteration.id,
+                        //     //     objetive: formatMessage(part).driverContent,
+                        //     //     number: selectedIteration.number
+                        //     // });
+                        //     // setPhaseExecuted(false);
+                        //     // renderedChat.push(
+                        //     //     <AgentChatMessage 
+                        //     //         text={formatMessage(part).formattedMessage}
+                        //     //         event={event}
+                        //     //         lastEventTime={localLastEffectTime}
+                        //     //         key={key}
+                        //     //     />
+                        //     // );
+                        // }
+                        // else {
+                            
+                        // }
+                        
                     }
                 });
-               
+            } else if (event.event.innerDialog){
+                renderedChat.push(
+                    <AgentInnerDialogBlock 
+                        text={event.event.innerDialog} 
+                        event={event} 
+                        lastEventTime={lastEffectEndTime}
+                        key={event.id}
+                    />
+                );
+                messageSize = event.event.innerDialog.length;
             }
-
-            else if (event.event.innerDialog){
-                renderedChat.push(<AgentInnerDialogBlock 
-                    text={event.event.innerDialog} 
-                    event={event} 
-                    lastEventTime={lastEffectEndTime}
-                    key={event.id}/>
-                )
-                messageSize = event.event.innerDialog.length
-            }
-            
         }
-        // Compute delay for typing effect
-        lastEffectEndTime += messageSize * 5
-
-    })
+        lastEffectEndTime += messageSize * 5;
+    });
 
     if (conversationMetadata.partialMessage) {
         if (lastSection === 'user') {
-            renderedChat.push( <EnterAgentSection name={agentObject.value.name} key="partial-section"/>)
+            renderedChat.push(<EnterAgentSection name={agentObject.value.name} key="partial-section"/>);
         }
         renderedChat.push(
             <AgentPartialChatMessage text={conversationMetadata.partialMessage} key="partial"/>
-        )
+        );
     }
 
     return (
-        <View style={{height: 'calc(100vh - 230px)', overflowY: 'scroll'}}>
+        <View style={{height: 'calc(100vh - 450px)', overflowY: 'scroll'}}>
             <View>
-            <Flex
-                minHeight='calc(100vh - 220px)'
-                direction="column"
-                justifyContent="flex-end"
-                paddingBlockEnd={20}
+                <Flex
+                    minHeight='calc(100vh - 220px)'
+                    direction="column"
+                    justifyContent="flex-end"
+                    paddingBlockEnd={20}
                 >
                     {renderedChat}                   
                     <div ref={chatBottomRef}/>
                 </Flex>
             </View>
         </View>
-    )
-
+    );
 }

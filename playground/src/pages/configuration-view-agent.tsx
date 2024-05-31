@@ -1,10 +1,22 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Flex, Loader, SliderField, SelectField, TextAreaField, TextField, View, CheckboxField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Loader,
+  SliderField,
+  SelectField,
+  TextAreaField,
+  TextField,
+  View,
+  CheckboxField,
+  Card,
+} from "@aws-amplify/ui-react";
 import { Container } from "../library/container";
 import { useAgentApiAgent, useKnowledgeBase } from "../apis/agent-api";
 import { useAgentApiDeleteAgent } from "../apis/agent-api/hooks/useDeleteAgent";
 import { useEffect, useState } from "react";
 import { useAgentApiUpdateAgent } from "../apis/agent-api/hooks/useUpdateAgent";
+import { AgentPhase } from "../apis/agent-api/types";
 
 export function ConfigurationViewAgent() {
   const { agentId } = useParams();
@@ -15,7 +27,9 @@ export function ConfigurationViewAgent() {
   const [temperature, setTemperature] = useState<number | null>(null);
   const [topP, setTopP] = useState<number | null>(null);
   const [maxGenLen, setMaxGenLen] = useState(1500);
-  const [systemPrompt, setSystemPrompt] = useState("Eres un asistente útil y amigable.");
+  const [systemPrompt, setSystemPrompt] = useState(
+    "Eres un asistente útil y amigable."
+  );
   const [knowledgeBaseId, setKnowledgeBaseId] = useState("FFUYGR42Y1");
   const [ifuseKnowledgeBase, setUseKnowledgeBase] = useState(true);
   const [numberOfResults, setNumberOfResults] = useState(3);
@@ -25,25 +39,56 @@ export function ConfigurationViewAgent() {
   const [precedence, setPrecedence] = useState(1);
   const [forceRender, setForceRender] = useState(false);
   const KnowledgeBases = useKnowledgeBase();
+  const [phases, setPhases] = useState<AgentPhase[]>([]);
+  const [phaseName, setPhaseName] = useState("");
+  const [phaseInstruction, setPhaseInstruction] = useState("");
+  const [phaseDescription, setPhaseDescription] = useState("");
+  const [expandedPhaseIndex, setExpandedPhaseIndex] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     if (agentObject.value) {
       const agent = agentObject.value;
-      
+
+      console.log("agent: ", agent);
+
       setAgentName(agent.name || "");
       setHandlerLambda(agent.handlerLambda || "");
-      setSystemPrompt(agent.systemPrompt || "Eres un asistente útil y amigable.");
+      setSystemPrompt(
+        agent.systemPrompt || "Eres un asistente útil y amigable."
+      );
       setInputMaxToken(agent.inputMaxToken || 1000);
       setPrecedence(agent.precedence || 1);
       setTemperature(agent.modelParams?.temperature ?? 0.7);
       setTopP(agent.modelParams?.top_p ?? 0.9);
       setMaxGenLen(agent.modelParams?.max_gen_len || 1500);
-      setKnowledgeBaseId(agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1");
+      setKnowledgeBaseId(
+        agent.knowledgeBaseParams?.knowledgeBaseId || "FFUYGR42Y1"
+      );
       setUseKnowledgeBase(agent.knowledgeBaseParams?.useKnowledgeBase ?? true);
       setNumberOfResults(agent.knowledgeBaseParams?.numberOfResults || 3);
-      setForceRender(prev => !prev); // Toggle force render
+      console.log("agent.phases: ", agent.phases);
+      setPhases(agent.phases || []);
+      setForceRender((prev) => !prev); // Toggle force render
     }
   }, [agentObject.value]);
+
+  const handleAddPhase = () => {
+    if (phaseName && phaseDescription && phaseInstruction) {
+      setPhases([
+        ...phases,
+        {
+          name: phaseName,
+          description: phaseDescription,
+          instruccion: phaseInstruction,
+        },
+      ]);
+      setPhaseName("");
+      setPhaseDescription("");
+      setPhaseInstruction("");
+    }
+  };
 
   useEffect(() => {
     console.log("ifuseKnowledgeBase state updated: ", ifuseKnowledgeBase);
@@ -56,9 +101,18 @@ export function ConfigurationViewAgent() {
   const onDelete = () => {
     deleteAgent(agentId).then(() => nav("/configuration"));
   };
+  const handleToggleExpand = (index: number) => {
+    setExpandedPhaseIndex(expandedPhaseIndex === index ? null : index);
+  };
+
+  const handleRemovePhase = (index: number) => {
+    const newPhases = phases.filter((_, i) => i !== index);
+    setPhases(newPhases);
+  };
 
   const onUpdate = () => {
     const updatedAgent = {
+      id: agentId!,
       name: agentName,
       handlerLambda: handlerLambda,
       systemPrompt: systemPrompt,
@@ -74,8 +128,14 @@ export function ConfigurationViewAgent() {
         useKnowledgeBase: ifuseKnowledgeBase,
         numberOfResults: numberOfResults,
       },
+      phases: phases.map((phase) => ({
+        name: phase.name,
+        description: phase.description,
+        instruccion: phase.instruccion,
+      })),
     };
-    updateAgent(agentId!, updatedAgent)
+
+    updateAgent(updatedAgent)
       .then(() => {
         alert("Agent updated successfully!");
       })
@@ -150,7 +210,12 @@ export function ConfigurationViewAgent() {
               value={maxGenLen.toString()}
               onChange={(e) => setMaxGenLen(parseInt(e.target.value, 10))}
             />
-            <SelectField label="Knowledge Base" size="small" value={knowledgeBaseId} onChange={(e) => setKnowledgeBaseId(e.target.value)}>
+            <SelectField
+              label="Knowledge Base"
+              size="small"
+              value={knowledgeBaseId}
+              onChange={(e) => setKnowledgeBaseId(e.target.value)}
+            >
               {KnowledgeBases.value?.map((kb) => (
                 <option key={kb.knowledgeBaseId} value={kb.knowledgeBaseId}>
                   {kb.name}
@@ -171,6 +236,104 @@ export function ConfigurationViewAgent() {
               onChange={(e) => setNumberOfResults(parseInt(e.target.value, 10))}
             />
           </Flex>
+          <Container heading="Phases">
+            <View>
+              <TextField
+                label="Phase Name"
+                value={phaseName}
+                onChange={(e) => setPhaseName(e.target.value)}
+                placeholder="Phase Name"
+              />
+              <TextAreaField
+                label="Phase Description"
+                value={phaseDescription}
+                onChange={(e) => setPhaseDescription(e.target.value)}
+                placeholder="Phase Description"
+              />
+              <Button onClick={handleAddPhase}>Add Phase</Button>
+              <View marginTop="20px">
+                <h3>Phases</h3>
+                <Flex direction="row" gap={10}>
+                  {phases.map((phase, index) => (
+                    <Flex
+                      key={index}
+                      padding="10px"
+                      border="1px solid lightgray"
+                      borderRadius="5px"
+                      backgroundColor="white"
+                      direction="column"
+                      position="relative"
+                      width={expandedPhaseIndex === index ? "100%" : "300px"}
+                      maxWidth="500px"
+                      style={{ wordBreak: "break-word" }}
+                    >
+                      <strong>{phase.name}</strong>
+                      <p
+                        style={{
+                          overflow:
+                            expandedPhaseIndex === index ? "visible" : "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace:
+                            expandedPhaseIndex === index ? "normal" : "nowrap",
+                          display:
+                            expandedPhaseIndex === index
+                              ? "block"
+                              : "-webkit-box",
+                          WebkitLineClamp:
+                            expandedPhaseIndex === index ? "unset" : 3,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        {phase.description}
+                      </p>
+                      <p
+                        style={{
+                          overflow:
+                            expandedPhaseIndex === index ? "visible" : "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace:
+                            expandedPhaseIndex === index ? "normal" : "nowrap",
+                          display:
+                            expandedPhaseIndex === index
+                              ? "block"
+                              : "-webkit-box",
+                          WebkitLineClamp:
+                            expandedPhaseIndex === index ? "unset" : 3,
+                          WebkitBoxOrient: "vertical",
+                        }}
+                      >
+                        <strong>Instrucción:</strong> {phase.instruccion}
+                      </p>
+                      <Button
+                        size="small"
+                        variation="link"
+                        onClick={() => handleToggleExpand(index)}
+                        padding="0"
+                        margin="0"
+                        alignSelf="flex-start"
+                      >
+                        {expandedPhaseIndex === index
+                          ? "Show less"
+                          : "Show more"}
+                      </Button>
+                      <Button
+                        size="small"
+                        variation="link"
+                        onClick={() => handleRemovePhase(index)}
+                        position="absolute"
+                        top="5px"
+                        right="5px"
+                        padding="0"
+                        margin="0"
+                      >
+                        Remove
+                      </Button>
+                    </Flex>
+                  ))}
+                </Flex>
+              </View>
+            </View>
+          </Container>
         </Container>
       </Container>
       <Flex direction="row" justifyContent="end" padding="1rem">

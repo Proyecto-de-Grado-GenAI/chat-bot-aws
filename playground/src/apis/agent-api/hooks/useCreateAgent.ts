@@ -1,4 +1,4 @@
-import { Agent } from "../types";
+import { Agent, AgentPhase } from "../types";
 import { useSetRecoilState } from "recoil";
 import { GraphqlQuery } from "../../invoker";
 import { Agents, Loadable } from "../state";
@@ -23,10 +23,11 @@ export interface CreateAgentArgs {
         useKnowledgeBase: boolean
         numberOfResults: number
     }
+    phases: AgentPhase[]
 }
 
 const createAgentQuery = new GraphqlQuery<CreateAgentResponse>(`
-    mutation CreateAgent($handlerLambda: String!, $systemPrompt: String!, $name: String!, $inputMaxToken: Int!, $precedence: Int!, $modelParams: ModelParamsInput!, $knowledgeBaseParams: KnowledgeBaseParamsInput!) {
+    mutation CreateAgent($handlerLambda: String!, $systemPrompt: String!, $name: String!, $inputMaxToken: Int!, $precedence: Int!, $modelParams: ModelParamsInput!, $knowledgeBaseParams: KnowledgeBaseParamsInput!, $phases: [AgentPhaseInput!]!) {
         createAgent(config: {
             name: $name, 
             handlerLambda: $handlerLambda, 
@@ -34,7 +35,8 @@ const createAgentQuery = new GraphqlQuery<CreateAgentResponse>(`
             inputMaxToken: $inputMaxToken, 
             precedence: $precedence,
             modelParams: $modelParams,
-            knowledgeBaseParams: $knowledgeBaseParams
+            knowledgeBaseParams: $knowledgeBaseParams,
+            phases: $phases
         }) {
             id
             name
@@ -52,9 +54,15 @@ const createAgentQuery = new GraphqlQuery<CreateAgentResponse>(`
                 useKnowledgeBase
                 numberOfResults
             }
+            phases {
+                name
+                description
+                instruccion
+            }
         }
     }
 `)
+
 
 export function useAgentApiCreateAgent () {
 

@@ -28,6 +28,11 @@ const listAgentsQuery = new GraphqlQuery<GetAgentResponse>(`
                 useKnowledgeBase
                 numberOfResults
             }
+            phases {
+                name
+                description
+                instruccion
+            }
         }
     }
 `)

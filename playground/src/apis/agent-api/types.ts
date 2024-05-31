@@ -31,8 +31,28 @@ export interface Agent {
     precedence: number;
     modelParams: ModelParams;
     knowledgeBaseParams: KnowledgeBaseParams;
+    phases : AgentPhase[];
 }
 
+export interface AgentPhase {
+    name: string;
+    description: string;
+    instruccion: string;
+}
+export interface Iteration {
+    id: string;
+    number: number;
+    name: string;
+    objetive: string;
+    systemElements: systemElement[] | [];
+    
+}
+export interface IterationInput {
+    number: number;
+    name: string;
+    objetive: string;
+    systemElements: systemElement[] | [];
+}
 export interface ModelParams {
     temperature: number;
     top_p: number;
@@ -75,6 +95,12 @@ export interface KnowledgeBaseParamsInput {
     numberOfResults: number;
 }
 
+export interface AgentPhaseInput {
+    name: string;
+    description: string;
+    instruccion: string;
+}
+
 export interface NewAgent {
     name: string;
     handlerLambda: string;
@@ -83,6 +109,7 @@ export interface NewAgent {
     precedence: number;
     modelParams: ModelParamsInput;
     knowledgeBaseParams: KnowledgeBaseParamsInput;
+    phases: AgentPhaseInput[];
 }
 
 export interface NewAgentInput {
@@ -93,6 +120,7 @@ export interface NewAgentInput {
     precedence: number;
     modelParams: ModelParamsInput;
     knowledgeBaseParams: KnowledgeBaseParamsInput;
+    phases: AgentPhaseInput[];
 }
 
 export interface UpdateAgentInput {
@@ -101,8 +129,17 @@ export interface UpdateAgentInput {
     systemPrompt?: string;
     inputMaxToken?: number;
     precedence?: number;
-    modelParams?: ModelParamsInput;
-    knowledgeBaseParams?: KnowledgeBaseParamsInput;
+    modelParams?: {
+        temperature: number;
+        top_p: number;
+        max_gen_len: number;
+    };
+    knowledgeBaseParams?: {
+        knowledgeBaseId: string;
+        useKnowledgeBase: boolean;
+        numberOfResults: number;
+    };
+    phases?: AgentPhaseInput[];
 }
 
 export interface KnowledgeBase {
@@ -116,4 +153,9 @@ export interface KnowledgeBase {
 export interface Variable { 
     name: string;
     value: string;
+}
+
+export interface systemElement {
+    name: string;
+    description: string;
 }

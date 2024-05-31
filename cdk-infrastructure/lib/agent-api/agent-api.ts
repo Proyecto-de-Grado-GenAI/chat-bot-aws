@@ -16,6 +16,7 @@ interface AgentApiProps {
         conversationTable: dynamodb.ITable;
         eventTable: dynamodb.ITable;
         LLmTable: dynamodb.ITable;
+        iterationTable: dynamodb.ITable;
     };
 }
 
@@ -50,6 +51,7 @@ export function buildAgentApi(scope: Construct, props: AgentApiProps) {
     const LLMTableDS = appsyncApi.addDynamoDbDataSource('LLMTable', props.tables.LLmTable);
     const conversationTableDS = appsyncApi.addDynamoDbDataSource('ConversationTable', props.tables.conversationTable);
     const eventsTableDS = appsyncApi.addDynamoDbDataSource('EventsTable', props.tables.eventTable);
+    const IterationTableDS = appsyncApi.addDynamoDbDataSource('IterationTable', props.tables.iterationTable);
     const noneDS = appsyncApi.addNoneDataSource('NoneDataSource');
 
     // Also one for lambda invoke through http, a bit more involved to setup
@@ -83,6 +85,20 @@ export function buildAgentApi(scope: Construct, props: AgentApiProps) {
     addJsResolver(scope, appsyncApi, 'Query.listConversations', { code: 'scan', dataSource: conversationTableDS });
     addJsResolver(scope, appsyncApi, 'Mutation.createConversation', { code: 'create', dataSource: conversationTableDS });
     addJsResolver(scope, appsyncApi, 'Mutation.deleteConversation', { code: 'delete', dataSource: conversationTableDS });
+
+    // CRUD on Iterations
+    addJsResolver(scope, appsyncApi, 'Query.getIteration', { code: 'get', dataSource: IterationTableDS });
+    addJsResolver(scope, appsyncApi, 'Query.listIterations', { code: 'scan', dataSource: IterationTableDS });
+    addJsResolver(scope, appsyncApi, 'Mutation.createIteration', { code: 'create', dataSource: IterationTableDS });
+    addJsResolver(scope, appsyncApi, 'Mutation.deleteIteration', { code: 'delete', dataSource: IterationTableDS });
+
+    addJsResolver(scope, appsyncApi, 'Mutation.updateIteration', { code: 'update', dataSource: IterationTableDS });
+    addJsResolver(scope, appsyncApi, 'Mutation.updateAgent', { code: 'update', dataSource: agentTableDS });
+
+
+    // Add resolver for updating agents
+
+    
 
     // Agent gets special resolvers to publish events to clients
     addJsResolver(scope, appsyncApi, 'Mutation.agentPublishEvent', {
@@ -130,7 +146,8 @@ export function buildAgentApi(scope: Construct, props: AgentApiProps) {
     }
 
     // Add resolver for updating agents
-    addJsResolver(scope, appsyncApi, 'Mutation.updateAgent', { code: 'update', dataSource: agentTableDS });
+    
+    
 
     // Finally some more general metadata linkage
     addJsResolver(scope, appsyncApi, 'Conversation.events', {

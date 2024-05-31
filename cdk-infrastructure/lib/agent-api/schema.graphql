@@ -66,6 +66,10 @@ input UserAction {
     systemPrompt: String
     knowledgeBaseParams: KnowledgeBaseParamsInput
     variables: [VariableInput]
+    agentPhase: AgentPhaseInput
+    Iteration: IterationInput
+    executePhase: Boolean
+    useBusinessContext: Boolean
 }
 
 input VariableInput {
@@ -93,6 +97,12 @@ input LLmInput {
     model: String!
 }
 
+type AgentPhase {
+    name: String
+    description: String
+    instruccion: String
+}
+
 type Agent @aws_cognito_user_pools {
     id: ID!
     timestamp: String!
@@ -103,6 +113,7 @@ type Agent @aws_cognito_user_pools {
     inputMaxToken: Int!
     modelParams: ModelParams
     knowledgeBaseParams: KnowledgeBaseParams
+    phases: [AgentPhase]
 }
 
 type ModelParams {
@@ -125,6 +136,13 @@ input NewAgent {
     precedence: Int!
     modelParams: ModelParamsInput
     knowledgeBaseParams: KnowledgeBaseParamsInput
+    phases: [AgentPhaseInput]
+}
+
+input AgentPhaseInput {
+    name: String
+    description: String
+    instruccion: String
 }
 
 input UpdateAgentInput {
@@ -135,6 +153,7 @@ input UpdateAgentInput {
     precedence: Int
     modelParams: ModelParamsInput
     knowledgeBaseParams: KnowledgeBaseParamsInput
+    phases: [AgentPhaseInput]
 }
 
 input NewLLm {
@@ -142,8 +161,36 @@ input NewLLm {
     model: String!
 }
 
+input IterationInput {
+    objetive: String
+    name: String
+    number: Int
+    systemElements: [systemElementInput]
+}
+
+type Iteration {
+    id: ID!
+    objetive: String
+    name: String
+    number: Int
+    systemElements: [systemElement]
+}
+
+type systemElement{
+    name: String
+    description: String
+}
+
+input systemElementInput{
+    name: String
+    description: String
+}
+
+
 type Query @aws_cognito_user_pools {
     getAgent(id: ID!): Agent!
+    getIteration(id: ID!): Iteration!
+    listIterations: [Iteration]!
     listAgents: [Agent]!
     getLLm(id: ID!): LLm!
     listLLms: [LLm]!
@@ -153,12 +200,16 @@ type Query @aws_cognito_user_pools {
 
 type Mutation {
     createAgent(config: NewAgent!): Agent! @aws_cognito_user_pools
+    createIteration(config: IterationInput!): Iteration! @aws_cognito_user_pools
+    deleteIteration(id: ID!): Iteration! @aws_cognito_user_pools
+    updateIteration(id: ID!, config: IterationInput): Iteration! @aws_cognito_user_pools
     updateAgent(id: ID!, config: UpdateAgentInput!): Agent! @aws_cognito_user_pools
     deleteAgent(id: ID!): Agent! @aws_cognito_user_pools
     createConversation(config: NewConversation!): Conversation! @aws_cognito_user_pools
     deleteConversation(id: ID!): Conversation! @aws_cognito_user_pools
     createLLm(config: NewLLm!): LLm! @aws_cognito_user_pools
     deleteLLm(id: ID!): LLm! @aws_cognito_user_pools
+    
 
     # User side operations
     userPublishMessage(conversationId: ID!, event: UserAction!): ConversationEvent! @aws_cognito_user_pools

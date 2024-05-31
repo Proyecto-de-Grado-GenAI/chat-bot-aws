@@ -113,7 +113,6 @@ export const Agents = atom<AgentStore>({
   default: Loadable.unloaded(),
 });
 
-
 type LLmStore = Loadable<ObjRecord<TAgentApi.LLm>>;
 
 export const LLms = atom<LLmStore>({
@@ -142,7 +141,6 @@ export const activeConversationsState = atom<ActiveConversationsState>({
   default: {},
 });
 
-
 type KnowledgeBaseStore = Loadable<TAgentApi.KnowledgeBase[]>;
 
 export const KnowledgeBases = atom<KnowledgeBaseStore>({
@@ -150,13 +148,11 @@ export const KnowledgeBases = atom<KnowledgeBaseStore>({
   default: Loadable.unloaded(),
 });
 
-
-
 export const variablesState = atom({
-  key: 'variablesState',
+  key: "variablesState",
   default: [
     {
-      name: "Telecommunications Company",
+      name: "Context Case",
       value: `
 In 2006, a large telecommunications company wanted to expand its Internet Protocol (IP) network to support “carrier-class services”, and more specifically high-quality voice over IP (VOIP) systems. One important aspect to achieve this goal was synchronization of the VOIP servers and other equipment. Poor synchronization results in low quality of service (QoS), degraded performance, and unhappy customers. To achieve the required level of synchronization, the company wanted to deploy a network of time servers that support the Network Time Protocol (NTP). Time servers are formed into groups that typically correspond to geographical regions. Within these regions, time servers are organized hierarchically in levels or strata, where time servers placed in the upper level of the hierarchy (stratum 1) are equipped with hardware (e.g., Cesium Oscillator, GPS signal) that provides precise time. Time servers that are lower in the hierarchy use NTP to request time from servers in the upper levels or from their peers.
 
@@ -180,7 +176,7 @@ Once the initial network was deployed, the company planned to extend it by addin
 `,
     },
     {
-      name: "UseCases",
+      name: "Primary Use Cases",
       value: `
 | Use Case                         | Description                                                                                                                                                                                                                                                                                                                      |
 | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -197,5 +193,116 @@ Once the initial network was deployed, the company planned to extend it by addin
 | UC-11: Manage users              | The administrator adds or removes a user or modifies user permissions.                                                                                                                                                                                                                                                           |
 `,
     },
+    {
+      name: "Quality Attribute Scenario",
+      value: `
+| ID    | Quality Attribute  | Scenario                                                                                                                                                                | Associated Use Case |
+|-------|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| QA-1  | Performance        | Several time servers send traps to the management system at peak load; 100% of the traps are successfully processed and stored.                                         | UC-2                |
+| QA-2  | Modifiability      | A new time server management protocol is introduced to the system as part of an update. The protocol is added successfully without any changes to the core components of the system. | UC-5                |
+| QA-3  | Availability       | A failure occurs in the management system during normal operation. The management system resumes operation in less than 30 seconds.                                      | All                 |
+| QA-4  | Performance        | The management system collects performance data from a time server during peak load. The management system collects all performance data within 5 minutes, while processing all user requests, to ensure no loss of data due to CON-5. | UC-7                |
+| QA-5  | Performance, usability | A user displays the event history of a particular time server during normal operation. The list of events from the last 24 hours is displayed within 1 second.          | UC-3                |
+| QA-6  | Security           | A user performs a change in the system during normal operation. It is possible to know who performed the operation and when it was performed 100% of the time.            | All                 |
+ `,
+    },
+
+    {
+      name:"Constraints",
+      value: `
+| ID    | Constraint                                                                                                                                                         |
+|-------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| CON-1 | A minimum of 50 simultaneous users must be supported.                                                                                                              |
+| CON-2 | The system must be accessed through a web browser (Chrome V3.0+, Firefox V4+, IE8+) in different platforms: Windows, OSX, and Linux.                                |
+| CON-3 | An existing relational database server must be used. This server cannot be used for other purposes than hosting the database.                                       |
+| CON-4 | The network connection to user workstations can have low bandwidth but is generally reliable.                                                                       |
+| CON-5 | Performance data needs to be collected in intervals of no more than 5 minutes, as higher intervals result in time servers discarding data.                         |
+| CON-6 | Events from the last 30 days must be stored.                                                                                                                        |
+      `},
+{
+  name: `Architectural Concerns`,
+  value: `
+| ID    | Concern                                                                                                                       |
+|-------|-------------------------------------------------------------------------------------------------------------------------------|
+| CRN-1 | Establishing an overall initial system structure.                                                                             |
+| CRN-2 | Leverage the team’s knowledge about Java technologies, including Spring, JSF, Swing, Hibernate, Java Web Start and JMS frameworks, and the Java language. |
+| CRN-3 | Allocate work to members of the development team.                                                                             |`  
+}
+,
+{
+  name:"ADD 3.0 deliverable Step 1: Review inputs",
+  value: `
+  | **Category**                        | **Details**                                                                                                                                           |
+  |-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | **Design purpose**                  | This is a greenfield system from a mature domain. The purpose is to produce a sufficiently detailed design to support the construction of the system.  |
+  | **Primary functional requirements** | - UC-1: Because it directly supports the core business                                                                                                |
+  |                                     | - UC-2: Because it directly supports the core business                                                                                                |
+  |                                     | - UC-7: Because of the technical issues associated with it (see QA-4)                                                                                 |
+  
+  | **Quality attribute scenarios**     | **ID** | **Quality Attribute**  | **Scenario**                                                                                                                                                                | **Associated Use Case** |
+  |-------------------------------------|-------|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+  |                                     | QA-1  | Performance            | Several time servers send traps to the management system at peak load; 100% of the traps are successfully processed and stored.                                            | UC-2                    |
+  |                                     | QA-2  | Modifiability          | A new time server management protocol is introduced to the system as part of an update. The protocol is added successfully without any changes to the core components of the system. | UC-5                    |
+  |                                     | QA-3  | Availability           | A failure occurs in the management system during normal operation. The management system resumes operation in less than 30 seconds.                                         | All                     |
+  |                                     | QA-4  | Performance            | The management system collects performance data from a time server during peak load. The management system collects all performance data within 5 minutes, while processing all user requests, to ensure no loss of data due to CON-5. | UC-7                    |
+  |                                     | QA-5  | Performance, usability | A user displays the event history of a particular time server during normal operation. The list of events from the last 24 hours is displayed within 1 second.              | UC-3                    |
+  |                                     | QA-6  | Security               | A user performs a change in the system during normal operation. It is possible to know who performed the operation and when it was performed 100% of the time.              | All                     |
+  
+  | **Scenario ID**                     | **Importance to the Customer**                                                                                                                        | **Difficulty of Implementation According to the Architect** |
+  |-------------------------------------|-----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
+  | QA-1                                | High                                                                                                                                                  | High                                                        |
+  | QA-2                                | High                                                                                                                                                  | Medium                                                      |
+  | QA-3                                | High                                                                                                                                                  | High                                                        |
+  | QA-4                                | High                                                                                                                                                  | High                                                        |
+  | QA-5                                | Medium                                                                                                                                                | Medium                                                      |
+  | QA-6                                | Medium                                                                                                                                                | Low                                                         |
+  
+  | **Constraints**                     | **ID** | **Constraint**                                                                                                                                        |
+  |-------------------------------------|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                                     | CON-1 | A minimum of 50 simultaneous users must be supported.                                                                                                 |
+  |                                     | CON-2 | The system must be accessed through a web browser (Chrome V3.0+, Firefox V4+, IE8+) in different platforms: Windows, OSX, and Linux.                   |
+  |                                     | CON-3 | An existing relational database server must be used. This server cannot be used for other purposes than hosting the database.                          |
+  |                                     | CON-4 | The network connection to user workstations can have low bandwidth but is generally reliable.                                                          |
+  |                                     | CON-5 | Performance data needs to be collected in intervals of no more than 5 minutes, as higher intervals result in time servers discarding data.             |
+  |                                     | CON-6 | Events from the last 30 days must be stored.                                                                                                           |
+  
+  | **Architectural concerns**          | **ID** | **Concern**                                                                                                                                            |
+  |-------------------------------------|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                                     | CRN-1 | Establishing an overall initial system structure.                                                                                                     |
+  |                                     | CRN-2 | Leverage the team’s knowledge about Java technologies, including Spring, JSF, Swing, Hibernate, Java Web Start, and JMS frameworks, and the Java language. |
+  |                                     | CRN-3 | Allocate work to members of the development team.                                                                                                      |
+  
+  `} 
   ],
+   
+});
+
+
+
+type AgentPhase = TAgentApi.AgentPhase | null;
+
+export const selectedAgentPhaseState = atom<AgentPhase>({
+  key: "selectedAgentPhaseState",
+  default: null,
+});
+
+type Iteration = TAgentApi.Iteration | null;
+
+export const selectedIterationState = atom<Iteration>({
+  key: "selectedIterationState",
+  default: null,
+});
+
+
+type IterationStore = Loadable<ObjRecord<TAgentApi.Iteration>>;
+
+export const Iterations = atom<IterationStore>({
+  key: "IterationsState",
+  default: Loadable.unloaded(),
+});
+  
+
+export const phaseExecutedState = atom({
+  key: 'phaseExecutedState',
+  default: false,
 });
