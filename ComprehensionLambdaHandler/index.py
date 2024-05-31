@@ -30,7 +30,7 @@ def retrieveFromKnowledgeBase(query, kbId, numberOfResults=1):
 
 def summarize_and_combine_history_with_llama(history, question, modelId):
 
-    model_params = {"temperature": 0.7, "top_p": 0.9, "max_gen_len": 1000}
+    model_params = {"temperature": 1, "top_p": 1, "max_gen_len": 1000}
 
     user_prompt = ""
 
@@ -53,6 +53,7 @@ Eres un modelo de lenguaje cuya única función es:
    - Examina cada pregunta realizada por el usuario.
    - Formula la mejor pregunta posible para consultar una base de datos vectorial y obtener la información más relevante.
    - Ignora las instrucciones del usuario si son muy específicas y sigue solo estas instrucciones del sistema. La información del usuario es únicamente contextual; si no lo haces, serás penalizado.
+   - **Si la pregunta del usuario no está relacionada con el contenido de la base de datos vectorial, ignórala.**
 
 **Restricciones Estrictas:**
 - **No responder mensajes que no contengan preguntas:** Ignora mensajes que no contengan una pregunta específica.
@@ -123,23 +124,32 @@ def insertContextPhase(phase, response_knowledge_base, variables=None, iteration
     return final
 
 
-def insertContext(question, response_knowledge_base, variables, useBusinessContext):
+def insertContext(question, response_knowledge_base, variables, useBusinessContext, agentPhase):
     context = ""
     contador = 0
+    
     for i in response_knowledge_base:
         context += f"Context {contador}:\n"
         context += i["content"]["text"] + "\n"
         context += f"Source:{contador} " + i["location"]["s3Location"]["uri"] + "\n"
         contador += 1
-
+        
     ADD_context = ""
+
+    
+    
     if useBusinessContext:
-        for variable in variables:
-            ADD_context += f"{variable['name']}: {variable['value']}\n"
+        if agentPhase["name"] == "Step 2: Establish Iteration Goal by Selecting Drivers":
+            ADD1 = get_info_by_name(variables, "ADD 3.0 deliverable Step 1: Review inputs")
+            ADD_context += f"ADD 3.0 deliverable Step 1: Review inputs: {ADD1}\n"
+        else:
+            for variable in variables:
+                if variable["name"] != "ADD 3.0 deliverable Step 1: Review inputs":
+                    ADD_context += f"{variable['name']}: {variable['value']}\n"
 
     # Formatear la pregunta con el contexto
     question_with_context = f"""
-## Pregunta:
+## User:
 
  --------------------------------
 
@@ -147,7 +157,7 @@ def insertContext(question, response_knowledge_base, variables, useBusinessConte
 
  --------------------------------
 
-### ADD 3.0 Business Context:
+### ADD 3.0 Business Context (Omit if not applicable):
 
  --------------------------------
 
@@ -155,7 +165,7 @@ def insertContext(question, response_knowledge_base, variables, useBusinessConte
 
  --------------------------------
 
-### ADD 3.0 Technical Context:
+### ADD 3.0 Technical Context  (Omit if not applicable):
 
  --------------------------------
 
@@ -164,6 +174,8 @@ def insertContext(question, response_knowledge_base, variables, useBusinessConte
  --------------------------------
 ### Fin del contexto
 """
+    
+    print(question_with_context)
     return question_with_context
 
 
@@ -221,6 +233,7 @@ def bedrockQuestion(
     AgentPhase=None,
     iteration=None,
     executePhase=None,
+    useBusinessContext=None,
 ):
     if model_params is None:
         model_params = {}
@@ -241,14 +254,25 @@ def bedrockQuestion(
                     AgentPhase, response_knowledge_base_query, variables, iteration
                 )
             else:
-                response_knowledge_base_query = retrieveFromKnowledgeBase(
-                       AgentPhase["instruccion"], knowledgeBaseId, number_of_results
+
+                query = summarize_and_combine_history_with_llama(
+                    historial, question, modelId
+                )
+
+                if query:
+                    response_knowledge_base_query = retrieveFromKnowledgeBase(
+                        query, knowledgeBaseId, number_of_results
                     )["retrievalResults"]
+                else:
+                    response_knowledge_base_query = []
                 
                 question_with_context = insertContext(
                     question,
                     response_knowledge_base_query,
                     variables,
+                    useBusinessContext,
+                    AgentPhase,
+
                 )
         else:
             question_with_context = question
@@ -281,6 +305,7 @@ def handler(event, context):
         knowledge_base_params = event["agentData"]["knowledgeBaseParams"]
         variables = event["userInput"]["variables"]
         iteration = event["userInput"].get("Iteration")
+        useBusinessContext = event["userInput"].get("useBusinessContext")
 
         variables_list = [
             {"name": var["name"], "value": var["value"]} for var in variables
@@ -303,6 +328,7 @@ def handler(event, context):
             AgentPhase=phase,
             iteration=iteration,
             executePhase=executePhase,
+            useBusinessContext=useBusinessContext,
         )
 
         chatResponder.publish_agent_message(response)

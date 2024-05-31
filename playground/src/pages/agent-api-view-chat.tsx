@@ -56,7 +56,7 @@ export function AIAgentViewChat() {
   const [selectedIteration, setSelectedIteration] = useRecoilState(
     selectedIterationState
   );
-  const [includeBusinessContext, setIncludeBusinessContext] = useState(false);
+  const [includeBusinessContext, setIncludeBusinessContext] = useState(true);
 
   useAgentApiSubscribeConversation(chatId);
 

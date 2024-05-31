@@ -152,7 +152,7 @@ def insertContext(question, response_knowledge_base, variables, useBusinessConte
 
     # Formatear la pregunta con el contexto
     question_with_context = f"""
-## Pregunta:
+## User:
 
  --------------------------------
 
