@@ -123,8 +123,7 @@ def insertContextPhase(phase, response_knowledge_base, variables=None, iteration
     return final
 
 
-def insertContext(question, response_knowledge_base, variables):
-    # Construir el contexto a partir de la base de conocimiento
+def insertContext(question, response_knowledge_base, variables, useBusinessContext):
     context = ""
     contador = 0
     for i in response_knowledge_base:
@@ -133,25 +132,38 @@ def insertContext(question, response_knowledge_base, variables):
         context += f"Source:{contador} " + i["location"]["s3Location"]["uri"] + "\n"
         contador += 1
 
-    # Construir el contexto ADD 3.0 a partir de las variables
     ADD_context = ""
-    for variable in variables:
-        ADD_context += f"{variable['name']}: {variable['value']}\n"
+    if useBusinessContext:
+        for variable in variables:
+            ADD_context += f"{variable['name']}: {variable['value']}\n"
 
     # Formatear la pregunta con el contexto
     question_with_context = f"""
 ## Pregunta:
-{question}
 
-### ADD 3.0 Context:
-{ADD_context}
+ --------------------------------
 
-### Contexto Negocio:
-{context}
+ {question}
 
+ --------------------------------
+
+### ADD 3.0 Business Context:
+
+ --------------------------------
+
+ {ADD_context}
+
+ --------------------------------
+
+### ADD 3.0 Technical Context:
+
+ --------------------------------
+
+ {context}
+
+ --------------------------------
 ### Fin del contexto
 """
-    print (question_with_context)
     return question_with_context
 
 
