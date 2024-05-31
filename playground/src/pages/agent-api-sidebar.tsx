@@ -355,9 +355,9 @@ export function AIAgentSidebar() {
         ...selectedIteration,
         objetive: newIterationObjective || selectedIteration.objetive,
         systemElements: [
-          ...selectedIteration.systemElements,
+          ...selectedIteration.systemElements || [], // Asegurarse de que systemElements no sea null
           ...newSystemElements,
-        ].filter((element) => !deletedSystemElements.includes(element)),
+        ].filter((element) => !deletedSystemElements.includes(element)) || [],
       };
       updateIteration(updatedIteration)
         .then(() => {
@@ -373,6 +373,7 @@ export function AIAgentSidebar() {
       alert("No hay una iteración seleccionada para actualizar.");
     }
   };
+  
 
   const handleDeleteSystemElement = (index, isExisting) => {
     if (isExisting && selectedIteration) {
