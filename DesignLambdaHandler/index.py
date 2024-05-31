@@ -156,11 +156,13 @@ def insertContext(question, response_knowledge_base, variables, useBusinessConte
 
  --------------------------------
 
- {question}
+ USER: {question} END:USER
+
+### Context (no usar si no se relaciona con la petición de arriba):
 
  --------------------------------
 
-### ADD 3.0 Business Context:
+#### ADD 3.0 Business Context:
 
  --------------------------------
 
@@ -168,7 +170,7 @@ def insertContext(question, response_knowledge_base, variables, useBusinessConte
 
  --------------------------------
 
-### ADD 3.0 Technical Context:
+#### ADD 3.0 Technical Context:
 
  --------------------------------
 
