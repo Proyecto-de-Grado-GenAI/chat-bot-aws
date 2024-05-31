@@ -69,6 +69,7 @@ input UserAction {
     agentPhase: AgentPhaseInput
     Iteration: IterationInput
     executePhase: Boolean
+    useBusinessContext: Boolean
 }
 
 input VariableInput {

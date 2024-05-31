@@ -8,6 +8,7 @@ import {
   Card,
   Loader,
   Text,
+  CheckboxField,
 } from "@aws-amplify/ui-react";
 import {
   useAgentApiAgent,
@@ -30,6 +31,12 @@ import {
   selectedIterationState,
 } from "../apis/agent-api/state";
 import llama3Tokenizer from "llama3-tokenizer-js";
+import {
+  AgentPhase,
+  IterationInput,
+  LLm,
+  Variable,
+} from "../apis/agent-api/types";
 
 export function AIAgentViewChat() {
   const { chatId } = useParams();
@@ -46,6 +53,10 @@ export function AIAgentViewChat() {
   const selectedAgent = useRecoilValue(selectedAgentState);
   const [variablesList] = useRecoilState(variablesState);
   const selectedPhase = useRecoilState(selectedAgentPhaseState);
+  const [selectedIteration, setSelectedIteration] = useRecoilState(
+    selectedIterationState
+  );
+  const [includeBusinessContext, setIncludeBusinessContext] = useState(false);
 
   useAgentApiSubscribeConversation(chatId);
 
@@ -78,6 +89,27 @@ export function AIAgentViewChat() {
     setTokens(totalTokens + currentInputTokens);
   }, [events, chatString]);
 
+  interface Payload {
+    message: string;
+    model: LLm;
+    modelParams: {
+      temperature: number;
+      top_p: number;
+      max_gen_len: number;
+    };
+    systemPrompt: string;
+    knowledgeBaseParams: {
+      knowledgeBaseId: string;
+      useKnowledgeBase: boolean;
+      numberOfResults: number;
+    };
+    variables: Variable[];
+    agentPhase: AgentPhase;
+    executePhase: boolean;
+    Iteration?: IterationInput;
+    useBusinessContext: boolean;
+  }
+
   const handleSendMessage = () => {
     if (!selectedLlm) {
       alert("Por favor, seleccione un LLM para enviar mensajes.");
@@ -89,7 +121,7 @@ export function AIAgentViewChat() {
       return;
     }
 
-    const payload = {
+    const payload: Payload = {
       message: chatString,
       model: selectedLlm,
       modelParams: {
@@ -108,7 +140,14 @@ export function AIAgentViewChat() {
       },
       variables: variablesList,
       agentPhase: selectedPhase[0],
+      executePhase: false,
+      useBusinessContext: includeBusinessContext,
     };
+
+    // if (selectedIteration !== null) {
+    //   payload.Iteration = selectedIteration;
+    // }
+
     console.log("Sending message:", payload);
     submitMessage(payload);
     setChatString("");
@@ -148,7 +187,7 @@ export function AIAgentViewChat() {
           <ChatRendered />
         </Container>
         <br />
-        <Card >
+        <Card>
           {conversationMetadata.responding && <Loader variation="linear" />}
           {!conversationMetadata.responding && (
             <>
@@ -167,6 +206,13 @@ export function AIAgentViewChat() {
                 maxLength={maxCharacters}
               />
               <Flex justifyContent="space-between">
+                <CheckboxField
+                  label="Incluir contexto del negocio"
+                  name="includeBusinessContext"
+                  checked={includeBusinessContext}
+                  onChange={(e) => setIncludeBusinessContext(e.target.checked)}
+                />
+
                 <Text>{`Presiona Enter para enviar el mensaje`}</Text>
                 <Text>{`${tokens} tokens`}</Text>
                 <Text>{`${chatString.length} / ${maxCharacters} caracteres`}</Text>

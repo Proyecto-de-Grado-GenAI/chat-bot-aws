@@ -124,22 +124,34 @@ def insertContextPhase(phase, response_knowledge_base, variables=None, iteration
 
 
 def insertContext(question, response_knowledge_base, variables):
+    # Construir el contexto a partir de la base de conocimiento
     context = ""
     contador = 0
     for i in response_knowledge_base:
-        context += "Context " + str(contador) + "\n"
+        context += f"Context {contador}:\n"
         context += i["content"]["text"] + "\n"
-        context += (
-            f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
-        )
+        context += f"Source:{contador} " + i["location"]["s3Location"]["uri"] + "\n"
         contador += 1
 
+    # Construir el contexto ADD 3.0 a partir de las variables
     ADD_context = ""
-
     for variable in variables:
         ADD_context += f"{variable['name']}: {variable['value']}\n"
 
-    question_with_context = f"""{question}\nADD 3.0 Context:{ADD_context}\nContexto:\n{context}\nEnd of context"""
+    # Formatear la pregunta con el contexto
+    question_with_context = f"""
+## Pregunta:
+{question}
+
+### ADD 3.0 Context:
+{ADD_context}
+
+### Contexto Negocio:
+{context}
+
+### Fin del contexto
+"""
+    print (question_with_context)
     return question_with_context
 
 
@@ -200,7 +212,7 @@ def bedrockQuestion(
 ):
     if model_params is None:
         model_params = {}
-
+    print(executePhase)
     if modelId in supported_models:
         historial = extract_messages_from_chat(history)
         if use_knowledge_base:

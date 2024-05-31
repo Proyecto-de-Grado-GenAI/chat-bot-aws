@@ -355,7 +355,7 @@ export function AIAgentSidebar() {
         ...selectedIteration,
         objetive: newIterationObjective || selectedIteration.objetive,
         systemElements: [
-          ...selectedIteration.systemElements || [], // Asegurarse de que systemElements no sea null
+          ...selectedIteration.systemElements || [], 
           ...newSystemElements,
         ].filter((element) => !deletedSystemElements.includes(element)) || [],
       };

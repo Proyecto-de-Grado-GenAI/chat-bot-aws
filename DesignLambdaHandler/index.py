@@ -100,48 +100,86 @@ Eres un modelo de lenguaje cuya única función es:
 
 
 def insertContextPhase(phase, response_knowledge_base, variables=None, iteration=None):
+    # Obtener información de las variables
     ADD1 = get_info_by_name(variables, "ADD 3.0 deliverable Step 1: Review inputs")
-    context = ""
-    contador = 0
+    objetivo_propuesto = iteration["objetive"]
+    número_de_iteración = iteration["number"]
+    elementos_del_sistema = iteration["systemElements"]
 
-    for i in response_knowledge_base:
-        context += i["content"]["text"] + "\n"
-        contador += 1
+    # Construir el contexto del ADD 3.0 a partir de la base de conocimiento
+    contexto_add = "\n".join(
+        [entry["content"]["text"] for entry in response_knowledge_base]
+    )
 
-    if (
-        ADD1 != None
-        and phase["name"]
-        == "Step 3: Choose One or More Elements of the System to Refine"
-    ):
+    elementos_del_sistema_ordenados = sorted(
+        elementos_del_sistema, key=lambda x: x["name"]
+    )
+    descripcion_elementos = "\n\n     ".join(
+        [
+            f"System Element: {element['name']}: {element['description']}"
+            for element in elementos_del_sistema_ordenados
+        ]
+    )
+    # Verificar si estamos en el paso 3 del ADD 3.0
+    if phase["name"] == "Step 3: Choose One or More Elements of the System to Refine":
         final = phase["description"].format(
-            add_context=context,
+            add_context=contexto_add,
             add_1=ADD1,
-            objetivo_propuesto=iteration["objetive"],
-            número_de_iteración=iteration["number"],
+            objetivo_propuesto=objetivo_propuesto,
+            número_de_iteración=número_de_iteración,
+            elementos_del_sistema=descripcion_elementos,
         )
     else:
         final = None
     return final
 
 
-def insertContext(question, response_knowledge_base, variables):
+def insertContext(question, response_knowledge_base, variables, useBusinessContext):
     context = ""
     contador = 0
     for i in response_knowledge_base:
-        context += "Context " + str(contador) + "\n"
+        context += f"Context {contador}:\n"
         context += i["content"]["text"] + "\n"
-        context += (
-            f"Source:{str(contador)} " + i["location"]["s3Location"]["uri"] + "\n"
-        )
+        context += f"Source:{contador} " + i["location"]["s3Location"]["uri"] + "\n"
         contador += 1
 
     ADD_context = ""
+    if useBusinessContext:
+        for variable in variables:
+            if variable["name"] == "ADD 3.0 deliverable Step 1: Review inputs":
+                ADD_context += f"{variable['name']}: {variable['value']}\n"
+                break
 
-    for variable in variables:
-        ADD_context += f"{variable['name']}: {variable['value']}\n"
+    # Formatear la pregunta con el contexto
+    question_with_context = f"""
+## Pregunta:
 
-    question_with_context = f"""{question}\nADD 3.0 Context:{ADD_context}\nContexto:\n{context}\nEnd of context"""
+ --------------------------------
+
+ {question}
+
+ --------------------------------
+
+### ADD 3.0 Business Context:
+
+ --------------------------------
+
+ {ADD_context}
+
+ --------------------------------
+
+### ADD 3.0 Technical Context:
+
+ --------------------------------
+
+ {context}
+
+ --------------------------------
+### Fin del contexto
+"""
+    print (question_with_context)
     return question_with_context
+
 
 
 def define_Llama3_prompt(history, system_prompt, question_with_context_variables):
@@ -198,18 +236,16 @@ def bedrockQuestion(
     AgentPhase=None,
     iteration=None,
     executePhase=None,
+    useBusinessContext=None,
 ):
     if model_params is None:
         model_params = {}
-
+    print(history)
     if modelId in supported_models:
         historial = extract_messages_from_chat(history)
         if use_knowledge_base:
-            if (
-                AgentPhase.get("name")
-                == "Step 2: Establish Iteration Goal by Selecting Drivers"
-                and executePhase
-            ):
+            if executePhase:
+                print("Ejecutando fase")
                 response_knowledge_base_query = retrieveFromKnowledgeBase(
                     AgentPhase["instruccion"], knowledgeBaseId, number_of_results
                 )["retrievalResults"]
@@ -226,6 +262,7 @@ def bedrockQuestion(
                     question,
                     response_knowledge_base_query,
                     variables,
+                    useBusinessContext
                 )
         else:
             question_with_context = question
@@ -258,6 +295,7 @@ def handler(event, context):
         knowledge_base_params = event["agentData"]["knowledgeBaseParams"]
         variables = event["userInput"]["variables"]
         iteration = event["userInput"].get("Iteration")
+        useBusinessContext = event["userInput"].get("useBusinessContext")
 
         variables_list = [
             {"name": var["name"], "value": var["value"]} for var in variables
@@ -265,6 +303,7 @@ def handler(event, context):
 
         phase = event["userInput"]["agentPhase"]
         executePhase = event["userInput"].get("executePhase")
+
 
         response = bedrockQuestion(
             event["chatString"],
@@ -279,6 +318,7 @@ def handler(event, context):
             AgentPhase=phase,
             iteration=iteration,
             executePhase=executePhase,
+            useBusinessContext=useBusinessContext,
         )
 
         chatResponder.publish_agent_message(response)
