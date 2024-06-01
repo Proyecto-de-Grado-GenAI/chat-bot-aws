@@ -27,13 +27,13 @@
     "inputMaxToken": 20000,
     "precedence": 2,
     "modelParams": {
-      "temperature": 1,
-      "top_p": 0.2,
+      "temperature": 0.25,
+      "top_p": 0.25,
       "max_gen_len": 2048
     },
     "knowledgeBaseParams": {
       "useKnowledgeBase": true,
-      "numberOfResults": 10
+      "numberOfResults": 5
     },
     "phases": [
       {
@@ -60,7 +60,7 @@
     },
     "knowledgeBaseParams": {
       "useKnowledgeBase": true,
-      "numberOfResults": 10
+      "numberOfResults": 5
     },
     "phases": [
       {
