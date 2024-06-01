@@ -39,11 +39,13 @@ npm run build
 npm run deploy
 ```
 
+
+## Desde aquí es lo importante para desplegar el aplicativo localmente, las indicaciones superiores son para desplegar la infraestuctura POR LO QUE NO debería hacerse sin permiso.
 Then get the website running
 
 ```
 
-## Desde aquí es lo importante para desplegar el aplicativo las indicaciones superiores son para desplegar la infraestuctura POR LO QUE NO debería hacerse sin permiso.
+
 
 # move to playground
 cd ../playground
