@@ -162,7 +162,6 @@ export function AIAgentSidebar() {
 
     updateAgent(updatedAgent)
       .then(() => {
-        alert("Agent updated successfully!");
       })
       .catch((error) => {
         alert(`Failed to update agent: ${error.message}`);
@@ -329,7 +328,6 @@ export function AIAgentSidebar() {
     console.log("Payload: ", payload);
 
     submitMessage(payload);
-    alert("Fase ejecutada con éxito!");
     setPhaseExecuted(true);
   };
 
