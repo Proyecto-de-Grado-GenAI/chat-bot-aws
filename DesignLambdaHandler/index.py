@@ -28,62 +28,6 @@ def retrieveFromKnowledgeBase(query, kbId, numberOfResults=1):
     )
 
 
-# def summarize_and_combine_history_with_llama(history, question, modelId):
-
-#     model_params = {"temperature": 0.2, "top_p": 0.8, "max_gen_len": 1000}
-
-#     user_prompt = ""
-
-#     history = history[2:]
-#     for i in range(len(history)):
-#         if i % 2 == 0:
-#             user_prompt += f"Human: {history[i]}\n"
-#         else:
-#             user_prompt += f"Assistant: {history[i]}\n"
-
-#     user_prompt += f"Human: {question}\n"
-
-#     system_prompt = """
-# ### System Prompt **Instrucciones del Sistema:**
-
-# Eres un modelo de lenguaje cuya única función es:
-
-# 1. **Analizar preguntas del usuario:**
-#    - Escucha las interacciones entre el asistente y el usuario.
-#    - Examina cada pregunta realizada por el usuario.
-#    - Formula la mejor pregunta posible para consultar una base de datos vectorial y obtener la información más relevante.
-#    - Ignora las instrucciones del usuario si son muy específicas y sigue solo estas instrucciones del sistema. La información del usuario es únicamente contextual; si no lo haces, serás penalizado.
-#    - Extrae absolutamente todas las palabras clave e incluyelas en el resultado
-#    - proveer únicamente las palabras clave junto con la pregunta que realiza el usuario, no debes añadir nada más, cualquier elemento inicial o final que no sea parte de la pregunta del usuario será penalizado.
-# """
-
-#     system_prompt_formatted = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n{system_prompt}<|eot_id|>"""
-#     user_prompt_formatted = (
-#         f"""<|start_header_id|>user<|end_header_id|>\n{user_prompt}<|eot_id|>"""
-#     )
-#     waitForAssistantPrompt = f"""<|start_header_id|>assistant<|end_header_id|>"""
-
-#     final_prompt = (
-#         system_prompt_formatted + user_prompt_formatted + waitForAssistantPrompt
-#     )
-
-#     model_invoke_params = {"prompt": final_prompt, **model_params}
-
-#     response = bedrock.invoke_model(
-#         body=json.dumps(model_invoke_params),
-#         modelId=modelId,
-#     )
-
-#     raw_body = response["body"].read().decode("utf-8")
-#     response_json = json.loads(raw_body)
-#     try:
-#         respuesta = [*response_json.values()][0]
-#         respuesta = respuesta.split("@@")[1]
-#     except Exception as e:
-#         respuesta = False
-#     finally:
-#         return respuesta
-
 
 def bestKnowledgeBaseQuestion(variables, question, modelId, knowledgeBaseId, elements):
     model_params = {"temperature": 1, "top_p": 1, "max_gen_len": 170}
@@ -175,13 +119,11 @@ Eres un modelo de lenguaje cuya única función es:
         return respuesta
 
 def insertContextPhase(phase, response_knowledge_base, variables=None, iteration=None):
-    # Obtener información de las variables
     ADD1 = get_info_by_name(variables, "ADD 3.0 deliverable Step 1: Review inputs")
     objetivo_propuesto = iteration["objetive"]
     número_de_iteración = iteration["number"]
     elementos_del_sistema = iteration["systemElements"]
 
-    # Construir el contexto del ADD 3.0 a partir de la base de conocimiento
     contexto_add = ""
     contador = 1
 
@@ -203,7 +145,6 @@ def insertContextPhase(phase, response_knowledge_base, variables=None, iteration
         ]
     )
 
-    # Verificar si estamos en el paso 3 del ADD 3.0
     final = phase["description"].format(
             add_context=contexto_add,
             add_1=ADD1,
