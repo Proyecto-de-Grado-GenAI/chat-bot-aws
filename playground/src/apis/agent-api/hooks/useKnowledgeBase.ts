@@ -25,7 +25,12 @@ export function useKnowledgeBase() {
 
         const fetchKnowledgeBases = async () => {
             try {
-                const invocation = new CloudFunctionInvocation<TAgentApi.KnowledgeBase[]>({}, KnowledgeBaseURL);
+                const invocation = new CloudFunctionInvocation<TAgentApi.KnowledgeBase[]>({
+                    "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    "Access-Control-Allow-Methods": "*",
+                    "Access-Control-Allow-Origin": "*"
+                }
+                    , KnowledgeBaseURL);
                 const result = await invocation.invoke();
                 setKnowledgeBases(Loadable.loaded(result));
             } catch (error) {
