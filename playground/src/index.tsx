@@ -17,9 +17,10 @@ import '@aws-amplify/ui-react/styles.css';
 import './index.css';
 import { Amplify } from 'aws-amplify'
 import { agentApiEndpoint, cognitoConfig, s3Config } from './endpoints';
+import { Hub } from 'aws-amplify/utils';
 
 // Load auth config data
-Amplify.configure({ 
+Amplify.configure({
   Auth: {
     Cognito: cognitoConfig
   },
@@ -30,9 +31,10 @@ Amplify.configure({
     GraphQL: {
       endpoint: agentApiEndpoint,
       defaultAuthMode: "userPool"
+    },
   },
-},
 })
+
 
 // Force import of prismjs, if the value is not references its not loaded
 console.log('loading prism' || Prism)
@@ -50,16 +52,16 @@ root.render(
             <Route path="/configuration/agent-new" element={<ConfigurationNewAgent />} />
             <Route path="/configuration/agent/:agentId" element={<ConfigurationViewAgent />} />
           </Route>
-          
-          
+
+
           <Route path="/chat" element={<AIAgentSidebar />} >
             <Route path="/chat/new" element={<AIAgentNewChat />} />
-            <Route path="/chat/view/:chatId" element={<AIAgentViewChat /> } />
+            <Route path="/chat/view/:chatId" element={<AIAgentViewChat />} />
           </Route>
-          
-          <Route path="/" element={<Navigate to="/chat" replace/>} />
+
+          <Route path="/" element={<Navigate to="/chat" replace />} />
         </Routes>
-        
+
       </PageWrapper>
     </BrowserRouter>
   </RecoilRoot>
