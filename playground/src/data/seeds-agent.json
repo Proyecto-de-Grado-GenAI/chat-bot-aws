@@ -11,7 +11,7 @@
     },
     "knowledgeBaseParams": {
       "useKnowledgeBase": true,
-      "numberOfResults": 12
+      "numberOfResults": 5
     },
     "phases": [
       {
@@ -33,7 +33,7 @@
     },
     "knowledgeBaseParams": {
       "useKnowledgeBase": true,
-      "numberOfResults": 10
+      "numberOfResults": 5
     },
     "phases": [
       {
@@ -60,7 +60,7 @@
     },
     "knowledgeBaseParams": {
       "useKnowledgeBase": true,
-      "numberOfResults": 10
+      "numberOfResults": 5
     },
     "phases": [
       {
@@ -87,7 +87,7 @@
     },
     "knowledgeBaseParams": {
       "useKnowledgeBase": true,
-      "numberOfResults": 10
+      "numberOfResults": 5
     },
     "phases": [
       {
