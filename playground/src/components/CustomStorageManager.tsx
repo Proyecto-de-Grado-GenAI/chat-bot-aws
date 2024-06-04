@@ -4,8 +4,6 @@ import '@aws-amplify/ui-react/styles.css';
 
 
 const CustomStorageManager = () => {
-
-
     const processFile = async ({ file }) => {
         const fileExtension = file.name.split('.').pop();
 
@@ -20,8 +18,6 @@ const CustomStorageManager = () => {
                 return { file, key: `${hashHex}.${fileExtension}` };
             });
     };
-
-
     return (
         <div>
             <StorageManager
