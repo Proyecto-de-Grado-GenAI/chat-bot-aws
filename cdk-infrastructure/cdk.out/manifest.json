@@ -1,0 +1,839 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "AppsyncAgentAPIDemoRepo.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "AppsyncAgentAPIDemoRepo.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "AppsyncAgentAPIDemoRepo": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/us-east-1",
+      "properties": {
+        "templateFile": "AppsyncAgentAPIDemoRepo.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1/06de8d1fed39e05c674e81b464ab769eb2fa75cb11bf7c70832b45f7443f1c35.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "AppsyncAgentAPIDemoRepo.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "AppsyncAgentAPIDemoRepo.assets"
+      ],
+      "metadata": {
+        "/AppsyncAgentAPIDemoRepo/MyAgentsDDBTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MyAgentsDDBTable5F24C213"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/MyIterationDDBTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MyIterationDDBTable32A69513"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/MyConversationsDDBTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MyConversationsDDBTable26A0A62F"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/MyEventsDDBTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MyEventsDDBTable97CF93F8"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/MyLLmsDDBTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MyLLmsDDBTable89A65379"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/SeedLLmTable/CustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SeedLLmTableCustomResource0B45D199"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Custom::DynamodbSeederCustomDynamodbSeeder/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomDynamodbSeederCustomDynamodbSeederServiceRole5FC6AEF8"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Custom::DynamodbSeederCustomDynamodbSeeder/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomDynamodbSeederCustomDynamodbSeederServiceRoleDefaultPolicy6C04255C"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Custom::DynamodbSeederCustomDynamodbSeeder/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomDynamodbSeederCustomDynamodbSeeder3D3D7F10"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/agents-table": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "agentstable"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/conversations-table": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "conversationstable"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/events-table": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "eventstable"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/LLm-table": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LLmtable"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/iteration-table": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "iterationtable"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/attachments-bucket-name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "attachmentsbucketname"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/auth-user-pool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authuserpool56A639C7"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/auth-user-pool/auth-app-client/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authuserpoolauthappclientB14AE63A"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/auth-identity-pool": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authidentitypool"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/CognitoDefaultAuthenticatedRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoDefaultAuthenticatedRoleC5D5C31E"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/CognitoDefaultAuthenticatedRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoDefaultAuthenticatedRoleDefaultPolicy4C5EB799"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/IdentityPoolRoleAttachment": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IdentityPoolRoleAttachment"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/cognito-pool": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "cognitopool"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/cognito-client": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "cognitoclient"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/identity-pool": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "identitypool"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Authenticated-role-name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Authenticatedrolename"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ApiLogsRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiApiLogsRole0968288F"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApi18BFFA11"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/Schema": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiSchema229EB19A"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiLogRetention0B02A09A"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/AgentTable/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiAgentTableServiceRole14BFFDF6"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/AgentTable/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiAgentTableServiceRoleDefaultPolicy6DEAFF1B"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/AgentTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiAgentTable92F26602"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LLMTable/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiLLMTableServiceRole679BD109"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LLMTable/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiLLMTableServiceRoleDefaultPolicy65EA9015"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LLMTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiLLMTable4BA60C34"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ConversationTable/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiConversationTableServiceRole1F92818A"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ConversationTable/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiConversationTableServiceRoleDefaultPolicy7C5349B6"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ConversationTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiConversationTableFD74857F"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/EventsTable/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiEventsTableServiceRole813C4A53"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/EventsTable/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiEventsTableServiceRoleDefaultPolicyE991C377"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/EventsTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiEventsTableB1C39D13"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/IterationTable/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiIterationTableServiceRoleFCA99BD0"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/IterationTable/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiIterationTableServiceRoleDefaultPolicyA9AFE19B"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/IterationTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiIterationTableB95A2AF9"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/NoneDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApiNoneDataSource3ADA7CD5"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/lambdaFunctionHttp/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApilambdaFunctionHttpServiceRole3BC49FAE"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentAppsyncApi/lambdaFunctionHttp/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentAppsyncApilambdaFunctionHttp4CFB865B"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/lambda-http-role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "lambdahttproleB4F2C63A"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/lambda-http-role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "lambdahttproleDefaultPolicy4113761C"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getAgent_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetAgent03BFE3B91"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getAgent_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetAgentresolver1E1E73DB"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listAgents_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistAgents071F25A6D"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listAgents_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistAgentsresolverBC524777"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getLLm_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetLLm0063F5AD6"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getLLm_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetLLmresolver8466382F"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listLLms_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistLLms052BDF71B"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listLLms_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistLLmsresolverF4E852CB"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createLLm_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateLLm016C1CCBC"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createLLm_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateLLmresolverF8050C41"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteLLm_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteLLm0FA42789D"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteLLm_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteLLmresolverE8879D33"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getConversation_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetConversation03FE328FC"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getConversation_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetConversationresolver26528811"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listConversations_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistConversations00F572FF9"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listConversations_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistConversationsresolver734C9594"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createConversation_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateConversation0229CA09E"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createConversation_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateConversationresolver7910BA7C"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteConversation_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteConversation0C465D827"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteConversation_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteConversationresolver5556C7BC"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getIteration_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetIteration01DE0AC18"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_getIteration_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetIterationresolver9D705F4D"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listIterations_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistIterations0CA5FCDE2"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Query_listIterations_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistIterationsresolver90868ED7"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createIteration_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateIteration0BE9D0735"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createIteration_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateIterationresolver3C604422"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteIteration_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteIteration04031ECBC"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteIteration_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteIterationresolver8EED9DE2"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_updateIteration_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateIteration087359995"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_updateIteration_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateIterationresolver6F5A81F4"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_updateAgent_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateAgent0C6ACDF6C"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_updateAgent_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateAgentresolverF268AA00"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_agentPublishEvent_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationagentPublishEvent0443D1121"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_agentPublishEvent_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationagentPublishEventresolver59DD98FF"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_agentPublishMetadata_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationagentPublishMetadata03000FC60"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_agentPublishMetadata_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationagentPublishMetadataresolverDB2D69F0"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationuserPublishMessage0EB00D775"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_1/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationuserPublishMessage19923CA49"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_2/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationuserPublishMessage2A5E4FE09"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_3/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationuserPublishMessage3716F9753"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_4/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationuserPublishMessage4965E44E1"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_5/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationuserPublishMessage5759C7480"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationuserPublishMessageresolverC78343FF"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createAgent_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateAgent06B4F6DA8"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_createAgent_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateAgentresolverF8C767A4"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteAgent_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteAgent05FB0E98C"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Mutation_deleteAgent_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteAgentresolverEAD26B01"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Conversation_events_0/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Conversationevents0DA6980B4"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Conversation_events_resolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Conversationeventsresolver5F517A72"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/agent-api-endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "agentapiendpoint"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/enable-constructing-agents": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "enableconstructingagents"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ExplorationLambdaHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentLambdaFunctionexecutionroleExplorationLambdaHandler00D65C35"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ExplorationLambdaHandler/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentLambdaFunctionexecutionroleExplorationLambdaHandlerDefaultPolicy77603AF3"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AppsyncAgentFunction-ExplorationLambdaHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppsyncAgentFunctionExplorationLambdaHandler5AEBB6F1"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/ExplorationLambdaHandler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExplorationLambdaHandler"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-DesignLambdaHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentLambdaFunctionexecutionroleDesignLambdaHandler812EB838"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-DesignLambdaHandler/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentLambdaFunctionexecutionroleDesignLambdaHandlerDefaultPolicy5B5BFD03"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AppsyncAgentFunction-DesignLambdaHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppsyncAgentFunctionDesignLambdaHandler2837A572"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/DesignLambdaHandler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DesignLambdaHandler"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ComprehensionLambdaHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerBDDD323A"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ComprehensionLambdaHandler/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerDefaultPolicyB6821C05"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AppsyncAgentFunction-ComprehensionLambdaHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AppsyncAgentFunctionComprehensionLambdaHandler498D20E3"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/ComprehensionLambdaHandler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ComprehensionLambdaHandler"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-checkKnowledgeBaseHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentLambdaFunctionexecutionrolecheckKnowledgeBaseHandler4CD8959F"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/CustomLambda-checkKnowledgeBaseHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomLambdacheckKnowledgeBaseHandler5C8E8A81"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayB43989DE"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayDeployment684B161B3b45bd25623c0eb6665489a2781860d1"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayDeploymentStageprod85317116"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayEndpoint68DCE046"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayOPTIONS662A3564"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/POST/ApiPermission.AppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7C.POST..": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayPOSTApiPermissionAppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7CPOSTA2837A9C"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/POST/ApiPermission.Test.AppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7C.POST..": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayPOSTApiPermissionTestAppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7CPOST7B7F9686"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiGatewayPOST984D837E"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiAuthorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiAuthorizer5AB8F2B6"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/AgentApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AgentApiUrl"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/checkKnowledgeBaseHandler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "checkKnowledgeBaseHandler"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/Region": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Region"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/AppsyncAgentAPIDemoRepo/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "AppsyncAgentAPIDemoRepo"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

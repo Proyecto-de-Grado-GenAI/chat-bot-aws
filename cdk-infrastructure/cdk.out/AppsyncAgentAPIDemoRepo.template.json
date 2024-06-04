@@ -1,0 +1,3848 @@
+{
+ "Resources": {
+  "MyAgentsDDBTable5F24C213": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/MyAgentsDDBTable/Resource"
+   }
+  },
+  "MyIterationDDBTable32A69513": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/MyIterationDDBTable/Resource"
+   }
+  },
+  "MyConversationsDDBTable26A0A62F": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/MyConversationsDDBTable/Resource"
+   }
+  },
+  "MyEventsDDBTable97CF93F8": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "conversationId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "conversationId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "id",
+      "KeyType": "RANGE"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/MyEventsDDBTable/Resource"
+   }
+  },
+  "MyLLmsDDBTable89A65379": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "id",
+      "AttributeType": "S"
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "id",
+      "KeyType": "HASH"
+     }
+    ],
+    "ProvisionedThroughput": {
+     "ReadCapacityUnits": 5,
+     "WriteCapacityUnits": 5
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/MyLLmsDDBTable/Resource"
+   }
+  },
+  "SeedLLmTableCustomResource0B45D199": {
+   "Type": "Custom::DynamodbSeeder",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomDynamodbSeederCustomDynamodbSeeder3D3D7F10",
+      "Arn"
+     ]
+    },
+    "TableName": {
+     "Ref": "MyLLmsDDBTable89A65379"
+    },
+    "Seeds": {
+     "InlineSeeds": "[{\"id\":\"1\",\"name\":\"LLama-3-70B\",\"model\":\"meta.llama3-70b-instruct-v1:0\"},{\"id\":\"2\",\"name\":\"LLama-3-8B\",\"model\":\"meta.llama3-8b-instruct-v1:0\"}]"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/SeedLLmTable/CustomResource/Default"
+   }
+  },
+  "CustomDynamodbSeederCustomDynamodbSeederServiceRole5FC6AEF8": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Custom::DynamodbSeederCustomDynamodbSeeder/ServiceRole/Resource"
+   }
+  },
+  "CustomDynamodbSeederCustomDynamodbSeederServiceRoleDefaultPolicy6C04255C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:BatchWriteItem",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "MyLLmsDDBTable89A65379",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CustomDynamodbSeederCustomDynamodbSeederServiceRoleDefaultPolicy6C04255C",
+    "Roles": [
+     {
+      "Ref": "CustomDynamodbSeederCustomDynamodbSeederServiceRole5FC6AEF8"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Custom::DynamodbSeederCustomDynamodbSeeder/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CustomDynamodbSeederCustomDynamodbSeeder3D3D7F10": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "904af69a21680318d3cb786992cbaaaf083d47d42ee4f55a613d4bef78d7c053.zip"
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomDynamodbSeederCustomDynamodbSeederServiceRole5FC6AEF8",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x",
+    "Timeout": 900
+   },
+   "DependsOn": [
+    "CustomDynamodbSeederCustomDynamodbSeederServiceRoleDefaultPolicy6C04255C",
+    "CustomDynamodbSeederCustomDynamodbSeederServiceRole5FC6AEF8"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Custom::DynamodbSeederCustomDynamodbSeeder/Resource",
+    "aws:asset:path": "asset.904af69a21680318d3cb786992cbaaaf083d47d42ee4f55a613d4bef78d7c053",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "authuserpool56A639C7": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_email",
+       "Priority": 1
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailVerificationMessage": "Thanks for signing up Your verification code is {####}",
+    "EmailVerificationSubject": "You need to verify your email for the playground",
+    "Policies": {
+     "PasswordPolicy": {
+      "MinimumLength": 8
+     }
+    },
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "appsync-playground-demo-user-pool",
+    "UsernameAttributes": [
+     "email"
+    ],
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "Thanks for signing up Your verification code is {####}",
+     "EmailSubject": "You need to verify your email for the playground",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/auth-user-pool/Resource"
+   }
+  },
+  "authuserpoolauthappclientB14AE63A": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AllowedOAuthFlows": [
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "email",
+     "openid",
+     "profile"
+    ],
+    "CallbackURLs": [
+     "http://localhost:3000"
+    ],
+    "ClientName": "appsync-playground-demo-client",
+    "ExplicitAuthFlows": [
+     "ALLOW_USER_PASSWORD_AUTH",
+     "ALLOW_USER_SRP_AUTH",
+     "ALLOW_REFRESH_TOKEN_AUTH"
+    ],
+    "GenerateSecret": false,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "UserPoolId": {
+     "Ref": "authuserpool56A639C7"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/auth-user-pool/auth-app-client/Resource"
+   }
+  },
+  "authidentitypool": {
+   "Type": "AWS::Cognito::IdentityPool",
+   "Properties": {
+    "AllowUnauthenticatedIdentities": false,
+    "CognitoIdentityProviders": [
+     {
+      "ClientId": {
+       "Ref": "authuserpoolauthappclientB14AE63A"
+      },
+      "ProviderName": {
+       "Fn::GetAtt": [
+        "authuserpool56A639C7",
+        "ProviderName"
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/auth-identity-pool"
+   }
+  },
+  "CognitoDefaultAuthenticatedRoleC5D5C31E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRoleWithWebIdentity",
+       "Condition": {
+        "StringEquals": {
+         "cognito-identity.amazonaws.com:aud": {
+          "Ref": "authidentitypool"
+         }
+        },
+        "ForAnyValue:StringLike": {
+         "cognito-identity.amazonaws.com:amr": "authenticated"
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Federated": "cognito-identity.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/CognitoDefaultAuthenticatedRole/Resource"
+   }
+  },
+  "CognitoDefaultAuthenticatedRoleDefaultPolicy4C5EB799": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "cognito-identity:*",
+        "cognito-sync:*",
+        "mobileanalytics:PutEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "s3:*",
+       "Effect": "Allow",
+       "Resource": "arn:aws:s3:::chat-bot-comprehension-bucket/private/${cognito-identity.amazonaws.com:sub}/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CognitoDefaultAuthenticatedRoleDefaultPolicy4C5EB799",
+    "Roles": [
+     {
+      "Ref": "CognitoDefaultAuthenticatedRoleC5D5C31E"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/CognitoDefaultAuthenticatedRole/DefaultPolicy/Resource"
+   }
+  },
+  "IdentityPoolRoleAttachment": {
+   "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
+   "Properties": {
+    "IdentityPoolId": {
+     "Ref": "authidentitypool"
+    },
+    "Roles": {
+     "authenticated": {
+      "Fn::GetAtt": [
+       "CognitoDefaultAuthenticatedRoleC5D5C31E",
+       "Arn"
+      ]
+     }
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/IdentityPoolRoleAttachment"
+   }
+  },
+  "AgentAppsyncApiApiLogsRole0968288F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSAppSyncPushToCloudWatchLogs"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ApiLogsRole/Resource"
+   }
+  },
+  "AgentAppsyncApi18BFFA11": {
+   "Type": "AWS::AppSync::GraphQLApi",
+   "Properties": {
+    "AdditionalAuthenticationProviders": [
+     {
+      "AuthenticationType": "AWS_IAM"
+     }
+    ],
+    "AuthenticationType": "AMAZON_COGNITO_USER_POOLS",
+    "LogConfig": {
+     "CloudWatchLogsRoleArn": {
+      "Fn::GetAtt": [
+       "AgentAppsyncApiApiLogsRole0968288F",
+       "Arn"
+      ]
+     },
+     "FieldLogLevel": "ALL"
+    },
+    "Name": "AI-Agent-Playground-AgentApi",
+    "UserPoolConfig": {
+     "AwsRegion": "us-east-1",
+     "DefaultAction": "ALLOW",
+     "UserPoolId": {
+      "Ref": "authuserpool56A639C7"
+     }
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/Resource"
+   }
+  },
+  "AgentAppsyncApiSchema229EB19A": {
+   "Type": "AWS::AppSync::GraphQLSchema",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Definition": "type LLm @aws_iam @aws_cognito_user_pools {\r\n    id: String!\r\n    name: String!\r\n    model: String!\r\n}\r\n\r\ntype ConversationEvent @aws_iam @aws_cognito_user_pools {\r\n    id: String!\r\n    timestamp: String!\r\n    conversationId: ID!\r\n    sender: String!\r\n    event: EventMessage!\r\n}\r\n\r\ntype EventMessage @aws_iam @aws_cognito_user_pools {\r\n    message: String\r\n    innerDialog: String\r\n    actionRequested: String\r\n    actionResult: String\r\n}\r\n\r\ninput EventMessageInput @aws_cognito_user_pools {\r\n    message: String\r\n    innerDialog: String\r\n    actionRequested: String\r\n    actionResult: String\r\n}\r\n\r\ntype Conversation @aws_cognito_user_pools {\r\n    id: String!\r\n    timestamp: String!\r\n    agent: ID!\r\n    events: [ConversationEvent!]\r\n}\r\n\r\ninput NewConversation @aws_cognito_user_pools {\r\n    agent: ID!\r\n}\r\n\r\ninput NewAgentAction {\r\n    conversationId: ID!\r\n    sender: String!\r\n    event: EventMessageInput!\r\n}\r\n\r\ninput NewAgentMetadata {\r\n    conversationId: ID!\r\n    agentStartResponding: Boolean\r\n    agentStopResponding: Boolean\r\n    agentPartialMessage: String\r\n}\r\n\r\ntype AgentMetadata @aws_iam @aws_cognito_user_pools {\r\n    conversationId: ID!\r\n    agentStartResponding: Boolean\r\n    agentStopResponding: Boolean\r\n    agentPartialMessage: String\r\n}\r\n\r\ninput UserAction {\r\n    message: String\r\n    model: LLmInput!\r\n    actionRequested: String\r\n    actionResult: String\r\n    modelParams: ModelParamsInput\r\n    systemPrompt: String\r\n    knowledgeBaseParams: KnowledgeBaseParamsInput\r\n    variables: [VariableInput]\r\n    agentPhase: AgentPhaseInput\r\n    Iteration: IterationInput\r\n    executePhase: Boolean\r\n    useBusinessContext: Boolean\r\n}\r\n\r\ninput VariableInput {\r\n  name: String\r\n  value: String\r\n}\r\n\r\ninput KnowledgeBaseParamsInput {\r\n  knowledgeBaseId: String\r\n  useKnowledgeBase: Boolean\r\n  numberOfResults: Int\r\n}\r\n\r\ninput ModelParamsInput {\r\n  temperature: Float\r\n  top_p: Float\r\n  max_gen_len: Int\r\n}\r\n\r\n\r\n\r\ninput LLmInput {\r\n    id: String!\r\n    name: String!\r\n    model: String!\r\n}\r\n\r\ntype AgentPhase {\r\n    name: String\r\n    description: String\r\n    instruccion: String\r\n}\r\n\r\ntype Agent @aws_cognito_user_pools {\r\n    id: ID!\r\n    timestamp: String!\r\n    precedence: Int!\r\n    name: String!\r\n    handlerLambda: String!\r\n    systemPrompt: String!\r\n    inputMaxToken: Int!\r\n    modelParams: ModelParams\r\n    knowledgeBaseParams: KnowledgeBaseParams\r\n    phases: [AgentPhase]\r\n}\r\n\r\ntype ModelParams {\r\n    temperature: Float\r\n    top_p: Float\r\n    max_gen_len: Int\r\n}\r\n\r\ntype KnowledgeBaseParams {\r\n    knowledgeBaseId: String\r\n    useKnowledgeBase: Boolean\r\n    numberOfResults: Int\r\n}\r\n\r\ninput NewAgent {\r\n    name: String!\r\n    handlerLambda: String!\r\n    systemPrompt: String!\r\n    inputMaxToken: Int!\r\n    precedence: Int!\r\n    modelParams: ModelParamsInput\r\n    knowledgeBaseParams: KnowledgeBaseParamsInput\r\n    phases: [AgentPhaseInput]\r\n}\r\n\r\ninput AgentPhaseInput {\r\n    name: String\r\n    description: String\r\n    instruccion: String\r\n}\r\n\r\ninput UpdateAgentInput {\r\n    name: String\r\n    handlerLambda: String\r\n    systemPrompt: String\r\n    inputMaxToken: Int\r\n    precedence: Int\r\n    modelParams: ModelParamsInput\r\n    knowledgeBaseParams: KnowledgeBaseParamsInput\r\n    phases: [AgentPhaseInput]\r\n}\r\n\r\ninput NewLLm {\r\n    name: String!\r\n    model: String!\r\n}\r\n\r\ninput IterationInput {\r\n    objetive: String\r\n    name: String\r\n    number: Int\r\n    systemElements: [systemElementInput]\r\n}\r\n\r\ntype Iteration {\r\n    id: ID!\r\n    objetive: String\r\n    name: String\r\n    number: Int\r\n    systemElements: [systemElement]\r\n}\r\n\r\ntype systemElement{\r\n    name: String\r\n    description: String\r\n}\r\n\r\ninput systemElementInput{\r\n    name: String\r\n    description: String\r\n}\r\n\r\n\r\ntype Query @aws_cognito_user_pools {\r\n    getAgent(id: ID!): Agent!\r\n    getIteration(id: ID!): Iteration!\r\n    listIterations: [Iteration]!\r\n    listAgents: [Agent]!\r\n    getLLm(id: ID!): LLm!\r\n    listLLms: [LLm]!\r\n    getConversation(id: ID!): Conversation!\r\n    listConversations: [Conversation]!\r\n}\r\n\r\ntype Mutation {\r\n    createAgent(config: NewAgent!): Agent! @aws_cognito_user_pools\r\n    createIteration(config: IterationInput!): Iteration! @aws_cognito_user_pools\r\n    deleteIteration(id: ID!): Iteration! @aws_cognito_user_pools\r\n    updateIteration(id: ID!, config: IterationInput): Iteration! @aws_cognito_user_pools\r\n    updateAgent(id: ID!, config: UpdateAgentInput!): Agent! @aws_cognito_user_pools\r\n    deleteAgent(id: ID!): Agent! @aws_cognito_user_pools\r\n    createConversation(config: NewConversation!): Conversation! @aws_cognito_user_pools\r\n    deleteConversation(id: ID!): Conversation! @aws_cognito_user_pools\r\n    createLLm(config: NewLLm!): LLm! @aws_cognito_user_pools\r\n    deleteLLm(id: ID!): LLm! @aws_cognito_user_pools\r\n    \r\n\r\n    # User side operations\r\n    userPublishMessage(conversationId: ID!, event: UserAction!): ConversationEvent! @aws_cognito_user_pools\r\n\r\n    # Agent side operations\r\n    agentPublishEvent(config: NewAgentAction!): ConversationEvent @aws_iam\r\n    agentPublishMetadata(config: NewAgentMetadata!): AgentMetadata @aws_iam\r\n}\r\n\r\ntype Subscription @aws_api_key {\r\n    onConversationEvents(conversationId: ID!): ConversationEvent\r\n        @aws_subscribe(mutations: [\"agentPublishEvent\"])\r\n        @aws_cognito_user_pools\r\n    onConversationMetadata(conversationId: ID!): AgentMetadata\r\n        @aws_subscribe(mutations: [\"agentPublishMetadata\"])\r\n        @aws_cognito_user_pools\r\n}\r\n\r\nschema {\r\n    query: Query\r\n    mutation: Mutation\r\n    subscription: Subscription\r\n}\r\n"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/Schema"
+   }
+  },
+  "AgentAppsyncApiLogRetention0B02A09A": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/appsync/apis/",
+       {
+        "Fn::GetAtt": [
+         "AgentAppsyncApi18BFFA11",
+         "ApiId"
+        ]
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LogRetention/Resource"
+   }
+  },
+  "AgentAppsyncApiAgentTableServiceRole14BFFDF6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/AgentTable/ServiceRole/Resource"
+   }
+  },
+  "AgentAppsyncApiAgentTableServiceRoleDefaultPolicy6DEAFF1B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MyAgentsDDBTable5F24C213",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentAppsyncApiAgentTableServiceRoleDefaultPolicy6DEAFF1B",
+    "Roles": [
+     {
+      "Ref": "AgentAppsyncApiAgentTableServiceRole14BFFDF6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/AgentTable/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AgentAppsyncApiAgentTable92F26602": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "DynamoDBConfig": {
+     "AwsRegion": "us-east-1",
+     "TableName": {
+      "Ref": "MyAgentsDDBTable5F24C213"
+     }
+    },
+    "Name": "AgentTable",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApiAgentTableServiceRole14BFFDF6",
+      "Arn"
+     ]
+    },
+    "Type": "AMAZON_DYNAMODB"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/AgentTable/Resource"
+   }
+  },
+  "AgentAppsyncApiLLMTableServiceRole679BD109": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LLMTable/ServiceRole/Resource"
+   }
+  },
+  "AgentAppsyncApiLLMTableServiceRoleDefaultPolicy65EA9015": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MyLLmsDDBTable89A65379",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentAppsyncApiLLMTableServiceRoleDefaultPolicy65EA9015",
+    "Roles": [
+     {
+      "Ref": "AgentAppsyncApiLLMTableServiceRole679BD109"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LLMTable/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AgentAppsyncApiLLMTable4BA60C34": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "DynamoDBConfig": {
+     "AwsRegion": "us-east-1",
+     "TableName": {
+      "Ref": "MyLLmsDDBTable89A65379"
+     }
+    },
+    "Name": "LLMTable",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApiLLMTableServiceRole679BD109",
+      "Arn"
+     ]
+    },
+    "Type": "AMAZON_DYNAMODB"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/LLMTable/Resource"
+   }
+  },
+  "AgentAppsyncApiConversationTableServiceRole1F92818A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ConversationTable/ServiceRole/Resource"
+   }
+  },
+  "AgentAppsyncApiConversationTableServiceRoleDefaultPolicy7C5349B6": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MyConversationsDDBTable26A0A62F",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentAppsyncApiConversationTableServiceRoleDefaultPolicy7C5349B6",
+    "Roles": [
+     {
+      "Ref": "AgentAppsyncApiConversationTableServiceRole1F92818A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ConversationTable/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AgentAppsyncApiConversationTableFD74857F": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "DynamoDBConfig": {
+     "AwsRegion": "us-east-1",
+     "TableName": {
+      "Ref": "MyConversationsDDBTable26A0A62F"
+     }
+    },
+    "Name": "ConversationTable",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApiConversationTableServiceRole1F92818A",
+      "Arn"
+     ]
+    },
+    "Type": "AMAZON_DYNAMODB"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/ConversationTable/Resource"
+   }
+  },
+  "AgentAppsyncApiEventsTableServiceRole813C4A53": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/EventsTable/ServiceRole/Resource"
+   }
+  },
+  "AgentAppsyncApiEventsTableServiceRoleDefaultPolicyE991C377": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MyEventsDDBTable97CF93F8",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentAppsyncApiEventsTableServiceRoleDefaultPolicyE991C377",
+    "Roles": [
+     {
+      "Ref": "AgentAppsyncApiEventsTableServiceRole813C4A53"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/EventsTable/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AgentAppsyncApiEventsTableB1C39D13": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "DynamoDBConfig": {
+     "AwsRegion": "us-east-1",
+     "TableName": {
+      "Ref": "MyEventsDDBTable97CF93F8"
+     }
+    },
+    "Name": "EventsTable",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApiEventsTableServiceRole813C4A53",
+      "Arn"
+     ]
+    },
+    "Type": "AMAZON_DYNAMODB"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/EventsTable/Resource"
+   }
+  },
+  "AgentAppsyncApiIterationTableServiceRoleFCA99BD0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/IterationTable/ServiceRole/Resource"
+   }
+  },
+  "AgentAppsyncApiIterationTableServiceRoleDefaultPolicyA9AFE19B": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "MyIterationDDBTable32A69513",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentAppsyncApiIterationTableServiceRoleDefaultPolicyA9AFE19B",
+    "Roles": [
+     {
+      "Ref": "AgentAppsyncApiIterationTableServiceRoleFCA99BD0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/IterationTable/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "AgentAppsyncApiIterationTableB95A2AF9": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "DynamoDBConfig": {
+     "AwsRegion": "us-east-1",
+     "TableName": {
+      "Ref": "MyIterationDDBTable32A69513"
+     }
+    },
+    "Name": "IterationTable",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApiIterationTableServiceRoleFCA99BD0",
+      "Arn"
+     ]
+    },
+    "Type": "AMAZON_DYNAMODB"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/IterationTable/Resource"
+   }
+  },
+  "AgentAppsyncApiNoneDataSource3ADA7CD5": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Name": "NoneDataSource",
+    "Type": "NONE"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/NoneDataSource/Resource"
+   }
+  },
+  "AgentAppsyncApilambdaFunctionHttpServiceRole3BC49FAE": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/lambdaFunctionHttp/ServiceRole/Resource"
+   }
+  },
+  "AgentAppsyncApilambdaFunctionHttp4CFB865B": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "HttpConfig": {
+     "AuthorizationConfig": {
+      "AuthorizationType": "AWS_IAM",
+      "AwsIamConfig": {
+       "SigningRegion": {
+        "Ref": "AWS::Region"
+       },
+       "SigningServiceName": "lambda"
+      }
+     },
+     "Endpoint": {
+      "Fn::Join": [
+       "",
+       [
+        "https://lambda.",
+        {
+         "Ref": "AWS::Region"
+        },
+        ".amazonaws.com"
+       ]
+      ]
+     }
+    },
+    "Name": "lambdaFunctionHttp",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "lambdahttproleB4F2C63A",
+      "Arn"
+     ]
+    },
+    "Type": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentAppsyncApi/lambdaFunctionHttp/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:DeleteRetentionPolicy",
+        "logs:PutRetentionPolicy"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "Roles": [
+     {
+      "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Handler": "index.handler",
+    "Runtime": "nodejs18.x",
+    "Timeout": 900,
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-east-1"
+     },
+     "S3Key": "4e26bf2d0a26f2097fb2b261f22bb51e3f6b4b52635777b1e54edbd8e2d58c35.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource",
+    "aws:asset:path": "asset.4e26bf2d0a26f2097fb2b261f22bb51e3f6b4b52635777b1e54edbd8e2d58c35",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "lambdahttproleB4F2C63A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/lambda-http-role/Resource"
+   }
+  },
+  "lambdahttproleDefaultPolicy4113761C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "AppsyncAgentFunctionComprehensionLambdaHandler498D20E3",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "AppsyncAgentFunctionDesignLambdaHandler2837A572",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "AppsyncAgentFunctionExplorationLambdaHandler5AEBB6F1",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AppsyncAgentFunctionComprehensionLambdaHandler498D20E3",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AppsyncAgentFunctionDesignLambdaHandler2837A572",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AppsyncAgentFunctionExplorationLambdaHandler5AEBB6F1",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "lambdahttproleDefaultPolicy4113761C",
+    "Roles": [
+     {
+      "Ref": "lambdahttproleB4F2C63A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/lambda-http-role/DefaultPolicy/Resource"
+   }
+  },
+  "QuerygetAgent03BFE3B91": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/get.ts\nfunction request(ctx) {\n  return {\n    operation: \"GetItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "AgentTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_getAgent_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiAgentTable92F26602",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getAgent_0/Resource"
+   }
+  },
+  "QuerygetAgentresolver1E1E73DB": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "getAgent",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerygetAgent03BFE3B91",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getAgent_resolver/Resource"
+   }
+  },
+  "QuerylistAgents071F25A6D": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/scan.ts\nfunction request(ctx) {\n  return { operation: \"Scan\", limit: 100 };\n}\nfunction response(ctx) {\n  if (ctx.result && ctx.result.items)\n    return ctx.result.items;\n  return [];\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "AgentTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_listAgents_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiAgentTable92F26602",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listAgents_0/Resource"
+   }
+  },
+  "QuerylistAgentsresolverBC524777": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "listAgents",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerylistAgents071F25A6D",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listAgents_resolver/Resource"
+   }
+  },
+  "QuerygetLLm0063F5AD6": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/get.ts\nfunction request(ctx) {\n  return {\n    operation: \"GetItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "LLMTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_getLLm_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiLLMTable4BA60C34",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getLLm_0/Resource"
+   }
+  },
+  "QuerygetLLmresolver8466382F": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "getLLm",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerygetLLm0063F5AD6",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getLLm_resolver/Resource"
+   }
+  },
+  "QuerylistLLms052BDF71B": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/scan.ts\nfunction request(ctx) {\n  return { operation: \"Scan\", limit: 100 };\n}\nfunction response(ctx) {\n  if (ctx.result && ctx.result.items)\n    return ctx.result.items;\n  return [];\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "LLMTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_listLLms_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiLLMTable4BA60C34",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listLLms_0/Resource"
+   }
+  },
+  "QuerylistLLmsresolverF4E852CB": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "listLLms",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerylistLLms052BDF71B",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listLLms_resolver/Resource"
+   }
+  },
+  "MutationcreateLLm016C1CCBC": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/create.ts\nfunction request(ctx) {\n  return {\n    operation: \"PutItem\",\n    key: util.dynamodb.toMapValues({\n      id: util.autoId()\n    }),\n    attributeValues: util.dynamodb.toMapValues({\n      ...ctx.arguments.config,\n      timestamp: util.time.nowISO8601()\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "LLMTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_createLLm_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiLLMTable4BA60C34",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createLLm_0/Resource"
+   }
+  },
+  "MutationcreateLLmresolverF8050C41": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "createLLm",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationcreateLLm016C1CCBC",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createLLm_resolver/Resource"
+   }
+  },
+  "MutationdeleteLLm0FA42789D": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/delete.ts\nfunction request(ctx) {\n  return {\n    operation: \"DeleteItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "LLMTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_deleteLLm_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiLLMTable4BA60C34",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteLLm_0/Resource"
+   }
+  },
+  "MutationdeleteLLmresolverE8879D33": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "deleteLLm",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationdeleteLLm0FA42789D",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteLLm_resolver/Resource"
+   }
+  },
+  "QuerygetConversation03FE328FC": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/get.ts\nfunction request(ctx) {\n  return {\n    operation: \"GetItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "ConversationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_getConversation_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiConversationTableFD74857F",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getConversation_0/Resource"
+   }
+  },
+  "QuerygetConversationresolver26528811": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "getConversation",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerygetConversation03FE328FC",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getConversation_resolver/Resource"
+   }
+  },
+  "QuerylistConversations00F572FF9": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/scan.ts\nfunction request(ctx) {\n  return { operation: \"Scan\", limit: 100 };\n}\nfunction response(ctx) {\n  if (ctx.result && ctx.result.items)\n    return ctx.result.items;\n  return [];\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "ConversationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_listConversations_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiConversationTableFD74857F",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listConversations_0/Resource"
+   }
+  },
+  "QuerylistConversationsresolver734C9594": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "listConversations",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerylistConversations00F572FF9",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listConversations_resolver/Resource"
+   }
+  },
+  "MutationcreateConversation0229CA09E": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/create.ts\nfunction request(ctx) {\n  return {\n    operation: \"PutItem\",\n    key: util.dynamodb.toMapValues({\n      id: util.autoId()\n    }),\n    attributeValues: util.dynamodb.toMapValues({\n      ...ctx.arguments.config,\n      timestamp: util.time.nowISO8601()\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "ConversationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_createConversation_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiConversationTableFD74857F",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createConversation_0/Resource"
+   }
+  },
+  "MutationcreateConversationresolver7910BA7C": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "createConversation",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationcreateConversation0229CA09E",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createConversation_resolver/Resource"
+   }
+  },
+  "MutationdeleteConversation0C465D827": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/delete.ts\nfunction request(ctx) {\n  return {\n    operation: \"DeleteItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "ConversationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_deleteConversation_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiConversationTableFD74857F",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteConversation_0/Resource"
+   }
+  },
+  "MutationdeleteConversationresolver5556C7BC": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "deleteConversation",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationdeleteConversation0C465D827",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteConversation_resolver/Resource"
+   }
+  },
+  "QuerygetIteration01DE0AC18": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/get.ts\nfunction request(ctx) {\n  return {\n    operation: \"GetItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "IterationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_getIteration_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiIterationTableB95A2AF9",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getIteration_0/Resource"
+   }
+  },
+  "QuerygetIterationresolver9D705F4D": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "getIteration",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerygetIteration01DE0AC18",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_getIteration_resolver/Resource"
+   }
+  },
+  "QuerylistIterations0CA5FCDE2": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/scan.ts\nfunction request(ctx) {\n  return { operation: \"Scan\", limit: 100 };\n}\nfunction response(ctx) {\n  if (ctx.result && ctx.result.items)\n    return ctx.result.items;\n  return [];\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "IterationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Query_listIterations_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiIterationTableB95A2AF9",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listIterations_0/Resource"
+   }
+  },
+  "QuerylistIterationsresolver90868ED7": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "listIterations",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerylistIterations0CA5FCDE2",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Query"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Query_listIterations_resolver/Resource"
+   }
+  },
+  "MutationcreateIteration0BE9D0735": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/create.ts\nfunction request(ctx) {\n  return {\n    operation: \"PutItem\",\n    key: util.dynamodb.toMapValues({\n      id: util.autoId()\n    }),\n    attributeValues: util.dynamodb.toMapValues({\n      ...ctx.arguments.config,\n      timestamp: util.time.nowISO8601()\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "IterationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_createIteration_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiIterationTableB95A2AF9",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createIteration_0/Resource"
+   }
+  },
+  "MutationcreateIterationresolver3C604422": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "createIteration",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationcreateIteration0BE9D0735",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createIteration_resolver/Resource"
+   }
+  },
+  "MutationdeleteIteration04031ECBC": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/delete.ts\nfunction request(ctx) {\n  return {\n    operation: \"DeleteItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "IterationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_deleteIteration_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiIterationTableB95A2AF9",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteIteration_0/Resource"
+   }
+  },
+  "MutationdeleteIterationresolver8EED9DE2": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "deleteIteration",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationdeleteIteration04031ECBC",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteIteration_resolver/Resource"
+   }
+  },
+  "MutationupdateIteration087359995": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/update.ts\nimport { util } from \"@aws-appsync/utils\";\nfunction request(ctx) {\n  const { id, config } = ctx.arguments;\n  const values = { ...config };\n  return dynamodbUpdateRequest({ keys: { id }, values });\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nfunction dynamodbUpdateRequest(params) {\n  const { keys, values } = params;\n  const sets = [];\n  const removes = [];\n  const expressionNames = {};\n  const expValues = {};\n  for (const [key, value] of Object.entries(values)) {\n    expressionNames[`#${key}`] = key;\n    if (value !== void 0 && value !== null) {\n      sets.push(`#${key} = :${key}`);\n      expValues[`:${key}`] = value;\n    } else {\n      removes.push(`#${key}`);\n    }\n  }\n  let expression = sets.length ? `SET ${sets.join(\", \")}` : \"\";\n  expression += removes.length ? ` REMOVE ${removes.join(\", \")}` : \"\";\n  return {\n    operation: \"UpdateItem\",\n    key: util.dynamodb.toMapValues(keys),\n    update: {\n      expression,\n      expressionNames,\n      expressionValues: util.dynamodb.toMapValues(expValues)\n    }\n  };\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "IterationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_updateIteration_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiIterationTableB95A2AF9",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_updateIteration_0/Resource"
+   }
+  },
+  "MutationupdateIterationresolver6F5A81F4": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "updateIteration",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationupdateIteration087359995",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_updateIteration_resolver/Resource"
+   }
+  },
+  "MutationupdateAgent0C6ACDF6C": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/update.ts\nimport { util } from \"@aws-appsync/utils\";\nfunction request(ctx) {\n  const { id, config } = ctx.arguments;\n  const values = { ...config };\n  return dynamodbUpdateRequest({ keys: { id }, values });\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nfunction dynamodbUpdateRequest(params) {\n  const { keys, values } = params;\n  const sets = [];\n  const removes = [];\n  const expressionNames = {};\n  const expValues = {};\n  for (const [key, value] of Object.entries(values)) {\n    expressionNames[`#${key}`] = key;\n    if (value !== void 0 && value !== null) {\n      sets.push(`#${key} = :${key}`);\n      expValues[`:${key}`] = value;\n    } else {\n      removes.push(`#${key}`);\n    }\n  }\n  let expression = sets.length ? `SET ${sets.join(\", \")}` : \"\";\n  expression += removes.length ? ` REMOVE ${removes.join(\", \")}` : \"\";\n  return {\n    operation: \"UpdateItem\",\n    key: util.dynamodb.toMapValues(keys),\n    update: {\n      expression,\n      expressionNames,\n      expressionValues: util.dynamodb.toMapValues(expValues)\n    }\n  };\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "AgentTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_updateAgent_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiAgentTable92F26602",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_updateAgent_0/Resource"
+   }
+  },
+  "MutationupdateAgentresolverF268AA00": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "updateAgent",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationupdateAgent0C6ACDF6C",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_updateAgent_resolver/Resource"
+   }
+  },
+  "MutationagentPublishEvent0443D1121": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/createTimeId.ts\nfunction request(ctx) {\n  return {\n    operation: \"PutItem\",\n    key: util.dynamodb.toMapValues({\n      id: util.time.nowISO8601() + \"-\" + util.autoId()\n    }),\n    attributeValues: util.dynamodb.toMapValues({\n      ...ctx.arguments.config,\n      timestamp: util.time.nowISO8601()\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "EventsTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_agentPublishEvent_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiEventsTableB1C39D13",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_agentPublishEvent_0/Resource"
+   }
+  },
+  "MutationagentPublishEventresolver59DD98FF": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "agentPublishEvent",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationagentPublishEvent0443D1121",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_agentPublishEvent_resolver/Resource"
+   }
+  },
+  "MutationagentPublishMetadata03000FC60": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Mutation.agentPublishMetadata.ts\nfunction request(ctx) {\n  return {};\n}\nfunction response(ctx) {\n  return ctx.arguments.config;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "NoneDataSource",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_agentPublishMetadata_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiNoneDataSource3ADA7CD5",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_agentPublishMetadata_0/Resource"
+   }
+  },
+  "MutationagentPublishMetadataresolverDB2D69F0": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "agentPublishMetadata",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationagentPublishMetadata03000FC60",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_agentPublishMetadata_resolver/Resource"
+   }
+  },
+  "MutationuserPublishMessage0EB00D775": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Query.userPublishMessage.getConvo.ts\nfunction request(ctx) {\n  return {\n    operation: \"GetItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.conversationId\n    })\n  };\n}\nfunction response(ctx) {\n  ctx.stash.conversationData = ctx.result;\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "ConversationTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_userPublishMessage_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiConversationTableFD74857F",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_0/Resource"
+   }
+  },
+  "MutationuserPublishMessage19923CA49": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Query.userPublishMessage.getEvents.ts\nfunction request(ctx) {\n  return {\n    operation: \"Query\",\n    query: JSON.parse(\n      util.transform.toDynamoDBConditionExpression({\n        [\"conversationId\"]: { eq: ctx.arguments.conversationId }\n      })\n    ),\n    limit: 2e3\n  };\n}\nfunction response(ctx) {\n  let items = ctx.result && ctx.result.items ? ctx.result.items : [];\n  ctx.stash.conversationData.events = items;\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "EventsTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_userPublishMessage_1",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiEventsTableB1C39D13",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_1/Resource"
+   }
+  },
+  "MutationuserPublishMessage2A5E4FE09": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Query.userPublishMessage.getAgent.ts\nfunction request(ctx) {\n  return {\n    operation: \"GetItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.stash.conversationData.agent\n    })\n  };\n}\nfunction response(ctx) {\n  ctx.stash.agentData = ctx.result;\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "AgentTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_userPublishMessage_2",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiAgentTable92F26602",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_2/Resource"
+   }
+  },
+  "MutationuserPublishMessage3716F9753": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Query.userPublishMessage.recordMessage.ts\nfunction request(ctx) {\n  return {\n    operation: \"PutItem\",\n    key: util.dynamodb.toMapValues({\n      id: util.time.nowISO8601() + \"-\" + util.autoId()\n    }),\n    attributeValues: util.dynamodb.toMapValues({\n      conversationId: ctx.arguments.conversationId,\n      sender: \"user\",\n      event: ctx.arguments.event,\n      timestamp: util.time.nowISO8601()\n    })\n  };\n}\nfunction response(ctx) {\n  ctx.stash.userInput = ctx.arguments.event;\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "EventsTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_userPublishMessage_3",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiEventsTableB1C39D13",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_3/Resource"
+   }
+  },
+  "MutationuserPublishMessage4965E44E1": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Query.userPublishMessage.buildHistory.ts\nvar USER_PREFIX = \"Human: \";\nvar AGENT_PREFIX = \"Assistant: \";\nfunction request(ctx) {\n  let chatHistory = [];\n  let requestIdMaps = {};\n  for (let eventData of ctx.stash.conversationData.events) {\n    requestIdMaps[eventData.id] = eventData.event;\n    if (eventData.event.message) {\n      chatHistory.push({\n        sender: eventData.sender,\n        text: eventData.event.message\n      });\n    } else if (eventData.event.innerDialog) {\n      chatHistory.push({\n        sender: eventData.sender,\n        text: eventData.event.innerDialog\n      });\n    } else if (eventData.event.actionResult) {\n      chatHistory.push({\n        sender: eventData.sender,\n        text: `Here is the result of the execution ${eventData.event.actionResult}`\n      });\n    } else if (eventData.event.actionRequested) {\n      chatHistory.push({\n        sender: eventData.sender,\n        text: `Attempting to invoke the following: ${eventData.event.actionRequestedContent}`\n      });\n    }\n  }\n  if (ctx.arguments.event.message) {\n    chatHistory.push({\n      sender: \"user\",\n      text: ctx.arguments.event.message\n    });\n  }\n  if (ctx.arguments.event.actionRequested) {\n    chatHistory.push({\n      sender: \"user\",\n      text: `I have invoked the the following for you: ${ctx.arguments.event.actionRequestedContent} and have gotten the result of ${ctx.arguments.event.actionResult}`\n    });\n  }\n  let chatString = \"\";\n  for (let chatEvent of chatHistory) {\n    let sender = chatEvent.sender === \"user\" ? USER_PREFIX : AGENT_PREFIX;\n    chatString += sender + chatEvent.text + \"\\n\";\n  }\n  if (ctx.stash.agentData.systemPrompt) {\n    chatString = USER_PREFIX + ctx.stash.agentData.systemPrompt + \"\\n\" + AGENT_PREFIX + \"understood\\n\" + chatString;\n  }\n  if (!chatString.startsWith(USER_PREFIX))\n    chatString = USER_PREFIX + \"\\n\" + chatString;\n  ctx.stash.chatString = chatString;\n  return {};\n}\nfunction response(ctx) {\n  return ctx.prev.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "NoneDataSource",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_userPublishMessage_4",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiNoneDataSource3ADA7CD5",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_4/Resource"
+   }
+  },
+  "MutationuserPublishMessage5759C7480": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Query.userPublishMessage.invokeLambda.ts\nfunction request(ctx) {\n  ctx.stash.headers = {\n    authorization: ctx.request.headers.authorization\n  };\n  return {\n    method: \"POST\",\n    resourcePath: `/2015-03-31/functions/${ctx.stash.agentData.handlerLambda}/invocations`,\n    params: {\n      headers: {\n        \"X-Amz-Invocation-Type\": \"Event\",\n        \"Content-Type\": \"application/json\"\n      },\n      body: ctx.stash\n    }\n  };\n}\nfunction response(ctx) {\n  return ctx.prev.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "lambdaFunctionHttp",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_userPublishMessage_5",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApilambdaFunctionHttp4CFB865B",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_5/Resource"
+   }
+  },
+  "MutationuserPublishMessageresolverC78343FF": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "userPublishMessage",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationuserPublishMessage0EB00D775",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationuserPublishMessage19923CA49",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationuserPublishMessage2A5E4FE09",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationuserPublishMessage3716F9753",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationuserPublishMessage4965E44E1",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationuserPublishMessage5759C7480",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_userPublishMessage_resolver/Resource"
+   }
+  },
+  "MutationcreateAgent06B4F6DA8": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/create.ts\nfunction request(ctx) {\n  return {\n    operation: \"PutItem\",\n    key: util.dynamodb.toMapValues({\n      id: util.autoId()\n    }),\n    attributeValues: util.dynamodb.toMapValues({\n      ...ctx.arguments.config,\n      timestamp: util.time.nowISO8601()\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "AgentTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_createAgent_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiAgentTable92F26602",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createAgent_0/Resource"
+   }
+  },
+  "MutationcreateAgentresolverF8C767A4": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "createAgent",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationcreateAgent06B4F6DA8",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_createAgent_resolver/Resource"
+   }
+  },
+  "MutationdeleteAgent05FB0E98C": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/delete.ts\nfunction request(ctx) {\n  return {\n    operation: \"DeleteItem\",\n    key: util.dynamodb.toMapValues({\n      id: ctx.arguments.id\n    })\n  };\n}\nfunction response(ctx) {\n  return ctx.result;\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "AgentTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Mutation_deleteAgent_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiAgentTable92F26602",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteAgent_0/Resource"
+   }
+  },
+  "MutationdeleteAgentresolverEAD26B01": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "deleteAgent",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationdeleteAgent05FB0E98C",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Mutation_deleteAgent_resolver/Resource"
+   }
+  },
+  "Conversationevents0DA6980B4": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "// lib/agent-api/functions/Conversation.events.ts\nfunction request(ctx) {\n  return {\n    operation: \"Query\",\n    query: JSON.parse(\n      util.transform.toDynamoDBConditionExpression({\n        [\"conversationId\"]: { eq: ctx.source.id }\n      })\n    ),\n    limit: 2e3\n  };\n}\nfunction response(ctx) {\n  if (ctx.result && ctx.result.items)\n    return ctx.result.items;\n  return [];\n}\nexport {\n  request,\n  response\n};\n",
+    "DataSourceName": "EventsTable",
+    "FunctionVersion": "2018-05-29",
+    "Name": "Conversation_events_0",
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    }
+   },
+   "DependsOn": [
+    "AgentAppsyncApiEventsTableB1C39D13",
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Conversation_events_0/Resource"
+   }
+  },
+  "Conversationeventsresolver5F517A72": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "AgentAppsyncApi18BFFA11",
+      "ApiId"
+     ]
+    },
+    "Code": "\n            export function request(ctx) { return {} }\n            export function response(ctx) { return ctx.prev.result }\n        ",
+    "FieldName": "events",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "Conversationevents0DA6980B4",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "Runtime": {
+     "Name": "APPSYNC_JS",
+     "RuntimeVersion": "1.0.0"
+    },
+    "TypeName": "Conversation"
+   },
+   "DependsOn": [
+    "AgentAppsyncApiSchema229EB19A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/Conversation_events_resolver/Resource"
+   }
+  },
+  "AgentLambdaFunctionexecutionroleExplorationLambdaHandler00D65C35": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": "appsync:GraphQL",
+         "Effect": "Allow",
+         "Resource": [
+          {
+           "Fn::GetAtt": [
+            "AgentAppsyncApi18BFFA11",
+            "Arn"
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             {
+              "Fn::GetAtt": [
+               "AgentAppsyncApi18BFFA11",
+               "Arn"
+              ]
+             },
+             "/*"
+            ]
+           ]
+          }
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "agentAPiInvoker"
+     },
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:Retrieve"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "bedrockAccessPolicy"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ExplorationLambdaHandler/Resource"
+   }
+  },
+  "AgentLambdaFunctionexecutionroleExplorationLambdaHandlerDefaultPolicy77603AF3": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "appsync:GraphQL",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:appsync:us-east-1:",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":apis/",
+          {
+           "Fn::GetAtt": [
+            "AgentAppsyncApi18BFFA11",
+            "ApiId"
+           ]
+          },
+          "/types/Mutation/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentLambdaFunctionexecutionroleExplorationLambdaHandlerDefaultPolicy77603AF3",
+    "Roles": [
+     {
+      "Ref": "AgentLambdaFunctionexecutionroleExplorationLambdaHandler00D65C35"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ExplorationLambdaHandler/DefaultPolicy/Resource"
+   }
+  },
+  "AppsyncAgentFunctionExplorationLambdaHandler5AEBB6F1": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ImageUri": {
+      "Fn::Sub": "${AWS::AccountId}.dkr.ecr.us-east-1.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-us-east-1:c607feb535b0cb86b0445c42531f69e3a504b90631e0cca56800c62ae6576a6c"
+     }
+    },
+    "Environment": {
+     "Variables": {
+      "AGENT_API_URL": {
+       "Fn::GetAtt": [
+        "AgentAppsyncApi18BFFA11",
+        "GraphQLUrl"
+       ]
+      }
+     }
+    },
+    "FunctionName": "AppsyncAgentFunction-ExplorationLambdaHandler",
+    "MemorySize": 1024,
+    "PackageType": "Image",
+    "Role": {
+     "Fn::GetAtt": [
+      "AgentLambdaFunctionexecutionroleExplorationLambdaHandler00D65C35",
+      "Arn"
+     ]
+    },
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "AgentLambdaFunctionexecutionroleExplorationLambdaHandlerDefaultPolicy77603AF3",
+    "AgentLambdaFunctionexecutionroleExplorationLambdaHandler00D65C35"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AppsyncAgentFunction-ExplorationLambdaHandler/Resource",
+    "aws:asset:path": "asset.c607feb535b0cb86b0445c42531f69e3a504b90631e0cca56800c62ae6576a6c",
+    "aws:asset:dockerfile-path": "Dockerfile",
+    "aws:asset:property": "Code.ImageUri"
+   }
+  },
+  "AgentLambdaFunctionexecutionroleDesignLambdaHandler812EB838": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": "appsync:GraphQL",
+         "Effect": "Allow",
+         "Resource": [
+          {
+           "Fn::GetAtt": [
+            "AgentAppsyncApi18BFFA11",
+            "Arn"
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             {
+              "Fn::GetAtt": [
+               "AgentAppsyncApi18BFFA11",
+               "Arn"
+              ]
+             },
+             "/*"
+            ]
+           ]
+          }
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "agentAPiInvoker"
+     },
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:Retrieve"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "bedrockAccessPolicy"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-DesignLambdaHandler/Resource"
+   }
+  },
+  "AgentLambdaFunctionexecutionroleDesignLambdaHandlerDefaultPolicy5B5BFD03": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "appsync:GraphQL",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:appsync:us-east-1:",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":apis/",
+          {
+           "Fn::GetAtt": [
+            "AgentAppsyncApi18BFFA11",
+            "ApiId"
+           ]
+          },
+          "/types/Mutation/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentLambdaFunctionexecutionroleDesignLambdaHandlerDefaultPolicy5B5BFD03",
+    "Roles": [
+     {
+      "Ref": "AgentLambdaFunctionexecutionroleDesignLambdaHandler812EB838"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-DesignLambdaHandler/DefaultPolicy/Resource"
+   }
+  },
+  "AppsyncAgentFunctionDesignLambdaHandler2837A572": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ImageUri": {
+      "Fn::Sub": "${AWS::AccountId}.dkr.ecr.us-east-1.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-us-east-1:01229ab54e5554cadf78dac19340a0893f61d3c71d46123e3666bde07da2bccd"
+     }
+    },
+    "Environment": {
+     "Variables": {
+      "AGENT_API_URL": {
+       "Fn::GetAtt": [
+        "AgentAppsyncApi18BFFA11",
+        "GraphQLUrl"
+       ]
+      }
+     }
+    },
+    "FunctionName": "AppsyncAgentFunction-DesignLambdaHandler",
+    "MemorySize": 1024,
+    "PackageType": "Image",
+    "Role": {
+     "Fn::GetAtt": [
+      "AgentLambdaFunctionexecutionroleDesignLambdaHandler812EB838",
+      "Arn"
+     ]
+    },
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "AgentLambdaFunctionexecutionroleDesignLambdaHandlerDefaultPolicy5B5BFD03",
+    "AgentLambdaFunctionexecutionroleDesignLambdaHandler812EB838"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AppsyncAgentFunction-DesignLambdaHandler/Resource",
+    "aws:asset:path": "asset.01229ab54e5554cadf78dac19340a0893f61d3c71d46123e3666bde07da2bccd",
+    "aws:asset:dockerfile-path": "Dockerfile",
+    "aws:asset:property": "Code.ImageUri"
+   }
+  },
+  "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerBDDD323A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": "appsync:GraphQL",
+         "Effect": "Allow",
+         "Resource": [
+          {
+           "Fn::GetAtt": [
+            "AgentAppsyncApi18BFFA11",
+            "Arn"
+           ]
+          },
+          {
+           "Fn::Join": [
+            "",
+            [
+             {
+              "Fn::GetAtt": [
+               "AgentAppsyncApi18BFFA11",
+               "Arn"
+              ]
+             },
+             "/*"
+            ]
+           ]
+          }
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "agentAPiInvoker"
+     },
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:Retrieve"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "bedrockAccessPolicy"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ComprehensionLambdaHandler/Resource"
+   }
+  },
+  "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerDefaultPolicyB6821C05": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "appsync:GraphQL",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:appsync:us-east-1:",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":apis/",
+          {
+           "Fn::GetAtt": [
+            "AgentAppsyncApi18BFFA11",
+            "ApiId"
+           ]
+          },
+          "/types/Mutation/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerDefaultPolicyB6821C05",
+    "Roles": [
+     {
+      "Ref": "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerBDDD323A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-ComprehensionLambdaHandler/DefaultPolicy/Resource"
+   }
+  },
+  "AppsyncAgentFunctionComprehensionLambdaHandler498D20E3": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ImageUri": {
+      "Fn::Sub": "${AWS::AccountId}.dkr.ecr.us-east-1.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-us-east-1:0ee2f7cd039fc92d72cce8ba5a3041b46973619860a657250a9afa713f653667"
+     }
+    },
+    "Environment": {
+     "Variables": {
+      "AGENT_API_URL": {
+       "Fn::GetAtt": [
+        "AgentAppsyncApi18BFFA11",
+        "GraphQLUrl"
+       ]
+      }
+     }
+    },
+    "FunctionName": "AppsyncAgentFunction-ComprehensionLambdaHandler",
+    "MemorySize": 1024,
+    "PackageType": "Image",
+    "Role": {
+     "Fn::GetAtt": [
+      "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerBDDD323A",
+      "Arn"
+     ]
+    },
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerDefaultPolicyB6821C05",
+    "AgentLambdaFunctionexecutionroleComprehensionLambdaHandlerBDDD323A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AppsyncAgentFunction-ComprehensionLambdaHandler/Resource",
+    "aws:asset:path": "asset.0ee2f7cd039fc92d72cce8ba5a3041b46973619860a657250a9afa713f653667",
+    "aws:asset:dockerfile-path": "Dockerfile",
+    "aws:asset:property": "Code.ImageUri"
+   }
+  },
+  "AgentLambdaFunctionexecutionrolecheckKnowledgeBaseHandler4CD8959F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock:ListKnowledgeBases",
+          "bedrock:Retrieve"
+         ],
+         "Effect": "Allow",
+         "Resource": "*"
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "bedrockAccessPolicy"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentLambdaFunction-execution-role-checkKnowledgeBaseHandler/Resource"
+   }
+  },
+  "CustomLambdacheckKnowledgeBaseHandler5C8E8A81": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ImageUri": {
+      "Fn::Sub": "${AWS::AccountId}.dkr.ecr.us-east-1.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-us-east-1:d2d1dac1ff2efc5ea737b49cae99b6fde2da64bdd70973f33638c8fd0b4db9bb"
+     }
+    },
+    "FunctionName": "AppsyncAgentFunction-checkKnowledgeBaseHandler",
+    "MemorySize": 1024,
+    "PackageType": "Image",
+    "Role": {
+     "Fn::GetAtt": [
+      "AgentLambdaFunctionexecutionrolecheckKnowledgeBaseHandler4CD8959F",
+      "Arn"
+     ]
+    },
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "AgentLambdaFunctionexecutionrolecheckKnowledgeBaseHandler4CD8959F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/CustomLambda-checkKnowledgeBaseHandler/Resource",
+    "aws:asset:path": "asset.d2d1dac1ff2efc5ea737b49cae99b6fde2da64bdd70973f33638c8fd0b4db9bb",
+    "aws:asset:dockerfile-path": "Dockerfile",
+    "aws:asset:property": "Code.ImageUri"
+   }
+  },
+  "AgentApiGatewayB43989DE": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "This service serves agent requests.",
+    "Name": "Agent Service"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiGateway/Resource"
+   }
+  },
+  "AgentApiGatewayDeployment684B161B3b45bd25623c0eb6665489a2781860d1": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "This service serves agent requests.",
+    "RestApiId": {
+     "Ref": "AgentApiGatewayB43989DE"
+    }
+   },
+   "DependsOn": [
+    "AgentApiGatewayOPTIONS662A3564",
+    "AgentApiGatewayPOST984D837E"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiGateway/Deployment/Resource"
+   }
+  },
+  "AgentApiGatewayDeploymentStageprod85317116": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "AgentApiGatewayDeployment684B161B3b45bd25623c0eb6665489a2781860d1"
+    },
+    "RestApiId": {
+     "Ref": "AgentApiGatewayB43989DE"
+    },
+    "StageName": "prod"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiGateway/DeploymentStage.prod/Resource"
+   }
+  },
+  "AgentApiGatewayOPTIONS662A3564": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "AgentApiGatewayB43989DE",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "AgentApiGatewayB43989DE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/OPTIONS/Resource"
+   }
+  },
+  "AgentApiGatewayPOSTApiPermissionAppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7CPOSTA2837A9C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CustomLambdacheckKnowledgeBaseHandler5C8E8A81",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AgentApiGatewayB43989DE"
+       },
+       "/",
+       {
+        "Ref": "AgentApiGatewayDeploymentStageprod85317116"
+       },
+       "/POST/"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/POST/ApiPermission.AppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7C.POST.."
+   }
+  },
+  "AgentApiGatewayPOSTApiPermissionTestAppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7CPOST7B7F9686": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CustomLambdacheckKnowledgeBaseHandler5C8E8A81",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "AgentApiGatewayB43989DE"
+       },
+       "/test-invoke-stage/POST/"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/POST/ApiPermission.Test.AppsyncAgentAPIDemoRepoAgentApiGatewayE6664A7C.POST.."
+   }
+  },
+  "AgentApiGatewayPOST984D837E": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "COGNITO_USER_POOLS",
+    "AuthorizerId": {
+     "Ref": "AgentApiAuthorizer5AB8F2B6"
+    },
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ \"statusCode\": \"200\" }"
+     },
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "CustomLambdacheckKnowledgeBaseHandler5C8E8A81",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "AgentApiGatewayB43989DE",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "AgentApiGatewayB43989DE"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiGateway/Default/POST/Resource"
+   }
+  },
+  "AgentApiAuthorizer5AB8F2B6": {
+   "Type": "AWS::ApiGateway::Authorizer",
+   "Properties": {
+    "IdentitySource": "method.request.header.Authorization",
+    "Name": "AppsyncAgentAPIDemoRepoAgentApiAuthorizerC1554898",
+    "ProviderARNs": [
+     {
+      "Fn::GetAtt": [
+       "authuserpool56A639C7",
+       "Arn"
+      ]
+     }
+    ],
+    "RestApiId": {
+     "Ref": "AgentApiGatewayB43989DE"
+    },
+    "Type": "COGNITO_USER_POOLS"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/AgentApiAuthorizer/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/21TwW7bMAz9lt0VbekGbFc3RrcCbZc527lgZNZRI4meJLfwDP/7KDlOXKAnvUdSlN6jdCXXX67kpw/wGlaqPq6M3sthF0EdBYceh7p3YKnm4G/YGxSbJ5fBKAzYfQ1crF1jMJK76ZyKmpw4Ay4+45LUEf2thQaX+S16q0NgNgoNVg4VTafkdUtGqz7XZTSK8PkRQsAYZJEW5vK6487xGgIKRY3TkeTwJ6DfEpm09YxnsDEaXVymLpHbmoGO/bx5ydOVisjeHCwHRwFtG3qn5PDdQ3v4a4pWpy2Z/bp7y3bqgBZEme0s9yVE2FHnVda6YA/kcEF/xNguaDGd+J7BG3JPuuk85ESFgcwL+uzkCfPIqAnyjpoKY1LFdaj87OdiQJO1nJMVthTYUd9nf6HVDUR8hZ4HhSGeNM6wxNZQb09WLhg/qCYrnUC6UdKTe95jPFCdkjOahjjPJhQdh73+N6m5sHE8NxKbLkSyFzqpnjxLYtK5/E5T4mcX246n56hG+Rw+vqy/yfVX/gLPQeuV79gYi7Ka1v8MmrqPHwMAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "AppsyncAgentAPIDemoRepo/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "agentstable": {
+   "Value": {
+    "Ref": "MyAgentsDDBTable5F24C213"
+   },
+   "Export": {
+    "Name": "agents-table"
+   }
+  },
+  "conversationstable": {
+   "Value": {
+    "Ref": "MyConversationsDDBTable26A0A62F"
+   },
+   "Export": {
+    "Name": "conversations-table"
+   }
+  },
+  "eventstable": {
+   "Value": {
+    "Ref": "MyEventsDDBTable97CF93F8"
+   },
+   "Export": {
+    "Name": "events-table"
+   }
+  },
+  "LLmtable": {
+   "Value": {
+    "Ref": "MyLLmsDDBTable89A65379"
+   },
+   "Export": {
+    "Name": "LLm-table"
+   }
+  },
+  "iterationtable": {
+   "Value": {
+    "Ref": "MyIterationDDBTable32A69513"
+   },
+   "Export": {
+    "Name": "iteration-table"
+   }
+  },
+  "attachmentsbucketname": {
+   "Value": "chat-bot-comprehension-bucket",
+   "Export": {
+    "Name": "attachments-bucket-name"
+   }
+  },
+  "cognitopool": {
+   "Value": {
+    "Ref": "authuserpool56A639C7"
+   },
+   "Export": {
+    "Name": "cognito-pool"
+   }
+  },
+  "cognitoclient": {
+   "Value": {
+    "Ref": "authuserpoolauthappclientB14AE63A"
+   },
+   "Export": {
+    "Name": "cognito-client"
+   }
+  },
+  "identitypool": {
+   "Value": {
+    "Ref": "authidentitypool"
+   },
+   "Export": {
+    "Name": "identity-pool"
+   }
+  },
+  "Authenticatedrolename": {
+   "Value": {
+    "Ref": "CognitoDefaultAuthenticatedRoleC5D5C31E"
+   },
+   "Export": {
+    "Name": "Authenticated-role-name"
+   }
+  },
+  "agentapiendpoint": {
+   "Value": {
+    "Fn::GetAtt": [
+     "AgentAppsyncApi18BFFA11",
+     "GraphQLUrl"
+    ]
+   },
+   "Export": {
+    "Name": "agent-api-endpoint"
+   }
+  },
+  "enableconstructingagents": {
+   "Value": "true",
+   "Export": {
+    "Name": "enable-constructing-agents"
+   }
+  },
+  "ExplorationLambdaHandler": {
+   "Value": {
+    "Ref": "AppsyncAgentFunctionExplorationLambdaHandler5AEBB6F1"
+   },
+   "Export": {
+    "Name": "ExplorationLambdaHandler"
+   }
+  },
+  "DesignLambdaHandler": {
+   "Value": {
+    "Ref": "AppsyncAgentFunctionDesignLambdaHandler2837A572"
+   },
+   "Export": {
+    "Name": "DesignLambdaHandler"
+   }
+  },
+  "ComprehensionLambdaHandler": {
+   "Value": {
+    "Ref": "AppsyncAgentFunctionComprehensionLambdaHandler498D20E3"
+   },
+   "Export": {
+    "Name": "ComprehensionLambdaHandler"
+   }
+  },
+  "AgentApiGatewayEndpoint68DCE046": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "AgentApiGatewayB43989DE"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "AgentApiGatewayDeploymentStageprod85317116"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "AgentApiUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "AgentApiGatewayB43989DE"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "AgentApiGatewayDeploymentStageprod85317116"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "checkKnowledgeBaseHandler": {
+   "Value": {
+    "Ref": "CustomLambdacheckKnowledgeBaseHandler5C8E8A81"
+   },
+   "Export": {
+    "Name": "checkKnowledgeBaseHandler"
+   }
+  },
+  "Region": {
+   "Value": "us-east-1"
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

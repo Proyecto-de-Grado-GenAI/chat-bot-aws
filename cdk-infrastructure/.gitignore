@@ -7,8 +7,11 @@ node_modules
 output.json
 # CDK asset staging directory
 .cdk.staging
-cdk.out
+cdk.out/*.*
+!cdk.out/*.json
 package-lock.json
 yarn.lock
 lib/example-action-apis/functions-js
 lib/agent-api/functions-js
+!cdk.out/artifacts.json
+

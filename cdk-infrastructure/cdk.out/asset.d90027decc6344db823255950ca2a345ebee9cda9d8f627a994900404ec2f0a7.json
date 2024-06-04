@@ -1,0 +1,13 @@
+[
+    {
+      "id": "1",
+      "name": "LLama-3-70B",
+      "model": "meta.llama3-70b-instruct-v1:0"
+    },
+    {
+      "id": "2",
+      "name": "LLama-3-8B",
+      "model": "meta.llama3-8b-instruct-v1:0"
+    }
+  ]
+  

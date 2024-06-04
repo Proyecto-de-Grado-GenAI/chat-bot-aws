@@ -1,0 +1,23 @@
+{
+  "AppsyncAgentAPIDemoRepo": {
+    "identitypool": "us-east-1:f3092cf9-e8fe-4f6d-a911-e356e7fe8efc",
+    "LLmtable": "AppsyncAgentAPIDemoRepo-MyLLmsDDBTable89A65379-BABRQIY7IH3S",
+    "AgentApiUrl": "https://kitkkb6sy3.execute-api.us-east-1.amazonaws.com/prod/",
+    "eventstable": "AppsyncAgentAPIDemoRepo-MyEventsDDBTable97CF93F8-WF7VMGG7U0XI",
+    "Authenticatedrolename": "AppsyncAgentAPIDemoRepo-CognitoDefaultAuthenticated-rkVZOPdOYiRI",
+    "ExplorationLambdaHandler": "AppsyncAgentFunction-ExplorationLambdaHandler",
+    "checkKnowledgeBaseHandler": "AppsyncAgentFunction-checkKnowledgeBaseHandler",
+    "cognitopool": "us-east-1_wpFCIry5J",
+    "attachmentsbucketname": "chat-bot-comprehension-bucket",
+    "ComprehensionLambdaHandler": "AppsyncAgentFunction-ComprehensionLambdaHandler",
+    "DesignLambdaHandler": "AppsyncAgentFunction-DesignLambdaHandler",
+    "AgentApiGatewayEndpoint68DCE046": "https://kitkkb6sy3.execute-api.us-east-1.amazonaws.com/prod/",
+    "agentapiendpoint": "https://fw5huorbarcxhifibzq4lmt5mq.appsync-api.us-east-1.amazonaws.com/graphql",
+    "enableconstructingagents": "true",
+    "agentstable": "AppsyncAgentAPIDemoRepo-MyAgentsDDBTable5F24C213-C3NPUV638O9K",
+    "conversationstable": "AppsyncAgentAPIDemoRepo-MyConversationsDDBTable26A0A62F-1JMQE46MV1ASX",
+    "cognitoclient": "4qk06i5hc2t6lbqgkj24phnprb",
+    "Region": "us-east-1",
+    "iterationtable": "AppsyncAgentAPIDemoRepo-MyIterationDDBTable32A69513-VKRKL3WEW8GK"
+  }
+}
