@@ -1,7 +1,6 @@
 import { fetchAuthSession } from 'aws-amplify/auth';
 import axios from "axios";
 
-// Función para invocar una función en la nube con autenticación
 export async function invokeCloudFunction<T>(body: any, endpoint: string, authHeaders: any): Promise<T> {
 
     try {
