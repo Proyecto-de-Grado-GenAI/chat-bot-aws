@@ -84,6 +84,12 @@ def retrieveFromKnowledgeBase(query, kbId, numberOfResults=1):
 #     finally:
 #         return respuesta
 
+def bestKnowledgeBaseQuestion(variables, question, modelId, knowledgeBaseId, elements):
+    ...
+
+
+
+
 
 def bestKnowledgeBaseQuestion(variables, question, modelId, knowledgeBaseId, elements):
     model_params = {"temperature": 1, "top_p": 1, "max_gen_len": 170}
@@ -176,44 +182,6 @@ Eres un modelo de lenguaje cuya única función es:
         return respuesta
 
 
-def insertContextPhase(phase, response_knowledge_base, variables=None, iteration=None):
-    # Obtener información de las variables
-    ADD1 = get_info_by_name(variables, "ADD 3.0 deliverable Step 1: Review inputs")
-    objetivo_propuesto = iteration["objetive"]
-    número_de_iteración = iteration["number"]
-    elementos_del_sistema = iteration["systemElements"]
-
-    # Construir el contexto del ADD 3.0 a partir de la base de conocimiento
-    contexto_add = ""
-    contador = 1
-
-    for i in response_knowledge_base:
-        contexto_add += f"--- Fragmento de contexto {contador} ---\n"
-        contexto_add += f"{i['content']['text']}\n"
-        contexto_add += f"Relevancia: {i['score']}\n"
-        contexto_add += f"Fuente {contador}: {i['location']['s3Location']['uri']}\n"
-        contexto_add += "-" * 50 + "\n"
-        contador += 1
-
-    elementos_del_sistema_ordenados = sorted(
-        elementos_del_sistema, key=lambda x: x["name"]
-    )
-    descripcion_elementos = "\n\n     ".join(
-        [
-            f"System Element: {element['name']}: {element['description']}"
-            for element in elementos_del_sistema_ordenados
-        ]
-    )
-
-    # Verificar si estamos en el paso 3 del ADD 3.0
-    final = phase["description"].format(
-        add_context=contexto_add,
-        add_1=ADD1,
-        objetivo_propuesto=objetivo_propuesto,
-        número_de_iteración=número_de_iteración,
-        elementos_del_sistema=descripcion_elementos,
-    )
-    return final
 
 
 def extractContextBusiness(variables):
