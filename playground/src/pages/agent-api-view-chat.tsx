@@ -144,11 +144,7 @@ export function AIAgentViewChat() {
       useBusinessContext: includeBusinessContext,
     };
 
-    // if (selectedIteration !== null) {
-    //   payload.Iteration = selectedIteration;
-    // }
 
-    console.log("Sending message:", payload);
     submitMessage(payload);
     setChatString("");
   };

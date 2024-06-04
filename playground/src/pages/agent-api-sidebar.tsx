@@ -337,10 +337,11 @@ export function AIAgentSidebar() {
   };
 
   const handleAddIteration = () => {
+    const iterationCount = (IterationsList.value?.items().length || 0) + 1;
     const newIteration = {
-      number: (IterationsList.value?.items().length || 0) + 1,
+      number: iterationCount,
       objetive: newIterationObjective,
-      name: "Iteración " + (IterationsList.value?.items().length || 1),
+      name: `Iteración ${iterationCount}`,
     };
     addIteration(newIteration)
       .then(() => {
