@@ -9,8 +9,9 @@ export async function invokeCloudFunction<T>(body: any, endpoint: string, authHe
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authHeaders.Authorization}`,
-                "Access-Control-Allow-Origin" : "*",
-                "Access-Control-Allow-Credentials" : true,
+                "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Origin": "*"
             },
         });
         const responseBody = response.data;
