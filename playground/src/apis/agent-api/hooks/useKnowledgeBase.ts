@@ -29,8 +29,7 @@ export function useKnowledgeBase() {
                     "Access-Control-Allow-Headers": 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     "Access-Control-Allow-Methods": "*",
                     "Access-Control-Allow-Origin": "*"
-                }
-                    , KnowledgeBaseURL);
+                }, KnowledgeBaseURL);
                 const result = await invocation.invoke();
                 setKnowledgeBases(Loadable.loaded(result));
             } catch (error) {
