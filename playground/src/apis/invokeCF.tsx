@@ -7,10 +7,8 @@ export async function invokeCloudFunction<T>(body: any, endpoint: string, authHe
     try {
         const response = await axios.post(endpoint, body, {
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8',
                 'Authorization': `Bearer ${authHeaders.Authorization}`,
-                "Access-Control-Allow-Methods": "*",
-                "Access-Control-Allow-Origin": "*"
             },
         });
         const responseBody = response.data;
