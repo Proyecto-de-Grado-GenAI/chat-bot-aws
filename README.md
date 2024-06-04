@@ -12,7 +12,7 @@ For the python basted lambda functions
 
 For deployment of the code to aws
 
-    - Node 16+
+    - Version de node v18.17.0
     - Yarn
     - Npm
     - AWS CDK
@@ -39,9 +39,13 @@ npm run build
 npm run deploy
 ```
 
+
+## Desde aquí es lo importante para desplegar el aplicativo localmente, las indicaciones superiores son para desplegar la infraestuctura POR LO QUE NO debería hacerse sin permiso.
 Then get the website running
 
 ```
+
+
 
 # move to playground
 cd ../playground

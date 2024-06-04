@@ -89,8 +89,9 @@ export function AIAgentSidebar() {
   const [selectedVariable, setSelectedVariable] = useState(
     "Telecommunications Company"
   );
-  const [variablesList] = useRecoilState(variablesState);
+  const [variablesList, setVariablesList] = useRecoilState(variablesState);
   const [phases, setPhases] = useState<AgentPhase[]>([]);
+
   const [selectedPhase, setSelectedPhase] = useRecoilState(
     selectedAgentPhaseState
   );
@@ -124,6 +125,11 @@ export function AIAgentSidebar() {
   const handleVariableChange = (event: any) => {
     setSelectedVariable(event.target.value);
   };
+  const [newVariableName, setNewVariableName] = useState("");
+  const [newVariableValue, setNewVariableValue] = useState("");
+  useEffect(() => {
+    localStorage.setItem("variablesList", JSON.stringify(variablesList));
+  }, [variablesList]);
 
   const handlePhaseChange = (event: any) => {
     const phase = phases.find((phase) => phase.name === event.target.value);
@@ -160,9 +166,7 @@ export function AIAgentSidebar() {
     };
 
     updateAgent(updatedAgent)
-      .then(() => {
-        alert("Agent updated successfully!");
-      })
+      .then(() => { })
       .catch((error) => {
         alert(`Failed to update agent: ${error.message}`);
       });
@@ -328,15 +332,15 @@ export function AIAgentSidebar() {
     console.log("Payload: ", payload);
 
     submitMessage(payload);
-    alert("Fase ejecutada con éxito!");
     setPhaseExecuted(true);
   };
 
   const handleAddIteration = () => {
+    const iterationCount = (IterationsList.value?.items().length || 0) + 1;
     const newIteration = {
-      number: (IterationsList.value?.items().length || 0) + 1,
+      number: iterationCount,
       objetive: newIterationObjective,
-      name: "Iteración " + (IterationsList.value?.items().length || 1),
+      name: `Iteración ${iterationCount}`,
     };
     addIteration(newIteration)
       .then(() => {
@@ -353,10 +357,11 @@ export function AIAgentSidebar() {
       const updatedIteration = {
         ...selectedIteration,
         objetive: newIterationObjective || selectedIteration.objetive,
-        systemElements: [
-          ...selectedIteration.systemElements || [], 
-          ...newSystemElements,
-        ].filter((element) => !deletedSystemElements.includes(element)) || [],
+        systemElements:
+          [
+            ...(selectedIteration.systemElements || []),
+            ...newSystemElements,
+          ].filter((element) => !deletedSystemElements.includes(element)) || [],
       };
       updateIteration(updatedIteration)
         .then(() => {
@@ -372,7 +377,22 @@ export function AIAgentSidebar() {
       alert("No hay una iteración seleccionada para actualizar.");
     }
   };
-  
+  const handleAddVariable = () => {
+    if (newVariableName && newVariableValue) {
+      const newVariable = { name: newVariableName, value: newVariableValue };
+      setVariablesList([...variablesList, newVariable]);
+      setNewVariableName("");
+      setNewVariableValue("");
+    } else {
+      alert("Nombre y valor de la variable son requeridos.");
+    }
+  };
+  const handleDeleteVariable = (variableName) => {
+    const updatedVariables = variablesList.filter(
+      (variable) => variable.name !== variableName
+    );
+    setVariablesList(updatedVariables);
+  };
 
   const handleDeleteSystemElement = (index, isExisting) => {
     if (isExisting && selectedIteration) {
@@ -432,6 +452,134 @@ export function AIAgentSidebar() {
     }
   };
 
+  const handleReloadExampleVariables = () => {
+    const exampleVariables = [
+      {
+        name: "Context Case",
+        value: `
+In 2006, a large telecommunications company wanted to expand its Internet Protocol (IP) network to support “carrier-class services”, and more specifically high-quality voice over IP (VOIP) systems. One important aspect to achieve this goal was synchronization of the VOIP servers and other equipment. Poor synchronization results in low quality of service (QoS), degraded performance, and unhappy customers. To achieve the required level of synchronization, the company wanted to deploy a network of time servers that support the Network Time Protocol (NTP). Time servers are formed into groups that typically correspond to geographical regions. Within these regions, time servers are organized hierarchically in levels or strata, where time servers placed in the upper level of the hierarchy (stratum 1) are equipped with hardware (e.g., Cesium Oscillator, GPS signal) that provides precise time. Time servers that are lower in the hierarchy use NTP to request time from servers in the upper levels or from their peers.
+
+Many pieces of equipment depend on the time provided by time servers in the network, so one priority for the company was to correct any problems that occur on the time servers. Such problems may require dispatching a technician to perform physical maintenance on the time servers, such as rebooting. Another priority for the company was to collect data from the time servers to monitor the performance of the synchronization framework.
+
+In the initial deployment plans, the company wanted to field 100 time servers of a particular model. Besides NTP, time servers support the Simple Network Management Protocol (SNMP), which provides three basic operations:
+
+- **Set() operations**: change configuration variables (e.g., connected peers)
+- **Get() operations**: retrieve configuration variables or performance data
+- **Trap() operations**: notifications of exceptional events such as the loss or restoration of the GPS signal or changes in the time reference
+
+To achieve the company’s goals, a management system for the time servers needed to be developed. This system needed to conform to the FCAPS model, which is a standard model for network management. The letters in the acronym stand for:
+
+- **Fault management**: The goal of fault management is to recognize, isolate, correct, and log faults that occur in the network. In this case, these faults correspond to traps generated by time servers or other problems such as loss of communication between the management system and the time servers.
+- **Configuration management**: This includes gathering and storing configurations from network devices, thereby simplifying the configuration of devices and tracking changes that are made to device configurations. In this system, besides changing individual configuration variables, it is necessary to be able to deploy a specific configuration to several time servers.
+- **Accounting**: The goal here is to gather device information. In this context, this includes tracking device hardware and firmware versions, hardware equipment, and other components of the system.
+- **Performance management**: This category focuses on determining the efficiency of the current network. By collecting and analyzing performance data, the network health can be monitored. In this case, delay, offset, and jitter measures are collected from the time servers.
+- **Security management**: This is the process of controlling access to assets in the network. In this case, there are two important types of users: technicians and administrators. Technicians can visualize trap information and configurations but cannot make changes; administrators are technicians who can visualize the same information but can also make changes to configurations, including adding and removing time servers from the network.
+
+Once the initial network was deployed, the company planned to extend it by adding time servers from newer models that might potentially support management protocols other than SNMP.
+    `,
+      },
+      {
+        name: "Primary Use Cases",
+        value: `
+| Use Case                         | Description                                                                                                                                                                                                                                                                                                                      |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UC-1: Monitor network status     | A user monitors the time servers in a hierarchical representation of the whole network. Problematic devices are highlighted, along with the logical regions where they are grouped. The user can expand and collapse the network representation. This representation is updated continuously as faults are detected or repaired. |
+| UC-2: Detect fault               | Periodically the management system contacts the time servers to see if they are “alive”. If a time server does not respond, or if a trap that signals a problem or a return to a normal state of operation is received, the event is stored and the network representation observed by the users is updated accordingly.         |
+| UC-3: Display event history      | Stored events associated with a particular time server or group of time servers are displayed. These can be filtered by various criteria such as type or severity.                                                                                                                                                               |
+| UC-4: Manage time servers        | The administrator adds a time server to, or removes a time server from, the network.                                                                                                                                                                                                                                             |
+| UC-5: Configure time server      | An administrator changes configuration parameters associated with a particular time server. The parameters are sent to the device and are also stored locally.                                                                                                                                                                   |
+| UC-6: Restore configuration      | A locally stored configuration is sent to one or more time servers.                                                                                                                                                                                                                                                              |
+| UC-7: Collect performance data   | Network performance data (delay, offset, and jitter) is collected periodically from the time servers.                                                                                                                                                                                                                            |
+| UC-8: Display information        | The user displays stored information about the time server—configuration values and other parameters such as the server name.                                                                                                                                                                                                    |
+| UC-9: Visualize performance data | The user displays network performance measures (delay, offset, jitter) in a graphical way to view and analyze network performance.                                                                                                                                                                                               |
+| UC-10: Log in                    | A user logs into the system through a login/password screen. Upon successful login, the user is presented with different options according to their role.                                                                                                                                                                        |
+| UC-11: Manage users              | The administrator adds or removes a user or modifies user permissions.                                                                                                                                                                                                                                                           |
+    `,
+      },
+      {
+        name: "Quality Attribute Scenario",
+        value: `
+| ID    | Quality Attribute  | Scenario                                                                                                                                                                | Associated Use Case |
+|-------|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------|
+| QA-1  | Performance        | Several time servers send traps to the management system at peak load; 100% of the traps are successfully processed and stored.                                         | UC-2                |
+| QA-2  | Modifiability      | A new time server management protocol is introduced to the system as part of an update. The protocol is added successfully without any changes to the core components of the system. | UC-5                |
+| QA-3  | Availability       | A failure occurs in the management system during normal operation. The management system resumes operation in less than 30 seconds.                                      | All                 |
+| QA-4  | Performance        | The management system collects performance data from a time server during peak load. The management system collects all performance data within 5 minutes, while processing all user requests, to ensure no loss of data due to CON-5. | UC-7                |
+| QA-5  | Performance, usability | A user displays the event history of a particular time server during normal operation. The list of events from the last 24 hours is displayed within 1 second.          | UC-3                |
+| QA-6  | Security           | A user performs a change in the system during normal operation. It is possible to know who performed the operation and when it was performed 100% of the time.            | All                 |
+    `,
+      },
+
+      {
+        name: "Constraints",
+        value: `
+| ID    | Constraint                                                                                                                                                         |
+|-------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| CON-1 | A minimum of 50 simultaneous users must be supported.                                                                                                              |
+| CON-2 | The system must be accessed through a web browser (Chrome V3.0+, Firefox V4+, IE8+) in different platforms: Windows, OSX, and Linux.                                |
+| CON-3 | An existing relational database server must be used. This server cannot be used for other purposes than hosting the database.                                       |
+| CON-4 | The network connection to user workstations can have low bandwidth but is generally reliable.                                                                       |
+| CON-5 | Performance data needs to be collected in intervals of no more than 5 minutes, as higher intervals result in time servers discarding data.                         |
+| CON-6 | Events from the last 30 days must be stored.                                                                                                                        |
+        `,
+      },
+      {
+        name: `Architectural Concerns`,
+        value: `
+| ID    | Concern                                                                                                                       |
+|-------|-------------------------------------------------------------------------------------------------------------------------------|
+| CRN-1 | Establishing an overall initial system structure.                                                                             |
+| CRN-2 | Leverage the team’s knowledge about Java technologies, including Spring, JSF, Swing, Hibernate, Java Web Start and JMS frameworks, and the Java language. |
+| CRN-3 | Allocate work to members of the development team.                                                                             |`,
+      },
+      {
+        name: "ADD 3.0 deliverable Step 1: Review inputs",
+        value: `
+| **Category**                        | **Details**                                                                                                                                           |
+|-------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Design purpose**                  | This is a greenfield system from a mature domain. The purpose is to produce a sufficiently detailed design to support the construction of the system.  |
+| **Primary functional requirements** | - UC-1: Because it directly supports the core business                                                                                                |
+|                                     | - UC-2: Because it directly supports the core business                                                                                                |
+|                                     | - UC-7: Because of the technical issues associated with it (see QA-4)                                                                                 |
+
+| **Quality attribute scenarios**     | **ID** | **Quality Attribute**  | **Scenario**                                                                                                                                                                | **Associated Use Case** |
+|-------------------------------------|-------|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+|                                     | QA-1  | Performance            | Several time servers send traps to the management system at peak load; 100% of the traps are successfully processed and stored.                                            | UC-2                    |
+|                                     | QA-2  | Modifiability          | A new time server management protocol is introduced to the system as part of an update. The protocol is added successfully without any changes to the core components of the system. | UC-5                    |
+|                                     | QA-3  | Availability           | A failure occurs in the management system during normal operation. The management system resumes operation in less than 30 seconds.                                         | All                     |
+|                                     | QA-4  | Performance            | The management system collects performance data from a time server during peak load. The management system collects all performance data within 5 minutes, while processing all user requests, to ensure no loss of data due to CON-5. | UC-7                    |
+|                                     | QA-5  | Performance, usability | A user displays the event history of a particular time server during normal operation. The list of events from the last 24 hours is displayed within 1 second.              | UC-3                    |
+|                                     | QA-6  | Security               | A user performs a change in the system during normal operation. It is possible to know who performed the operation and when it was performed 100% of the time.              | All                     |
+
+| **Scenario ID**                     | **Importance to the Customer**                                                                                                                        | **Difficulty of Implementation According to the Architect** |
+|-------------------------------------|-----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
+| QA-1                                | High                                                                                                                                                  | High                                                        |
+| QA-2                                | High                                                                                                                                                  | Medium                                                      |
+| QA-3                                | High                                                                                                                                                  | High                                                        |
+| QA-4                                | High                                                                                                                                                  | High                                                        |
+| QA-5                                | Medium                                                                                                                                                | Medium                                                      |
+| QA-6                                | Medium                                                                                                                                                | Low                                                         |
+
+| **Constraints**                     | **ID** | **Constraint**                                                                                                                                        |
+|-------------------------------------|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+|                                     | CON-1 | A minimum of 50 simultaneous users must be supported.                                                                                                 |
+|                                     | CON-2 | The system must be accessed through a web browser (Chrome V3.0+, Firefox V4+, IE8+) in different platforms: Windows, OSX, and Linux.                   |
+|                                     | CON-3 | An existing relational database server must be used. This server cannot be used for other purposes than hosting the database.                          |
+|                                     | CON-4 | The network connection to user workstations can have low bandwidth but is generally reliable.                                                          |
+|                                     | CON-5 | Performance data needs to be collected in intervals of no more than 5 minutes, as higher intervals result in time servers discarding data.             |
+|                                     | CON-6 | Events from the last 30 days must be stored.                                                                                                           |
+
+| **Architectural concerns**          | **ID** | **Concern**                                                                                                                                            |
+|-------------------------------------|-------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+|                                     | CRN-1 | Establishing an overall initial system structure.                                                                                                     |
+|                                     | CRN-2 | Leverage the team’s knowledge about Java technologies, including Spring, JSF, Swing, Hibernate, Java Web Start, and JMS frameworks, and the Java language. |
+|                                     | CRN-3 | Allocate work to members of the development team.                                                                                                      |
+    `,
+      },
+    ];
+    setVariablesList(exampleVariables);
+  };
+
   if (
     conversationsObject.isUnloaded() ||
     !conversationsObject.value ||
@@ -449,18 +597,18 @@ export function AIAgentSidebar() {
 
   const conversationsRendered = selectedAgent
     ? conversationsObject.value
-        .items()
-        .filter((conversation) => conversation.agent === selectedAgent.id)
-        .sort((c1, c2) => (c1.timestamp < c2.timestamp ? 1 : -1))
-        .map((conversation) => (
-          <AgentApiConversationListed
-            agent={agentObjectList.value
-              ?.items()
-              .find((agent) => agent.id === conversation.agent)}
-            conversation={conversation}
-            key={conversation.id}
-          />
-        ))
+      .items()
+      .filter((conversation) => conversation.agent === selectedAgent.id)
+      .sort((c1, c2) => (c1.timestamp < c2.timestamp ? 1 : -1))
+      .map((conversation) => (
+        <AgentApiConversationListed
+          agent={agentObjectList.value
+            ?.items()
+            .find((agent) => agent.id === conversation.agent)}
+          conversation={conversation}
+          key={conversation.id}
+        />
+      ))
     : [];
 
   const sortedAgents = agentObjectList.value
@@ -477,9 +625,8 @@ export function AIAgentSidebar() {
     );
   };
 
-  const heading = `LLM: ${selectedLlm?.name || "No LLM selected"} - Agente: ${
-    selectedAgent?.name || "No agent selected"
-  }`;
+  const heading = `LLM: ${selectedLlm?.name || "No LLM selected"} - Agente: ${selectedAgent?.name || "No agent selected"
+    }`;
 
   return (
     <Flex>
@@ -542,7 +689,7 @@ export function AIAgentSidebar() {
             Seleccionar Drivers y Vista Previa
             <Accordion.Icon />
           </Accordion.Trigger>
-          <Accordion.Content>
+          <Accordion.Content style={{ maxHeight: "400px", overflowY: "auto" }}>
             <SelectField
               label="Selecciona un Driver"
               size="small"
@@ -558,28 +705,67 @@ export function AIAgentSidebar() {
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {selectedContent}
             </ReactMarkdown>
+
+            <Button onClick={handleReloadExampleVariables}>
+              Recargar Variables de Ejemplo
+            </Button>
+
+            <Flex direction="column" gap={10}>
+              <TextField
+                label="Nombre de la nueva variable"
+                placeholder="Nombre"
+                size="small"
+                value={newVariableName}
+                onChange={(e) => setNewVariableName(e.target.value)}
+              />
+              <TextField
+                label="Valor de la nueva variable"
+                placeholder="Valor"
+                size="small"
+                value={newVariableValue}
+                onChange={(e) => setNewVariableValue(e.target.value)}
+              />
+              <Button onClick={handleAddVariable}>Agregar Variable</Button>
+            </Flex>
+
+            <Flex direction="column" gap={10}>
+              {variablesList.map((variable, index) => (
+                <Flex key={index} direction="row" alignItems="center" gap={10}>
+                  <Text>{variable.name}</Text>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {variable.value}
+                  </ReactMarkdown>
+
+                  <Button onClick={() => handleDeleteVariable(variable.name)}>
+                    Eliminar
+                  </Button>
+                </Flex>
+              ))}
+            </Flex>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion.Container>
 
       <Container heading={heading} width="100%">
-        <Text fontWeight="bold" fontSize="medium" padding="small">
-          {selectedIteration ? (
-            <>
-              <Text as="span" fontWeight="normal">
-                Número de iteración:{" "}
-              </Text>
-              {selectedIteration.number || "N/A"}
-              <br />
-              <Text as="span" fontWeight="normal">
-                Objetivo:{" "}
-              </Text>
-              {selectedIteration.objetive || "N/A"}
-            </>
-          ) : (
-            "No hay iteración seleccionada"
-          )}
-        </Text>
+        {selectedAgent?.name !== "Exploración" && (
+          <Text fontWeight="bold" fontSize="medium" padding="small">
+            {selectedIteration ? (
+              <>
+                <Text as="span" fontWeight="normal">
+                  Número de iteración:{" "}
+                </Text>
+                {selectedIteration.number || "N/A"}
+                <br />
+                <Text as="span" fontWeight="normal">
+                  Objetivo:{" "}
+                </Text>
+                {selectedIteration.objetive || "N/A"}
+              </>
+            ) : (
+              "No hay iteración seleccionada"
+            )}
+          </Text>
+        )}
         <Outlet />
       </Container>
 
@@ -591,7 +777,7 @@ export function AIAgentSidebar() {
           "Fases",
           "Selecciona la iteración",
           "Sube tus documentos",
-          "Seleccionar elementos del sistema"
+          "Seleccionar elementos del sistema",
         ]}
       >
         <Accordion.Item value="Etapas">
@@ -633,199 +819,200 @@ export function AIAgentSidebar() {
             {selectedPhase?.name.includes(
               "Step 2: Establish Iteration Goal by Selecting Drivers"
             ) && (
-              <Accordion.Item value="Selecciona la iteración">
-                <Accordion.Trigger>
-                  Seleccionar iteración
-                  <Accordion.Icon />
-                </Accordion.Trigger>
-                <Accordion.Content>
-                  <SelectField
-                    label="Selecciona una iteración"
-                    size="small"
-                    value={selectedIteration ? selectedIteration.id : ""}
-                    onChange={(e) => {
-                      const selected = IterationsList.value
-                        ?.items()
-                        .find((iteration) => iteration.id === e.target.value);
-                      setSelectedIteration(selected || null);
-                    }}
-                  >
-                    <option value="">Selecciona una iteración</option>
-                    {IterationsList.value?.items().map((iteration) => (
-                      <option key={iteration.id} value={iteration.id}>
-                        {iteration.name}
-                      </option>
-                    ))}
-                  </SelectField>
-                  <TextField
-                    label="Nuevo objetivo de iteración"
-                    placeholder="Describe el objetivo"
-                    size="small"
-                    value={newIterationObjective}
-                    onChange={(e) => setNewIterationObjective(e.target.value)}
-                  />
+                <Accordion.Item value="Selecciona la iteración">
+                  <Accordion.Trigger>
+                    Seleccionar iteración
+                    <Accordion.Icon />
+                  </Accordion.Trigger>
+                  <Accordion.Content>
+                    <SelectField
+                      label="Selecciona una iteración"
+                      size="small"
+                      value={selectedIteration ? selectedIteration.id : ""}
+                      onChange={(e) => {
+                        const selected = IterationsList.value
+                          ?.items()
+                          .find((iteration) => iteration.id === e.target.value);
+                        setSelectedIteration(selected || null);
+                      }}
+                    >
+                      <option value="">Selecciona una iteración</option>
+                      {IterationsList.value?.items().map((iteration) => (
+                        <option key={iteration.id} value={iteration.id}>
+                          {iteration.name}
+                        </option>
+                      ))}
+                    </SelectField>
+                    <TextField
+                      label="Nuevo objetivo de iteración"
+                      placeholder="Describe el objetivo"
+                      size="small"
+                      value={newIterationObjective}
+                      onChange={(e) => setNewIterationObjective(e.target.value)}
+                    />
 
-                  <Flex direction="row" gap={10}>
-                    <Button onClick={handleAddIteration}>
-                      Agregar Iteración
-                    </Button>
-                    <Button
-                      onClick={handleDeleteIteration}
-                      disabled={!selectedIteration}
-                    >
-                      Borrar Iteración
-                    </Button>
-                    <Button
-                      onClick={handleUpdateIteration}
-                      disabled={!selectedIteration}
-                    >
-                      Actualizar Iteración
-                    </Button>
-                  </Flex>
-                </Accordion.Content>
-              </Accordion.Item>
-            )}
+                    <Flex direction="row" gap={10}>
+                      <Button onClick={handleAddIteration}>
+                        Agregar Iteración
+                      </Button>
+                      <Button
+                        onClick={handleDeleteIteration}
+                        disabled={!selectedIteration}
+                      >
+                        Borrar Iteración
+                      </Button>
+                      <Button
+                        onClick={handleUpdateIteration}
+                        disabled={!selectedIteration}
+                      >
+                        Actualizar Iteración
+                      </Button>
+                    </Flex>
+                  </Accordion.Content>
+                </Accordion.Item>
+              )}
           </>
         )}
         {selectedAgent?.name === "Diseño" && (
           <>
-            {selectedPhase?.name.includes("Step 3: Choose One or More Elements of the System to Refine") && (
-               <Accordion.Item value="Seleccionar elementos del sistema">
-               <Accordion.Trigger>
-                 Seleccionar elementos del sistema
-                 <Accordion.Icon />
-               </Accordion.Trigger>
-               <Accordion.Content>
-                 <TextField
-                   label="Nuevo nombre del elemento del sistema"
-                   placeholder="Nombre del elemento"
-                   size="small"
-                   value={newSystemElementName}
-                   onChange={(e) => setNewSystemElementName(e.target.value)}
-                 />
-                 <TextField
-                   label="Nueva descripción del elemento del sistema"
-                   placeholder="Descripción del elemento"
-                   size="small"
-                   value={newSystemElementDescription}
-                   onChange={(e) =>
-                     setNewSystemElementDescription(e.target.value)
-                   }
-                 />
-                 <Flex direction="row" gap={10}>
-                   <Button onClick={handleAddSystemElement}>
-                     Agregar Elemento del Sistema
-                   </Button>
-                   <Button
-                     onClick={handleUpdateIteration}
-                     disabled={!selectedIteration}
-                   >
-                     Actualizar Iteración
-                   </Button>
-                 </Flex>
- 
-                 <Flex direction="column" gap={10}>
-                   {newSystemElements.length > 0 && (
-                     <ul>
-                       <Text fontWeight="bold">
-                         Elementos del sistema nuevos:
-                       </Text>
-                       {newSystemElements.map((element, index) => (
-                         <li key={index}>
-                           <Text fontWeight="bold">{element.name}</Text>
-                           <Text>{element.description}</Text>
-                           <Button
-                             onClick={() =>
-                               handleDeleteSystemElement(index, false)
-                             }
-                           >
-                             Eliminar
-                           </Button>
-                         </li>
-                       ))}
-                     </ul>
-                   )}
- 
-                   {(selectedIteration?.systemElements?.length ?? 0) > 0 && (
-                     <ul>
-                       <Text fontWeight="bold">Elementos del sistema:</Text>
-                       {selectedIteration?.systemElements?.map(
-                         (element, index) => (
-                           <li key={index}>
-                             <Text fontWeight="bold">{element.name}</Text>
-                             <Text>{element.description}</Text>
-                             <Button
-                               onClick={() =>
-                                 handleDeleteSystemElement(index, true)
-                               }
-                             >
-                               Eliminar
-                             </Button>
-                           </li>
-                         )
-                       )}
-                     </ul>
-                   )}
- 
-                   {deletedSystemElements.length > 0 && (
-                     <ul>
-                       <Text fontWeight="bold">
-                         Elementos del sistema borrados:
-                       </Text>
-                       {deletedSystemElements.map((element, index) => (
-                         <li key={index}>
-                           <Text fontWeight="bold">{element.name}</Text>
-                           <Text>{element.description}</Text>
-                         </li>
-                       ))}
-                     </ul>
-                   )}
-                 </Flex>
-               </Accordion.Content>
-             </Accordion.Item>
-            )}
+            {selectedPhase?.name.includes(
+              "Step 3: Choose One or More Elements of the System to Refine"
+            ) && (
+                <Accordion.Item value="Seleccionar elementos del sistema">
+                  <Accordion.Trigger>
+                    Seleccionar elementos del sistema
+                    <Accordion.Icon />
+                  </Accordion.Trigger>
+                  <Accordion.Content>
+                    <TextField
+                      label="Nuevo nombre del elemento del sistema"
+                      placeholder="Nombre del elemento"
+                      size="small"
+                      value={newSystemElementName}
+                      onChange={(e) => setNewSystemElementName(e.target.value)}
+                    />
+                    <TextField
+                      label="Nueva descripción del elemento del sistema"
+                      placeholder="Descripción del elemento"
+                      size="small"
+                      value={newSystemElementDescription}
+                      onChange={(e) =>
+                        setNewSystemElementDescription(e.target.value)
+                      }
+                    />
+                    <Flex direction="row" gap={10}>
+                      <Button onClick={handleAddSystemElement}>
+                        Agregar Elemento del Sistema
+                      </Button>
+                      <Button
+                        onClick={handleUpdateIteration}
+                        disabled={!selectedIteration}
+                      >
+                        Actualizar Iteración
+                      </Button>
+                    </Flex>
 
-           
+                    <Flex direction="column" gap={10}>
+                      {newSystemElements.length > 0 && (
+                        <ul>
+                          <Text fontWeight="bold">
+                            Elementos del sistema nuevos:
+                          </Text>
+                          {newSystemElements.map((element, index) => (
+                            <li key={index}>
+                              <Text fontWeight="bold">{element.name}</Text>
+                              <Text>{element.description}</Text>
+                              <Button
+                                onClick={() =>
+                                  handleDeleteSystemElement(index, false)
+                                }
+                              >
+                                Eliminar
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {(selectedIteration?.systemElements?.length ?? 0) > 0 && (
+                        <ul>
+                          <Text fontWeight="bold">Elementos del sistema:</Text>
+                          {selectedIteration?.systemElements?.map(
+                            (element, index) => (
+                              <li key={index}>
+                                <Text fontWeight="bold">{element.name}</Text>
+                                <Text>{element.description}</Text>
+                                <Button
+                                  onClick={() =>
+                                    handleDeleteSystemElement(index, true)
+                                  }
+                                >
+                                  Eliminar
+                                </Button>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      )}
+
+                      {deletedSystemElements.length > 0 && (
+                        <ul>
+                          <Text fontWeight="bold">
+                            Elementos del sistema borrados:
+                          </Text>
+                          {deletedSystemElements.map((element, index) => (
+                            <li key={index}>
+                              <Text fontWeight="bold">{element.name}</Text>
+                              <Text>{element.description}</Text>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </Flex>
+                  </Accordion.Content>
+                </Accordion.Item>
+              )}
           </>
         )}
-
-        <Accordion.Item value="Fases">
-          <Accordion.Trigger>
-            Selecccionar Fase
-            <Accordion.Icon />
-          </Accordion.Trigger>
-          <Accordion.Content>
-            <Flex direction="column" gap={10}>
-              <SelectField
-                label="Selecciona una fase"
-                size="small"
-                value={selectedPhase ? selectedPhase.name : ""}
-                onChange={handlePhaseChange}
-              >
-                <option value="">Selecciona una fase</option>
-                {phases.map((phase) => (
-                  <option key={phase.name} value={phase.name}>
-                    {phase.name}
-                  </option>
-                ))}
-              </SelectField>
-              <Text fontSize="medium">Descripción de la fase:</Text>
-              <Markdown>
-                {showFullDescription
-                  ? selectedPhase?.description
-                  : `${selectedPhase?.description?.slice(0, 100)}...`}
-              </Markdown>
-              <Button
-                onClick={() => setShowFullDescription(!showFullDescription)}
-              >
-                {showFullDescription ? "Ver Menos" : "Ver Más"}
-              </Button>
-              <Button onClick={handleExecutePhase} variation="primary">
-                Ejecutar Fase
-              </Button>
-            </Flex>
-          </Accordion.Content>
-        </Accordion.Item>
+        {selectedAgent?.name !== "Exploración" && (
+          <Accordion.Item value="Fases">
+            <Accordion.Trigger>
+              Seleccionar Fase
+              <Accordion.Icon />
+            </Accordion.Trigger>
+            <Accordion.Content>
+              <Flex direction="column" gap={10}>
+                <SelectField
+                  label="Selecciona una fase"
+                  size="small"
+                  value={selectedPhase ? selectedPhase.name : ""}
+                  onChange={handlePhaseChange}
+                >
+                  <option value="">Selecciona una fase</option>
+                  {phases.map((phase) => (
+                    <option key={phase.name} value={phase.name}>
+                      {phase.name}
+                    </option>
+                  ))}
+                </SelectField>
+                <Text fontSize="medium">Descripción de la fase:</Text>
+                <Markdown>
+                  {showFullDescription
+                    ? selectedPhase?.description
+                    : `${selectedPhase?.description?.slice(0, 100)}...`}
+                </Markdown>
+                <Button
+                  onClick={() => setShowFullDescription(!showFullDescription)}
+                >
+                  {showFullDescription ? "Ver Menos" : "Ver Más"}
+                </Button>
+                <Button onClick={handleExecutePhase} variation="primary">
+                  Ejecutar Fase
+                </Button>
+              </Flex>
+            </Accordion.Content>
+          </Accordion.Item>
+        )}
 
         <Accordion.Item value="Parámetros del modelo">
           <Accordion.Trigger>
